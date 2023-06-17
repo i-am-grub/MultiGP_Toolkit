@@ -1,6 +1,6 @@
 # MultiGP interface for RotorHazard
 
-> WARNING: This plugin is still under development
+> WARNING: This plugin is still under inital development
 
 This is a plugin being developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
