@@ -1,234 +1,197 @@
 import logging
-import json
-import requests
 import RHUtils
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
+from plugins.multigp_interface.multigpAPI import multigpAPI
 
 logger = logging.getLogger(__name__)
 
-def initialize(**kwargs):
+multigp = multigpAPI()
 
-    if 'rhapi' in kwargs:
-        rhapi = kwargs['rhapi']
+class RHmanager():
 
-        ui = uiManager(rhapi)
-
-        multigp_id = UIField(name = 'multigp_id', label = 'MultiGP Pilot ID', field_type = UIFieldType.BASIC_INT)
-        rhapi.fields.register_pilot_attribute(multigp_id)
-
-        rhapi.ui.register_panel('multigp', 'MultiGP', 'format', order=0)
-
-        api_setting = UIField(name = 'apiKey', label = 'Chapter API Key', field_type = UIFieldType.TEXT)
-        rhapi.fields.register_option(api_setting, 'multigp')
-
-        rhapi.ui.register_quickbutton('multigp', 'submit_apikey', 'Verify Key', lambda: setup_chapter(rhapi, ui))
-
-        
-def setup_chapter(rhapi, uiManager):
-    multigp.set_apiKey(rhapi.db.option('apiKey'))
-    chapter_name = multigp.fetch_chapter()
-    if chapter_name:
-        rhapi.ui.message_notify(chapter_name + " successfully verified. Please refresh the page.")
-        uiManager.setup_ui()
-
-    else:
-        rhapi.ui.message_notify("Check API Key or Internet Connection")
-
-
-def import_pilots(rhapi):
-
-    selected_race = rhapi.db.option('race_select')
-
-    logger.info(selected_race)
-
-    multigp.fetch_race_data(selected_race)
-    
-    # Eventually implment a check to see if pilots are already in database
-    for pilot in multigp.get_pilots():
-
-        pilot_name = pilot['firstName'] + " " + pilot['lastName']
-        rhapi.db.pilot_add(name = pilot_name, callsign = pilot['userName'])
-
-        # Add in MultiGP PilotID
-        #rhapi.db.pilot_attribute_value(pilot_name, 'multigp_id', pilot['pilotId'])
-
-    rhapi.ui.message_notify("Pilots imported. Please refresh the page.")
-
-# Can't implemenmt until a solution for not searching by RH pilot id is known
-def push_results(rhapi):
-    pass
-
-# Makes sure each option can't be registered more than once.
-class uiManager():
-
-    rhapi = None
-    _races_set = False
+    _rhapi = None
+    _multigp_cred_set = False
+    _multigp_importer_set = False
+    _multigp_exporter_set = False
     _pilot_import_set = False
+    _races_set = False
+    _class_import_set = False
     _race_class_set = False
     _push_results_set = False
 
     def __init__(self, rhapi):
-        self.rhapi = rhapi
+        self._rhapi = rhapi
 
-    def setup_races(self):
+    def verify_creds(self, args):
+
+        if self._multigp_cred_set is False:
+
+            multigp.set_apiKey(self._rhapi.db.option('apiKey'))
+
+            multigp.pull_chapter()
+            chapter_name = multigp.get_chapterName()
+            if chapter_name:
+                self._rhapi.ui.message_notify("API key for " + chapter_name + " has been recognized")
+            else:
+                self._rhapi.ui.message_notify("API key can not be verified. Please check the entered key or your internet connection")
+                return
+            
+            errors = multigp.set_sessionID(self._rhapi.db.option('mgp_username'), self._rhapi.db.option('mgp_password'))
+            if errors:
+                for error in errors:
+                    self._rhapi.ui.message_notify(errors[error])
+                return
+            else: 
+                userName = multigp.get_userName()
+                self._rhapi.ui.message_notify(userName + " has been signed in for " + chapter_name + ". User will remained logged in until system reboot.")
+
+            self._multigp_cred_set = True
+
+            self.setup_import_menu()
+            self._rhapi.ui.register_quickbutton('multigp_cred', 'multigp_exporter', 'Setup MultiGP Export Menu', self.setup_export_menu)
+            self._rhapi.ui.message_notify("To ensure proper functionality, please setup the MultiGP Export Menu AFTER the event has been completed.")
+
+    #
+    # Setting up UI elements
+    #
+
+    def setup_import_menu(self):
+        if self._multigp_importer_set is False:
+            self._rhapi.ui.register_panel('multigp_import', 'Import from MultiGP', 'format', order=0)
+            self.setup_race_selector()
+            self.setup_import_buttons()
+            
+            self._multigp_importer_set = True
+
+            self._rhapi.ui.message_notify("MultiGP import tools are now located under the Format tab.")
+
+    def setup_export_menu(self, args):
+        if self._multigp_exporter_set is False:
+            self._rhapi.ui.register_panel('multigp_export', 'Export to MultiGP', 'format', order=1)
+            self._multigp_exporter_set = True
+
+    #
+    # Import Event
+    #
+
+    # Race selector
+    def setup_race_selector(self):
         if self._races_set is False:
-            multigp.fetch_races()
-
+            multigp.pull_races()
             race_list = []
-
             for race_label in multigp.get_races():
                 race = UIFieldSelectOption(value = race_label, label = race_label)
                 race_list.append(race)
 
             race_selector = UIField('race_select', 'Select Race', field_type = UIFieldType.SELECT, options = race_list)
-
-            self.rhapi.fields.register_option(race_selector, 'multigp')
-
+            self._rhapi.fields.register_option(race_selector, 'multigp_import')
             self._races_set = True
 
-    def setup_pilot_import(self):
+    def setup_import_buttons(self):
         if self._pilot_import_set is False:
-            self.rhapi.ui.register_quickbutton('multigp', 'import_pilots', 'Import Pilots', lambda: import_pilots(self.rhapi))
+            self._rhapi.ui.register_quickbutton('multigp_import', 'import_pilots', 'Import Pilots', self.import_pilots)
+            self._pilot_import_set = True
+        if self._class_import_set is False:
+            self._rhapi.ui.register_quickbutton('multigp_import', 'import_class', 'Import Race Class', self.import_class)
             self._pilot_import_set = True
 
-    def setup_race_class(self):
+    # Import pilots and set MultiGP PilotID
+    def import_pilots(self, args):
+        selected_race = self._rhapi.db.option('race_select')
+
+        self._rhapi.ui.message_notify("Starting pilot import for " + selected_race)
+
+        db_pilots = self._rhapi.db.pilots
+
+        multigp.pull_race_data(selected_race)
+        for mgp_pilot in multigp.get_pilots():
+
+            db_match = None
+            for db_pilot in db_pilots:
+                    if db_pilot.callsign == mgp_pilot['userName']:
+                        db_match = db_pilot
+                        break
+
+            mgp_pilot_name = mgp_pilot['firstName'] + " " + mgp_pilot['lastName']
+            if db_match:
+                db_pilot, _ = self._rhapi.db.pilot_alter(db_match.id, name = mgp_pilot_name)
+            else:
+                db_pilot = self._rhapi.db.pilot_add(name = mgp_pilot_name, callsign = mgp_pilot['userName'])
+
+            self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': mgp_pilot['pilotId']})
+
+        self._rhapi.ui.message_notify("Pilots imported. Please refresh the page.")
+
+    # Import Classes and events
+    def import_class(self, args):
+        selected_race = self._rhapi.db.option('race_select')
+
+        self._rhapi.ui.message_notify("Starting class setup for " + selected_race)
+
+        multigp.pull_race_data(selected_race)
+        schedule = multigp.get_schedule()
+
+        num_rounds = len(schedule['rounds'])
+
+        race_class = self._rhapi.db.raceclass_add(name='MultiGP Class', rounds=num_rounds)
+
+        for heat in schedule['rounds'][0]['heats']:
+            heat_data = self._rhapi.db.heat_add(name=heat['name'], raceclass= race_class)
+
+            # TODO: Populate pilots to each heat on correct frequency
+
+    #
+    # Export Results
+    #
+
+    # Select class for bracketed results
+    def results_class_selector(self, args):
 
         if self._race_class_set is False:
-                
             class_list = []
-
-            for race_class in self.rhapi.db.raceclasses():
+            for race_class in self._rhapi.db.raceclasses():
                 classs = UIFieldSelectOption(value = race_class, label = race_class)
                 class_list.append(classs)
 
         class_selector = UIField('class_select', 'Select Class with Final Results', field_type = UIFieldType.SELECT, options = class_list)
-
-        self.rhapi.fields.register_option(class_selector, 'multigp')
-
+        self._rhapi.fields.register_option(class_selector, 'multigp_export')
         self._race_class_set = True
-    
-    def setup_push_results(self):
-        if self._push_results_set is False:
-            self.rhapi.ui.register_quickbutton('multigp', 'push_results', 'Push Results', lambda: push_results(self.rhapi))
-            self._push_results_set = True
 
-    def setup_ui(self):
-        self.setup_races()
-        self.setup_pilot_import()
-        self.setup_race_class()
-        #self.setup_push_results()
+    # Slot & Score, Bracket Results, or Global Qualifier
+    def push_type_selector(self):
+        # TODO
+        pass
 
-# MultiGP Handler
-class multigpAPI():
+    # Manual results push
+    def push_results(self):
+        # TODO
+        pass
 
-    _apiKey = None
-    _chapterId = None
-    _chapterName = None
-    _avaliable_events = []
-    _events_keys = {}
-    _event_name = None
-    _event_description = None
-    _event_pilots = []
-
-    def set_apiKey(self, apiKey):
-        self._apiKey = apiKey
-
-    def _request_and_download(self, url, json_request):
-        header = {'Content-type': 'application/json'}
-        response = requests.post(url, headers=header, data=json_request, timeout=1.5)
-
-        try:
-            returned_json = json.loads(response.text)
-        except:
-            returned_json = {'status' : False}
-        finally:
-            return returned_json
-
-    def fetch_chapter(self):
-        url = 'https://www.multigp.com/mgp/multigpwebservice/chapter/findChapterFromApiKey'
-        data = {
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
-
-        if returned_json['status']:
-            self._chapterId = returned_json['chapterId']
-            self._chapterName = returned_json['chapterName']
-            logger.info(self._chapterName)
-            return self._chapterName
-        
-        else:
-            logger.info("Check API Key or Internet Connection")
-            return None
+    # Finalize race results
+    def finalize_results(self):
+        # TODO
+        pass
 
 
-    def fetch_races(self):
+def initialize(rhapi):
 
-        url = 'https://www.multigp.com/mgp/multigpwebservice/race/listForChapter?chapterId=' + self._chapterId
-        data = {
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
+    RH = RHmanager(rhapi)
 
-        if returned_json['status']:
+    multigp_id = UIField(name = 'multigp_id', label = 'MultiGP Pilot ID', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_pilot_attribute(multigp_id)
 
-            self._avaliable_events = []
-            self._events_keys = {}
+    rhapi.ui.register_panel('multigp_cred', 'MultiGP Credentials', 'settings', order=0)
 
-            for race in returned_json['data']:
-                self._avaliable_events.append(race['name'])
-                self._events_keys[race['name']] = race['id']
+    apikey_field = UIField(name = 'apiKey', label = 'Chapter API Key', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_option(apikey_field, 'multigp_cred')
 
-            return returned_json['data']
-        
-        else:
-            logger.info("Check API Key or Internet Connection")
-            return None
-        
-    def get_races(self):
-        return self._avaliable_events
-    
-    def fetch_race_data(self, selected_race:str):
+    username_field = UIField(name = 'mgp_username', label = 'MultiGP Username', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_option(username_field, 'multigp_cred')
 
-        url = 'https://www.multigp.com/mgp/multigpwebservice/race/viewSimple?id=' + self._events_keys[selected_race]
-        data = {
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
+    password_field = UIField(name = 'mgp_password', label = 'MultiGP Password', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_option(password_field, 'multigp_cred')
 
-        if returned_json['status']:
-            self._event_name = returned_json['data']['name']
-            self._event_description = returned_json['data']['description']
-            self._event_pilots = returned_json['data']['entries']
-            return returned_json['data']
-        
-        else:
-            logger.info("Check API Key or Internet Connection")
-            return None
-    
-    def get_pilots(self):
-        return self._event_pilots
+    rhapi.ui.register_quickbutton('multigp_cred', 'submit_apikey', 'Verify Credentials', RH.verify_creds)
 
-    def push_final_results(self, selected_race:str, rankings):
-
-        url = 'https://www.multigp.com/mgp/multigpwebservice/race/captureOverallRaceResult?id=' + self._events_keys[selected_race]
-        data = {
-            'data' : {
-                'raceId' : self._events_keys[selected_race],
-                'bracketResults' : rankings,
-            },
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
-
-        if returned_json['status']:
-            logger.info(returned_json['statusDescription'])
-        else:
-            logger.info("Check API Key or Internet Connection")
-            return None
-
-multigp = multigpAPI()
+    # TODO: sytem events
+    # multigp.start_heat() on heat change
