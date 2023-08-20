@@ -51,6 +51,8 @@ class multigpAPI():
             self._chapterName = returned_json['chapterName']
             logger.info(self._chapterName)
 
+        return returned_json['status']
+
     def get_chapterName(self):
         return self._chapterName
 
@@ -94,6 +96,8 @@ class multigpAPI():
             for race in returned_json['data']:
                 self._avaliable_events.append(race['name'])
                 self._events_keys[race['name']] = race['id']
+
+        return returned_json['status']
         
     def get_races(self):
         return self._avaliable_events
@@ -112,6 +116,8 @@ class multigpAPI():
             self._event_description = returned_json['data']['description']
             self._event_pilots = returned_json['data']['entries']
             self._schedule = returned_json['data']['schedule']
+
+        return returned_json['status']
     
     def get_pilots(self):
         return self._event_pilots
@@ -152,8 +158,8 @@ class multigpAPI():
         return returned_json['status']
 
     # Capture pilots times and scores
-    def push_slot_and_score(self, selected_race:str, round:int, heat:int, slot:int, pilotID:int, 
-                            pilot_score:int, totalLaps:int, totalTime:float, fastestLapTime:float, fastest3ConsecutiveLapsTime:float):
+    def push_slot_and_score(self, selected_race:str, round:int, heat:int, slot:int, pilotID:int, pilot_score:int,
+                            totalLaps:int, totalTime:float, fastestLapTime:float, fastestConsecutiveLapsTime:float, consecutives_base:int):
 
         url = 'https://www.multigp.com/mgp/multigpwebservice/race/assignslot/id/' + self._events_keys[selected_race] + '/cycle/' + str(round) + '/heat/' + str(heat) + '/slot/' + str(slot)
         data = {
@@ -163,11 +169,15 @@ class multigpAPI():
                 'totalLaps' : totalLaps,
                 'totalTime' : totalTime,
                 'fastestLapTime' : fastestLapTime,
-                'fastest3ConsecutiveLapsTime'  : fastest3ConsecutiveLapsTime
             },
             'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
+        if consecutives_base == 3:
+            data['data']['fastest3ConsecutiveLapsTime'] = fastestConsecutiveLapsTime
+        elif consecutives_base == 2:
+            data['data']['fastest2ConsecutiveLapsTime'] = fastestConsecutiveLapsTime
+
         json_request = json.dumps(data)
         returned_json = self._request_and_download(url, json_request)
 

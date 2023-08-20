@@ -25,6 +25,3 @@ def initialize(rhapi):
     rhapi.fields.register_option(password_field, 'multigp_cred')
 
     rhapi.ui.register_quickbutton('multigp_cred', 'submit_apikey', 'Verify Credentials', RH.verify_creds)
-
-    # TODO: sytem events
-    # multigp.start_heat() on heat change
