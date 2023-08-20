@@ -1,8 +1,7 @@
 import logging
 import RHUtils
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
-
-from plugins.multigp_interface.RHmanager import RHmanager
+from plugins.MultiGP_Toolkit.RHmanager import RHmanager
 
 logger = logging.getLogger(__name__)
 
