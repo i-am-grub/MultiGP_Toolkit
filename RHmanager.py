@@ -2,7 +2,7 @@ import logging
 import RHUtils
 from eventmanager import Evt
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
-from plugins.multigp_interface.multigpAPI import multigpAPI
+from plugins.MultiGP_Toolkit.RHmanager import RHmanager
 
 logger = logging.getLogger(__name__)
 
