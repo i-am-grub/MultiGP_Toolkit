@@ -18,11 +18,14 @@ class multigpAPI():
     _event_name = None
     _event_description = None
     _event_pilots = []
+    _scoringFormat = None
     _schedule = {}
+    _zippyqIterator = None
+    _round_data = {}
 
     def _request_and_download(self, url, json_request):
         header = {'Content-type': 'application/json'}
-        response = requests.post(url, headers=header, data=json_request, timeout=3)
+        response = requests.post(url, headers=header, data=json_request, timeout=5)
 
         try:
             returned_json = json.loads(response.text)
@@ -111,13 +114,25 @@ class multigpAPI():
         json_request = json.dumps(data)
         returned_json = self._request_and_download(url, json_request)
 
+        with open('race_info.json', 'w') as f:
+            son = json.dumps(returned_json['data'], indent = 4)
+            f.write(son)
+
         if returned_json['status']:
             self._event_name = returned_json['data']['name']
             self._event_description = returned_json['data']['description']
+            self._scoringFormat = returned_json['data']['scoringFormat']
             self._event_pilots = returned_json['data']['entries']
             self._schedule = returned_json['data']['schedule']
+            self._zippyqIterator = returned_json['data']['zippyqIterator']
 
         return returned_json['status']
+    
+    def get_scoringformat(self):
+        return self._scoringFormat
+    
+    def get_zippyqIterator(self):
+        return self._zippyqIterator
     
     def get_pilots(self):
         return self._event_pilots
@@ -127,14 +142,21 @@ class multigpAPI():
     
     # Not fully implemented (for ZippyQ)
     def pull_additional_rounds(self, selected_race:str, round:int):
-        url = 'https://www.multigp.com/mgp/multigpwebservice/race/getAdditionalRounds?id=' + self._events_keys[selected_race] + '&startFromPage=' + str(round)
+        url = 'https://www.multigp.com/mgp/multigpwebservice/race/getAdditionalRounds?id=' + self._events_keys[selected_race] + '&startFromRound=' + str(round)
         data = {
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
         returned_json = self._request_and_download(url, json_request)
 
+        if returned_json['status']:
+            self._round_data = returned_json['data']
+
         return returned_json['status']
+    
+    def get_round(self):
+        return self._round_data
+
 
     #
     # Data to MultiGP

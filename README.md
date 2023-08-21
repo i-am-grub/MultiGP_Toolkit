@@ -6,12 +6,14 @@ This is a plugin being developed for the RotorHazard timing system. It allows fo
 
 ## Requirements
 
-Version 4.0.0.beta.4 or later is required due to the introduction of the RotorHazard API.
+Version requires the development branch of RotorHazard due to the introduction of the RHAPI and some current quirks.
 
-You will need your MultiGP Chapter's API key.
+You will need your MultiGP Chapter's API key and your login credentials.
 
 ## Installation
 
 To install, clone or copy this repository's folder into RotorHazard's plugin directory ```/src/server/plugins```, and (re)start the server.
 
 The plugin should be visable under the Settings tab. 
+
+## Documentation comming soon
