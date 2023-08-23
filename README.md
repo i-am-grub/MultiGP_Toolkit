@@ -1,7 +1,5 @@
 # MultiGP interface for RotorHazard
 
-[[_TOC_]]
-
 > WARNING: This plugin is still under inital development and will only be compatiable with the RotorHazard v4.0 (non-beta) release
 
 This is a plugin being developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
@@ -21,7 +19,7 @@ This is a plugin being developed for the RotorHazard timing system. It allows fo
 
 The plugin's functionality is split between the Settings and Format tabs in the RotorHazard UI.
 
-### Settings
+### Settings - MultiGP Credentials
 
 ![Credentials](docs/settings.png)
 
@@ -38,6 +36,8 @@ User's MultiGP Password
 
 #### Verify Credentials (Button)
 Button to check the entered credentials. Once signed in, the button will still be visable, but will become unusable. To sign the user out of the system, reboot the system
+
+### Format - MultiGP Tools
 
 ![MultiGP Tools](docs/format.png)
 
