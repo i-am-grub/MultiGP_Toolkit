@@ -20,7 +20,7 @@ def initialize(rhapi):
     username_field = UIField(name = 'mgp_username', label = 'MultiGP Username', field_type = UIFieldType.TEXT)
     rhapi.fields.register_option(username_field, 'multigp_cred')
 
-    password_field = UIField(name = 'mgp_password', label = 'MultiGP Password', field_type = UIFieldType.TEXT)
+    password_field = UIField(name = 'mgp_password', label = 'MultiGP Password', field_type = UIFieldType.PASSWORD)
     rhapi.fields.register_option(password_field, 'multigp_cred')
 
     rhapi.ui.register_quickbutton('multigp_cred', 'submit_apikey', 'Verify Credentials', RH.verify_creds)

@@ -15,9 +15,9 @@ class multigpAPI():
     _chapterName = None
     _avaliable_events = []
     _events_keys = {}
-    _event_name = None
-    _event_description = None
-    _event_pilots = []
+    _race_name = None
+    _race_description = None
+    _race_pilots = []
     _scoringFormat = None
     _schedule = {}
     _zippyqIterator = None
@@ -114,15 +114,11 @@ class multigpAPI():
         json_request = json.dumps(data)
         returned_json = self._request_and_download(url, json_request)
 
-        with open('race_info.json', 'w') as f:
-            son = json.dumps(returned_json['data'], indent = 4)
-            f.write(son)
-
         if returned_json['status']:
-            self._event_name = returned_json['data']['name']
-            self._event_description = returned_json['data']['description']
+            self._race_name = returned_json['data']['name']
+            self._race_description = returned_json['data']['description']
             self._scoringFormat = returned_json['data']['scoringFormat']
-            self._event_pilots = returned_json['data']['entries']
+            self._race_pilots = returned_json['data']['entries']
             self._schedule = returned_json['data']['schedule']
             self._zippyqIterator = returned_json['data']['zippyqIterator']
 
@@ -135,12 +131,11 @@ class multigpAPI():
         return self._zippyqIterator
     
     def get_pilots(self):
-        return self._event_pilots
+        return self._race_pilots
     
     def get_schedule(self):
         return self._schedule
-    
-    # Not fully implemented (for ZippyQ)
+
     def pull_additional_rounds(self, selected_race:str, round:int):
         url = 'https://www.multigp.com/mgp/multigpwebservice/race/getAdditionalRounds?id=' + self._events_keys[selected_race] + '&startFromRound=' + str(round)
         data = {
@@ -156,7 +151,6 @@ class multigpAPI():
     
     def get_round(self):
         return self._round_data
-
 
     #
     # Data to MultiGP
