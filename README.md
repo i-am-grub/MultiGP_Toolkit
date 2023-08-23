@@ -1,6 +1,6 @@
 # MultiGP interface for RotorHazard
 
-[TOC]
+[[_TOC_]]
 
 > WARNING: This plugin is still under inital development and will only be compatiable with the RotorHazard v4.0 (non-beta) release
 
@@ -23,7 +23,7 @@ The plugin's functionality is split between the Settings and Format tabs in the 
 
 ### Settings
 
-[Credentials](docs/settings.png)
+![Credentials](docs/settings.png)
 
 This screen is used to authenticate the RotorHarzard system to MultiGP. Each time the system is restartedm the user must sign in again to activate the plugin's toolkit
 
@@ -39,7 +39,7 @@ User's MultiGP Password
 #### Verify Credentials (Button)
 Button to check the entered credentials. Once signed in, the button will still be visable, but will become unusable. To sign the user out of the system, reboot the system
 
-[MultiGP Tools](docs/format.png)
+![MultiGP Tools](docs/format.png)
 
 #### MultiGP Race (Selector)
 Used to select which race the system will interact with on MultiGP's side
