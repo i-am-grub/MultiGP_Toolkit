@@ -12,7 +12,7 @@ This is a plugin being developed for the RotorHazard timing system. It allows fo
 ## Installation
 
 1. To install, clone or copy this repository's folder into RotorHazard's plugin directory ```/src/server/plugins```, and (re)start the server.
-    - If downloading the zip file directly from GitHub, make sure to rename the plugin's folder to ```MultiGP_Toolkit``` otherwise the plugin will not import
+    - If downloading the zip file directly from GitHub, make sure to rename the plugin's folder to ```MultiGP_Toolkit``` otherwise the plugin will fail to be imported
 2. The plugin should be visable under the Settings tab after rebooting. 
 
 ## User Guide
@@ -26,7 +26,7 @@ The plugin's functionality is split between the Settings and Format tabs in the 
 This screen is used to authenticate the RotorHarzard system to MultiGP. Each time the system is restartedm the user must sign in again to activate the plugin's toolkit
 
 #### Chapter API Key (Text)
-The API key for your chapter. Chapter admins should have access to this key by going to their chapter's home page and going to Manage >> Timing system key >> Copy to Clipboard
+The API key for your chapter. Chapter admins should have access to this key by going to their chapter's home page and going to ```Manage >> Timing system key >> Copy to Clipboard```
 
 #### MultiGP Username (Text)
 User's MultiGP Username
@@ -55,7 +55,7 @@ Once the race is saved (or a race is marshaled), push the results to MultiGP
 - **IMPORTANT**: Any heat name containing the word "Round" will have it's results pushed to MultiGP with the MultiGP round number set to RH raceclass heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
 #### Automatically pull ZippyQ rounds (Checkbox)
-Once the race is saved, pull the next ZippyQ round from MultiGP and import it into the same race class that was completed
+Once the race is saved, pull the next ZippyQ round from MultiGP and import it into the same race class that the completed race was a child of.
 - Sets the name of each heat to 'Round X'. You can delete heats as needed, but DO NOT change the names of these heats
 - This setting is not influenced by the ```Selectors```
 
@@ -66,12 +66,14 @@ Set the round number ZippyQ will use when manually using ```Import ZippyQ Round`
 Refresh the options in the ```MultiGP Race``` selector
 
 #### Import Pilots (Button)
-Import Pilots from selected ```MultiGP Race```. This import includes the pilot's MultiGP pilot id. The id is mandatory for pushing results
+Import Pilots from selected ```MultiGP Race```
+- This import includes the pilot's MultiGP pilot id. The MultiGP pilot id is mandatory for pushing results
 
 #### Import Race (Button)
 Import the selected ```MultiGP Race```
 - If the race is detected to be a non-ZippyQ race, the heats and pilot's slot order will also be set up
-- When pilots are added to their heats, they are assigned by MultiGP's slot number, NOT their frequency
+- When pilots are added to their heats, they are assigned to their race slot by MultiGP's slot number, NOT their frequency.
+    - You can set the MultiGP Frequency Profile by going to your event on the MultiGP website and head to ```Manage >> Manage Race >> Frequency Profile```. This should be configured before importing a race.
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
 
 #### Import ZippyQ Round (Button)
