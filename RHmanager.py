@@ -83,7 +83,7 @@ class RHmanager():
         zippyq_round = UIField('zippyq_round', zippyq_round_text, field_type = UIFieldType.BASIC_INT, value = 1)
         self._rhapi.fields.register_option(zippyq_round, 'multigp_tools')
 
-        self._rhapi.ui.register_quickbutton('multigp_tools', 'zippyq_import', 'Import ZippyQ round', self.manual_zippyq)
+        self._rhapi.ui.register_quickbutton('multigp_tools', 'zippyq_import', 'Import ZippyQ Round', self.manual_zippyq)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_results', 'Push Class Results', self.push_results)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_bracket', 'Push Class Rankings', self.push_bracketed_rankings)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_global', 'Push Global Qualifer Results', self.push_global_qualifer)
@@ -99,6 +99,8 @@ class RHmanager():
 
         race_selector = UIField('race_select', 'MultiGP Race', field_type = UIFieldType.SELECT, options = race_list)
         self._rhapi.fields.register_option(race_selector, 'multigp_tools')
+
+        self._rhapi.ui.broadcast_ui('format')
 
     # Import pilots and set MultiGP PilotID
     def import_pilots(self, args):
@@ -140,12 +142,13 @@ class RHmanager():
         self.multigp.pull_race_data(selected_race)
         schedule = self.multigp.get_schedule()
 
-        if self.multigp.get_zippyqIterator() == "0":
+        info = """Note: Do not change the name of this class if you are using any automatic tools. This description can be changed/deleted.\n
+        If using ZippyQ, please make sure the name of each heat in the ZippyQ class at least contains the word 'Round' in order to push results correctly."""
+        translated_info = self._rhapi.language.__(info)
+
+        if self.multigp.get_disableSlotAutoPopulation() == "0":
             num_rounds = len(schedule['rounds'])
             heat_advance_type = 1
-
-            info = "Note: Do not change the name of this class if you are using any automatic tools. This description can be changed/deleted."
-            translated_info = self._rhapi.language.__(info)
 
             race_class = self._rhapi.db.raceclass_add(name=selected_race, description=translated_info, rounds=num_rounds, heat_advance_type=heat_advance_type)
             db_pilots = self._rhapi.db.pilots
@@ -177,10 +180,11 @@ class RHmanager():
         else:
             num_rounds = 1
             heat_advance_type = 0
-            race_class = self._rhapi.db.raceclass_add(name=selected_race, rounds=num_rounds, heat_advance_type=heat_advance_type)
+            race_class = self._rhapi.db.raceclass_add(name=selected_race, description=translated_info, rounds=num_rounds, heat_advance_type=heat_advance_type)
 
         self._rhapi.ui.broadcast_raceclasses()
         self._rhapi.ui.broadcast_pilots()
+        self._rhapi.ui.broadcast_ui('format')
         message = "Race class imported."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
@@ -194,6 +198,8 @@ class RHmanager():
         
         class_selector = UIField('class_select', 'RotorHazard Class', field_type = UIFieldType.SELECT, options = class_list)
         self._rhapi.fields.register_option(class_selector, 'multigp_tools')
+
+        self._rhapi.ui.broadcast_ui('format')
 
     # Configure ZippyQ round
     def zippyq(self, raceclass_id, selected_race, heat_num):
@@ -264,6 +270,7 @@ class RHmanager():
 
     # Slot and Score
     def slot_score(self, race_info, selected_race):
+        race_name = self._rhapi.db.heat_by_id(race_info.heat_id).name
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
         for result in results:
             slot = result["node"] + 1
@@ -275,7 +282,7 @@ class RHmanager():
             fastestConsecutiveLapsTime = result["consecutives_raw"] * .001
             consecutives_base = result["consecutives_base"]
 
-            if "Round" in race_info.name:
+            if "Round" in race_name:
                 round = race_info.heat_id
                 heat = 1
             else:
@@ -287,8 +294,8 @@ class RHmanager():
                 message = "Results push to MultiGP FAILED. Check the timer's internet connection."
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                 return False
-            else:
-                return True
+            
+        return True
 
     # Automatially push results of heat
     def auto_slot_score(self, args):

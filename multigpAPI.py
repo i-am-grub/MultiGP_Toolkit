@@ -20,7 +20,7 @@ class multigpAPI():
     _race_pilots = []
     _scoringFormat = None
     _schedule = {}
-    _zippyqIterator = None
+    _disableSlotAutoPopulation = None
     _round_data = {}
 
     def _request_and_download(self, url, json_request):
@@ -120,15 +120,15 @@ class multigpAPI():
             self._scoringFormat = returned_json['data']['scoringFormat']
             self._race_pilots = returned_json['data']['entries']
             self._schedule = returned_json['data']['schedule']
-            self._zippyqIterator = returned_json['data']['zippyqIterator']
+            self._disableSlotAutoPopulation = returned_json['data']['disableSlotAutoPopulation']
 
         return returned_json['status']
     
     def get_scoringformat(self):
         return self._scoringFormat
     
-    def get_zippyqIterator(self):
-        return self._zippyqIterator
+    def get_disableSlotAutoPopulation(self):
+        return self._disableSlotAutoPopulation
     
     def get_pilots(self):
         return self._race_pilots
