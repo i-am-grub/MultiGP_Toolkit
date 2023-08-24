@@ -42,15 +42,16 @@ Button to check the entered credentials. Once signed in, the button will still b
 ![MultiGP Tools](docs/format.png)
 
 #### MultiGP Race (Selector)
-Used to select which race the system will interact with on MultiGP's side
+Used to select which race the system will interact with on **MultiGP**'s side
 - MultiGP has a uncontrollable timeframe for which races are avaliable and which ones are not. Races will typically stop appearing when the day of their scheduled event is about 2 months in the past.
 
 #### RotorHazard Class (Selector)
-Used to select which race the system will interact with on RotorHazard's side
+Used to select which race the system will interact with on **RotorHazard**'s side
 
 #### Automatically push heat results (Checkbox)
 Once the race is saved (or a race is marshaled), push the results to MultiGP
 - Requires the name of the race's class to be exactly the same as the name of the race on MultiGP's side
+- If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 - This setting is not influenced by the ```Selectors```
 - **IMPORTANT**: Any heat name containing the word "Round" will have it's results pushed to MultiGP with the MultiGP round number set to RH raceclass heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
@@ -58,6 +59,7 @@ Once the race is saved (or a race is marshaled), push the results to MultiGP
 Once the race is saved, pull the next ZippyQ round from MultiGP and import it into the same race class that the completed race was a child of.
 - Sets the name of each heat to 'Round X'. You can delete heats as needed, but DO NOT change the names of these heats
 - This setting is not influenced by the ```Selectors```
+- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
 
 #### ZippyQ round number (Integer)
 Set the round number ZippyQ will use when manually using ```Import ZippyQ Round```
@@ -71,13 +73,14 @@ Import Pilots from selected ```MultiGP Race```
 
 #### Import Race (Button)
 Import the selected ```MultiGP Race```
-- If the race is detected to be a non-ZippyQ race, the heats and pilot's slot order will also be set up
+- If the race is detected to be a non-ZippyQ race, the round number, heats and pilot slot order will also be set up
 - When pilots are added to their heats, they are assigned to their race slot by MultiGP's slot number, NOT their frequency.
     - You can set the MultiGP Frequency Profile by going to your event on the MultiGP website and head to ```Manage >> Manage Race >> Frequency Profile```. This should be configured before importing a race.
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
 
 #### Import ZippyQ Round (Button)
 Imports the entered ```ZippyQ round number``` from the selected ```MultiGP Race``` into the selected ```RotorHazard Class```
+- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
 
 #### Push Class Results (Button)
 Pushes the results in the selected ```RotorHazard Class``` to the selected ```MultiGP Race```
@@ -87,6 +90,7 @@ Pushes the results in the selected ```RotorHazard Class``` to the selected ```Mu
 #### Push Class Rankings (Button)
 Pushes the rankings in the selected ```RotorHazard Class``` to the selected ```MultiGP Race```.
 - You can push timer results to MultiGP, but still use the Class rankings to override the final race rankings on MultiGP's side
+- As stated by the MultiGP API documentation, could be used for final results from brackets.
 
 #### Coming Soon: Push Global Qualifer Results (Button) 
 Pushes the results in the selected ```RotorHazard Class``` to the selected ```MultiGP Race``` in the Global Qualifer format
