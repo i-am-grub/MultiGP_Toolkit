@@ -1,4 +1,4 @@
-# MultiGP interface for RotorHazard
+# MultiGP Toolkit for RotorHazard
 
 > WARNING: This plugin is currently only compatiable with the RotorHazard v4.0 (non-beta) release and the ```main``` branch of [RotorHazard](https://github.com/RotorHazard/RotorHazard)
 
