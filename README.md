@@ -1,6 +1,6 @@
 # MultiGP Toolkit for RotorHazard
 
-> WARNING: This plugin is currently only compatiable with the RotorHazard v4.0 (non-beta) release and the ```main``` branch of [RotorHazard](https://github.com/RotorHazard/RotorHazard)
+> WARNING: This plugin is currently only fully compatiable with the `main` branch of [RotorHazard](https://github.com/RotorHazard/RotorHazard)
 
 This is a plugin being developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
@@ -11,9 +11,12 @@ This is a plugin being developed for the RotorHazard timing system. It allows fo
 
 ## Installation
 
-1. To install, clone or copy this repository's folder into RotorHazard's plugin directory ```/src/server/plugins```, and (re)start the server.
-    - If downloading the zip file directly from GitHub, make sure to rename the plugin's folder to ```MultiGP_Toolkit``` otherwise the plugin will fail to be imported
+1. To install, clone or copy this repository's folder into RotorHazard's plugin directory `/src/server/plugins`, and (re)start the server.
+    - If installation is successful, the RotorHazard log will contain the message `Loaded plugin module MultiGP_Toolkit` at startup.
+    - If downloading the zip file directly from GitHub, make sure to rename the plugin's folder to `MultiGP_Toolkit` otherwise the plugin will fail to be imported
 2. The plugin should be visable under the Settings tab after rebooting. 
+
+---
 
 ## User Guide
 
@@ -23,78 +26,113 @@ The plugin's functionality is split between the Settings and Format tabs in the 
 
 ![Credentials](docs/settings.png)
 
-This screen is used to authenticate the RotorHarzard system to MultiGP. Each time the system is restartedm the user must sign in again to activate the plugin's toolkit
+This screen is used to authenticate the RotorHarzard system to MultiGP. Each time the system is restarted, the user must sign in again to activate the plugin's toolkit
 
 #### Chapter API Key (Text)
-The API key for your chapter. Chapter admins should have access to this key by going to their chapter's home page and going to ```Manage >> Timing system key >> Copy to Clipboard```
+
+The API key for your chapter. Chapter admins should have access to this key by going to their chapter's home page and going to `Manage >> Timing system key >> Copy to Clipboard`
 
 #### MultiGP Username (Text)
+
 User's MultiGP Username
 
 #### MultiGP Password (Text)
+
 User's MultiGP Password
 
 #### Verify Credentials (Button)
-Button to check the entered credentials. Once signed in, the button will still be visable, but will become unusable. To sign the user out of the system, reboot the system
+
+Used to check the entered credentials. If the credentials are valid, the user will be signed in and the toolkit will be activated.
+- To sign the user out of the system, reboot the system
+- Once signed in, the button will still be visable, but will become unusable.
 
 ### Format - MultiGP Tools
 
 ![MultiGP Tools](docs/format.png)
 
+> Note: The terminology for a ***MultiGP Race*** is equivalent to a ***RotorHazard Class***
+
 #### MultiGP Race (Selector)
-Used to select which race the system will interact with on **MultiGP**'s side
-- MultiGP has a uncontrollable timeframe for which races are avaliable and which ones are not. Races will typically stop appearing when the day of their scheduled event is about 2 months in the past.
+
+Used to select which race the system will interact with on ***MultiGP***'s side
+- Races will typically stop appearing when the day of their scheduled event is about 2 months in the past. This characteristic is determined by MultiGP and not the plugin.
 
 #### RotorHazard Class (Selector)
-Used to select which race the system will interact with on **RotorHazard**'s side
 
-#### Automatically push heat results (Checkbox)
-Once the race is saved (or a race is marshaled), push the results to MultiGP
+Used to select which class the system will interact with on ***RotorHazard***'s side
+
+#### Automatically push race results (Checkbox)
+
+Once the race is saved (or a race is marshaled), automatically push the results to MultiGP
 - Requires the name of the race's class to be exactly the same as the name of the race on MultiGP's side
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
-- This setting is not influenced by the ```Selectors```
-- **IMPORTANT**: Any heat name containing the word "Round" will have it's results pushed to MultiGP with the MultiGP round number set to RH raceclass heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
+- This setting is **NOT** influenced by the `MultiGP Race` or `RotorHazard Class` selectors
+- **IMPORTANT**: Any race class with the `Rounds` field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
 #### Automatically pull ZippyQ rounds (Checkbox)
-Once the race is saved, pull the next ZippyQ round from MultiGP and import it into the same race class that the completed race was a child of.
-- Sets the name of each heat to 'Round X'. You can delete heats as needed, but DO NOT change the names of these heats
-- This setting is not influenced by the ```Selectors```
+
+Once the race is saved, automatically pull the next ZippyQ round from MultiGP and import it into the same ***RotorHazard Class*** of the completed race
+- When using this feature make sure the following class settings are properly set:
+    - `Rounds`: Should be set to 0 or 1 (See notes under `Automatically push heat results` or `Push Class Results`)
+    - `Advance Heat`: Should be set to`Never`
+        - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
+- This setting is **NOT** influenced by the `MultiGP Race` or `RotorHazard Class` selectors
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+    - This import includes the pilot's MultiGP pilot id. The MultiGP pilot id is mandatory for pushing results
+    - When pilots are added to their heats, they are assigned to their race slot by using the ***MultiGP Race***'s slot number, NOT their frequency.
+        - You can change the ***MultiGP Race***'s slot configuration by navigating to `Manage >> Manage Race >> Frequency Profile` on the MultiGP event's page. This should be configured before importing a ***MultiGP Race***.
 
 #### ZippyQ round number (Integer)
-Set the round number ZippyQ will use when manually using ```Import ZippyQ Round```
+
+Set the round number ZippyQ will use when manually using `Import ZippyQ Round`
+- When using this feature make sure the following class settings are properly set:
+    - `Rounds`: Should be set to 0 or 1 (See notes under `Automatically push heat results` or `Push Class Results`)
+    - `Advance Heat`: Should be set to`Never`
+        - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
 
 #### Refresh MultiGP Races (Button)
-Refresh the options in the ```MultiGP Race``` selector
+
+Refresh the options in the `MultiGP Race` selector
 
 #### Import Pilots (Button)
-Import Pilots from selected ```MultiGP Race```
-- This import includes the pilot's MultiGP pilot id. The MultiGP pilot id is mandatory for pushing results
+
+Import pilots from selected `MultiGP Race`
+- This import includes the pilot's `MultiGP Pilot ID`. The `MultiGP Pilot ID` is mandatory for pushing results
 
 #### Import Race (Button)
-Import the selected ```MultiGP Race```
+
+Import the selected `MultiGP Race`
 - If the race is detected to be a non-ZippyQ race, the round number, heats and pilot slot order will also be set up
 - When pilots are added to their heats, they are assigned to their race slot by MultiGP's slot number, NOT their frequency.
-    - You can set the MultiGP Frequency Profile by going to your event on the MultiGP website and head to ```Manage >> Manage Race >> Frequency Profile```. This should be configured before importing a race.
+    - You can change the ***MultiGP Race***'s slot configuration by navigating to `Manage >> Manage Race >> Frequency Profile` on the MultiGP event's page. This should be configured before importing a ***MultiGP Race***.
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+    - This import includes the pilot's `MultiGP Pilot ID`. The `MultiGP Pilot ID` is mandatory for pushing results
+
 
 #### Import ZippyQ Round (Button)
-Imports the entered ```ZippyQ round number``` from the selected ```MultiGP Race``` into the selected ```RotorHazard Class```
+
+Imports the entered `ZippyQ round number` from the selected `MultiGP Race` into the selected `RotorHazard Class`
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+    - This import includes the pilot's `MultiGP Pilot ID`. The `MultiGP Pilot ID` is mandatory for pushing results
 
 #### Push Class Results (Button)
-Pushes the results in the selected ```RotorHazard Class``` to the selected ```MultiGP Race```
+
+Pushes the results in the selected `RotorHazard Class` to the selected `MultiGP Race`
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
-- **IMPORTANT**: Any heat name containing the word "Round" will have it's results pushed to MultiGP with the MultiGP round number set to RH raceclass heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
+- **IMPORTANT**: Any race class with the `Rounds` field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
 #### Push Class Rankings (Button)
-Pushes the rankings in the selected ```RotorHazard Class``` to the selected ```MultiGP Race```.
-- You can push timer results to MultiGP, but still use the Class rankings to override the final race rankings on MultiGP's side
-- As stated by the MultiGP API documentation, could be used for final results from brackets.
 
-#### Coming Soon: Push Global Qualifer Results (Button) 
-Pushes the results in the selected ```RotorHazard Class``` to the selected ```MultiGP Race``` in the Global Qualifer format
+Pushes the rankings in the selected `RotorHazard Class` to the selected `MultiGP Race`.
+- You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
+- This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
 
-#### Finalize Event
-Finalizes the selected ```MultiGP Race```
-- It is best practice to verify your results on MultiGP before using this button
+#### Coming Soon: Push Global Qualifer Results (Button)
+
+Pushes the results in the selected `RotorHazard Class` to the selected `MultiGP Race` in the Global Qualifer format
+- The ability for this feature to work is dependent on your chapter's **MultiGP determined** eligibility to host a Global Qualifer event
+
+#### Finalize Event (Button)
+
+Finalizes the selected `MultiGP Race`
+- It is considered best practice to verify your results on MultiGP before using this button.

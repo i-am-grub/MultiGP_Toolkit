@@ -71,7 +71,7 @@ class RHmanager():
         # Export Tools
         self.results_class_selector()
 
-        auto_slot_score_text = self._rhapi.language.__('Automatically push heat results')
+        auto_slot_score_text = self._rhapi.language.__('Automatically push race results')
         auto_slot_score = UIField('auto_slot_score', auto_slot_score_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_slot_score, 'multigp_tools')
 
@@ -270,7 +270,7 @@ class RHmanager():
 
     # Slot and Score
     def slot_score(self, race_info, selected_race):
-        race_name = self._rhapi.db.heat_by_id(race_info.heat_id).name
+        num_rounds = self._rhapi.db.class_by_id(race_info.class_id).rounds
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
         for result in results:
             slot = result["node"] + 1
@@ -282,7 +282,7 @@ class RHmanager():
             fastestConsecutiveLapsTime = result["consecutives_raw"] * .001
             consecutives_base = result["consecutives_base"]
 
-            if "Round" in race_name:
+            if num_rounds < 2:
                 round = race_info.heat_id
                 heat = 1
             else:
