@@ -17,10 +17,11 @@ def initialize(rhapi):
     apikey_field = UIField(name = 'apiKey', label = 'Chapter API Key', field_type = UIFieldType.TEXT)
     rhapi.fields.register_option(apikey_field, 'multigp_cred')
 
-    username_field = UIField(name = 'mgp_username', label = 'MultiGP Username', field_type = UIFieldType.TEXT)
-    rhapi.fields.register_option(username_field, 'multigp_cred')
+    #  The Session ID was supposedly replaced by the Chapter API key. Keeping fucntionality commented in case of something breaking
+    #username_field = UIField(name = 'mgp_username', label = 'MultiGP Username', field_type = UIFieldType.TEXT)
+    #rhapi.fields.register_option(username_field, 'multigp_cred')
 
-    password_field = UIField(name = 'mgp_password', label = 'MultiGP Password', field_type = UIFieldType.PASSWORD)
-    rhapi.fields.register_option(password_field, 'multigp_cred')
+    #password_field = UIField(name = 'mgp_password', label = 'MultiGP Password', field_type = UIFieldType.PASSWORD)
+    #rhapi.fields.register_option(password_field, 'multigp_cred')
 
     rhapi.ui.register_quickbutton('multigp_cred', 'submit_apikey', 'Verify Credentials', RH.verify_creds)

@@ -29,15 +29,16 @@ class RHmanager():
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                 return
             
-            errors = self.multigp.set_sessionID(self._rhapi.db.option('mgp_username'), self._rhapi.db.option('mgp_password'))
-            if errors:
-                for error in errors:
-                    self._rhapi.ui.message_notify(errors[error])
-                return
-            else: 
-                userName = self.multigp.get_userName()
-                message = userName + " has been signed and will remain logged in until system reboot."
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            #  The Session ID was supposedly replaced by the Chapter API key. Keeping fucntionality commented in case of something breaking
+            #errors = self.multigp.set_sessionID(self._rhapi.db.option('mgp_username'), self._rhapi.db.option('mgp_password'))
+            #if errors:
+            #    for error in errors:
+            #        self._rhapi.ui.message_notify(errors[error])
+            #    return
+            #else: 
+            #    userName = self.multigp.get_userName()
+            #    message = userName + " has been signed and will remain logged in until system reboot."
+            #    self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
             self._multigp_cred_set = True
 
@@ -86,7 +87,8 @@ class RHmanager():
         self._rhapi.ui.register_quickbutton('multigp_tools', 'zippyq_import', 'Import ZippyQ Round', self.manual_zippyq)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_results', 'Push Class Results', self.push_results)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_bracket', 'Push Class Rankings', self.push_bracketed_rankings)
-        self._rhapi.ui.register_quickbutton('multigp_tools', 'push_global', 'Push Global Qualifer Results', self.push_global_qualifer)
+        # The implementation for Global Qualifier results will be added for the 2024 season. Currently, there isn't a way to test functionality
+        # self._rhapi.ui.register_quickbutton('multigp_tools', 'push_global', 'Push Global Qualifer Results', self.push_global_qualifer)        
         self._rhapi.ui.register_quickbutton('multigp_tools', 'finalize_results', 'Finalize Event', self.finalize_results)
 
     # Race selector
@@ -142,8 +144,7 @@ class RHmanager():
         self.multigp.pull_race_data(selected_race)
         schedule = self.multigp.get_schedule()
 
-        info = """Note: Do not change the name of this class if you are using any automatic tools. This description can be changed/deleted.\n
-        If using ZippyQ, please make sure the name of each heat in the ZippyQ class at least contains the word 'Round' in order to push results correctly."""
+        info = """Note: Any race class with the Rounds field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results."""
         translated_info = self._rhapi.language.__(info)
 
         if self.multigp.get_disableSlotAutoPopulation() == "0":
@@ -270,7 +271,7 @@ class RHmanager():
 
     # Slot and Score
     def slot_score(self, race_info, selected_race):
-        num_rounds = self._rhapi.db.class_by_id(race_info.class_id).rounds
+        num_rounds = self._rhapi.db.raceclass_by_id(race_info.class_id).rounds
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
         for result in results:
             slot = result["node"] + 1
@@ -355,9 +356,9 @@ class RHmanager():
             message = "Failed to push rankings to MultiGP"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    # Coming Soon
-    def push_global_qualifer(self, args):
-        pass
+    # Coming in the 2024 season
+    #def push_global_qualifer(self, args):
+    #    pass
 
     # Finalize race results
     def finalize_results(self, args):

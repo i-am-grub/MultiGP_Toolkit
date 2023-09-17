@@ -165,7 +165,7 @@ class multigpAPI():
                 'cycle ' : round,
                 'heat ' : heat
             },
-            'sessionId' : self._sessionID,
+            #'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
@@ -186,7 +186,7 @@ class multigpAPI():
                 'totalTime' : totalTime,
                 'fastestLapTime' : fastestLapTime,
             },
-            'sessionId' : self._sessionID,
+            #'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
         if consecutives_base == 3:
@@ -247,7 +247,7 @@ class multigpAPI():
                         # }
                     # ]
             },
-            'sessionId' : self._sessionID,
+            #'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
@@ -259,7 +259,7 @@ class multigpAPI():
 
         url = 'https://www.multigp.com/mgp/multigpwebservice/race/finalize?id=' + self._events_keys[selected_race]
         data = {
-            'sessionId' : self._sessionID,
+            #'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
