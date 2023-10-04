@@ -1,19 +1,24 @@
 # MultiGP Toolkit for RotorHazard
 
-> WARNING: This plugin is currently only fully compatiable with the `main` branch of [RotorHazard](https://github.com/RotorHazard/RotorHazard)
+> WARNING: This plugin is compatiable with [RotorHazard v4.0.0-beta.5](https://github.com/RotorHazard/RotorHazard/releases/tag/v4.0.0-beta.5) and newer
 
-This is a plugin being developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
+This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
+
+When using the tool for pushing an pulling data from MultiGP, the RotoHazard system will requirem an internet connection, but it 
 
 ## Requirements
 
 - RotorHazard v4.0+ is required to run the plugin
 - You will need your MultiGP Chapter's API key and your user login credentials.
+- An internet connection when pushing or pulling data from MultiGP
+
+> NOTE: An internet connection is not required for running the event, unless the automatic tools are being used
+
 
 ## Installation
 
 1. To install, clone or copy this repository's folder into RotorHazard's plugin directory `/src/server/plugins`, and (re)start the server.
     - If installation is successful, the RotorHazard log will contain the message `Loaded plugin module MultiGP_Toolkit` at startup.
-    - If downloading the zip file directly from GitHub, make sure to rename the plugin's folder to `MultiGP_Toolkit` otherwise the plugin will fail to be imported
 2. The plugin should be visable under the Settings tab after rebooting. 
 
 ---
@@ -26,19 +31,11 @@ The plugin's functionality is split between the Settings and Format tabs in the 
 
 ![Credentials](docs/settings.png)
 
-This screen is used to authenticate the RotorHarzard system to MultiGP. Each time the system is restarted, the user must sign in again to activate the plugin's toolkit
+This screen is used to authenticate the RotorHarzard system to MultiGP. **Each time the system is restarted, the user must sign in again to activate the plugin's toolkit**
 
 #### Chapter API Key (Text)
 
 The API key for your chapter. Chapter admins should have access to this key by going to their chapter's home page and going to `Manage >> Timing system key >> Copy to Clipboard`
-
-#### MultiGP Username (Text)
-
-User's MultiGP Username
-
-#### MultiGP Password (Text)
-
-User's MultiGP Password
 
 #### Verify Credentials (Button)
 
@@ -84,7 +81,7 @@ Once the race is saved, automatically pull the next ZippyQ round from MultiGP an
 
 #### ZippyQ round number (Integer)
 
-Set the round number ZippyQ will use when manually using `Import ZippyQ Round`
+Set the round number ZippyQ will use when using `Import ZippyQ Round`
 - When using this feature make sure the following class settings are properly set:
     - `Rounds`: Should be set to 0 or 1 (See notes under `Automatically push heat results` or `Push Class Results`)
     - `Advance Heat`: Should be set to`Never`
