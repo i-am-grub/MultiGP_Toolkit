@@ -90,9 +90,7 @@ class RHmanager():
 
         self._rhapi.ui.register_quickbutton('multigp_tools', 'zippyq_import', 'Import ZippyQ Round', self.manual_zippyq)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_results', 'Push Class Results', self.push_results)
-        self._rhapi.ui.register_quickbutton('multigp_tools', 'push_bracket', 'Push Class Rankings', self.push_bracketed_rankings)
-        # The implementation for Global Qualifier results will be added for the 2024 season. Currently, there isn't a way to test functionality
-        # self._rhapi.ui.register_quickbutton('multigp_tools', 'push_global', 'Push Global Qualifer Results', self.push_global_qualifer)        
+        self._rhapi.ui.register_quickbutton('multigp_tools', 'push_bracket', 'Push Class Rankings', self.push_bracketed_rankings)     
         self._rhapi.ui.register_quickbutton('multigp_tools', 'finalize_results', 'Finalize Event', self.finalize_results)
 
     # Race selector
@@ -360,10 +358,6 @@ class RHmanager():
             message = "Failed to push rankings to MultiGP"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    # Coming in the 2024 season
-    #def push_global_qualifer(self, args):
-    #    pass
-
     # Finalize race results
     def finalize_results(self, args):
         selected_race = self._rhapi.db.option('race_select')
@@ -572,41 +566,6 @@ class multigpAPI():
                         # },
                     # ]
             },
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
-
-        return returned_json['status']
-    
-    # Global Qualifier results
-    def push_regional_race_results(self, selected_race:str, results:list):
-
-        url = 'https://www.multigp.com/mgp/multigpwebservice/race/captureOverallRaceResult?id=' + self._events_keys[selected_race]
-        data = {
-            'data' : {
-                'raceId' : self._events_keys[selected_race],
-                'results' : results,
-                    # [
-                        # {
-                        # orderNumber : Number,
-                        # pilotId : Number,
-                        # totalLaps : Number,
-                        # totalTime : Double,
-                        # tiebreaker : String,
-                        # roundResults:
-                            # [
-                                # {
-                                # roundNumber : Number, between 1 and 10
-                                # isUsed : Boolean,
-                                # totalLaps : Number,
-                                # totalTime : Double
-                                # }
-                            # ]
-                        # }
-                    # ]
-            },
-            #'sessionId' : self._sessionID,
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
