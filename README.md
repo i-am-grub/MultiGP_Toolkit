@@ -4,8 +4,6 @@
 
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
-When using the tool for pushing an pulling data from MultiGP, the RotoHazard system will requirem an internet connection, but it 
-
 ## Requirements
 
 - RotorHazard v4.0+ is required to run the plugin
