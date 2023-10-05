@@ -124,11 +124,6 @@ Pushes the rankings in the selected `RotorHazard Class` to the selected `MultiGP
 - You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
 - This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
 
-#### Push Global Qualifer Results (Button) : Coming in the 2024 Global Qualifier Season
-
-Pushes the results in the selected `RotorHazard Class` to the selected `MultiGP Race` in the Global Qualifer format
-- The ability for this feature to work is dependent on your chapter's **MultiGP determined** eligibility to host a Global Qualifer event
-
 #### Finalize Event (Button)
 
 Finalizes the selected `MultiGP Race`
