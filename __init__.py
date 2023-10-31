@@ -76,11 +76,11 @@ class RHmanager():
         # Export Tools
         self.results_class_selector()
 
-        auto_slot_score_text = self._rhapi.language.__('Automatically push race results')
+        auto_slot_score_text = self._rhapi.language.__('Automatically push ZippyQ race results')
         auto_slot_score = UIField('auto_slot_score', auto_slot_score_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_slot_score, 'multigp_tools')
 
-        auto_zippy_text = self._rhapi.language.__('Automatically pull ZippyQ rounds')
+        auto_zippy_text = self._rhapi.language.__('Automatically pull next ZippyQ round')
         auto_zippy = UIField('auto_zippy', auto_zippy_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_zippy, 'multigp_tools')
 
@@ -275,6 +275,19 @@ class RHmanager():
     def slot_score(self, race_info, selected_race):
         num_rounds = self._rhapi.db.raceclass_by_id(race_info.class_id).rounds
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
+
+        if num_rounds >= 2:
+            for result in results:
+                if self.custom_round_number < race_info.round_id:
+                    self.custom_round_number = race_info.round_id
+                    self.round_pilots = []
+
+                if result["pilot_id"] in self.round_pilots:
+                    self.override_round_heat = True
+                    self.custom_round_number += 1
+                    self.custom_heat_number = 1
+                    self.round_pilots = []
+
         for result in results:
             slot = result["node"] + 1
             pilotID = self._rhapi.db.pilot_attribute_value(result["pilot_id"], 'multigp_id')
@@ -288,47 +301,69 @@ class RHmanager():
             if num_rounds < 2:
                 round = race_info.heat_id
                 heat = 1
+            elif self.override_round_heat:
+                round = self.custom_round_number
+                heat = self.custom_heat_number
             else:
                 round = race_info.round_id
                 heat = race_info.heat_id
+
+            self.round_pilots.append(result["pilot_id"])
                 
             if not self.multigp.push_slot_and_score(selected_race, round, heat, slot, pilotID, 
                     pilot_score, totalLaps, totalTime, fastestLapTime, fastestConsecutiveLapsTime, consecutives_base):
                 message = "Results push to MultiGP FAILED. Check the timer's internet connection."
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                 return False
-            
-        return True
+        else:
+            self.custom_heat_number += 1
+            return True
 
-    # Automatially push results of heat
+    # Automatially push results of ZippyQ heat
     def auto_slot_score(self, args):
 
-        if self._rhapi.db.option('auto_slot_score') == "1":
+        race_info = self._rhapi.db.race_by_id(args['race_id'])
+        class_id = race_info.class_id
+        selected_race = self._rhapi.db.raceclass_by_id(class_id).name
+        num_rounds = self._rhapi.db.raceclass_by_id(class_id).rounds
+
+        if self._rhapi.db.option('auto_slot_score') == "1" and num_rounds < 2:
 
             message = "Automatically uploading results..."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-            race_info = self._rhapi.db.race_by_id(args['race_id'])
-            class_id = race_info.class_id
-            selected_race = self._rhapi.db.raceclass_by_id(class_id).name
-            
             if self.slot_score(race_info, selected_race):
                 message = "Results successfully pushed to MultiGP."
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
     # Push class results
     def push_results(self, args):
+
         selected_race = self._rhapi.db.option('race_select')
         selected_class = self._rhapi.db.option('class_select')
+        
+        self.custom_round_number = 1
+        self.custom_heat_number = 1
+        self.override_round_heat = False
+        self.round_pilots = []
+
         if not selected_race or not selected_class:
             message = "Select a RH Class to pull results from and a MultiGP Race to send results to"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
+        else:
+            message = "Starting to push results to MultiGP..."
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
         races = self._rhapi.db.races_by_raceclass(selected_class)
+
+        temp_list = []
         for race_info in races:
+            temp_list.append(race_info.id)
             if not self.slot_score(race_info, selected_race):
                 return
+            
+        logger.info(temp_list)
 
         message = "Results successfully pushed to MultiGP."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
