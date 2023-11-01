@@ -4,7 +4,7 @@ from plugins.MultiGP_Toolkit.RHmanager import RHmanager
 
 logger = logging.getLogger(__name__)
 
-PLUGIN_VERSION = 'v1.1.0'
+PLUGIN_VERSION = 'v1.2.0-dev'
 
 def initialize(rhapi):
 

@@ -12,11 +12,9 @@ This is a plugin developed for the RotorHazard timing system. It allows for the 
 
 ## Installation
 
-To install, download `MultiGP_Toolkit.zip` from the [Releases](https://github.com/i-am-grub/MultiGP_Toolkit/releases) page. Extract the `MultiGP_Toolkit` folder and copy it into RotorHazard's plugin directory `/src/server/plugins`. Restart the server.
+To install, follow the instructions on the [latest release](https://github.com/i-am-grub/MultiGP_Toolkit/releases) of the plugin.
 
-> If installation is successful, the RotorHazard log will contain the message `Loaded plugin module MultiGP_Toolkit` at startup.
-
-The plugin should be visable under the Settings tab after rebooting. 
+The plugin should be visable under the Settings tab after installing and rebooting. 
 
 ---
 
