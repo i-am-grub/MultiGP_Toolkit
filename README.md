@@ -1,23 +1,22 @@
 # MultiGP Toolkit for RotorHazard
 
-> WARNING: This plugin is compatiable with [RotorHazard v4.0.0-beta.5](https://github.com/RotorHazard/RotorHazard/releases/tag/v4.0.0-beta.5) and newer
-
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
 ## Requirements
 
 - RotorHazard v4.0+ is required to run the plugin
-- You will need your MultiGP Chapter's API key and your user login credentials.
+- You will need your MultiGP Chapter's API key
 - An internet connection when pushing or pulling data from MultiGP
 
 > NOTE: An internet connection is not required for running the event, unless the automatic tools are being used
 
-
 ## Installation
 
-1. To install, clone or copy this repository's folder into RotorHazard's plugin directory `/src/server/plugins`, and (re)start the server.
-    - If installation is successful, the RotorHazard log will contain the message `Loaded plugin module MultiGP_Toolkit` at startup.
-2. The plugin should be visable under the Settings tab after rebooting. 
+To install, download `MultiGP_Toolkit.zip` from the [Releases](https://github.com/i-am-grub/MultiGP_Toolkit/releases) page. Extract the `MultiGP_Toolkit` folder and copy it into RotorHazard's plugin directory `/src/server/plugins`. Restart the server.
+
+> If installation is successful, the RotorHazard log will contain the message `Loaded plugin module MultiGP_Toolkit` at startup.
+
+The plugin should be visable under the Settings tab after rebooting. 
 
 ---
 
@@ -56,9 +55,9 @@ Used to select which race the system will interact with on ***MultiGP***'s side
 
 Used to select which class the system will interact with on ***RotorHazard***'s side
 
-#### Automatically push race results (Checkbox)
+#### Automatically push ZippyQ race results (Checkbox)
 
-Once the race is saved (or a race is marshaled), automatically push the results to MultiGP
+Once the race is saved (or a race is marshaled), automatically push the race results to MultiGP if ZippyQ criteria is met.
 - Requires the name of the race's class to be exactly the same as the name of the race on MultiGP's side
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 - This setting is **NOT** influenced by the `MultiGP Race` or `RotorHazard Class` selectors
@@ -113,14 +112,22 @@ Imports the entered `ZippyQ round number` from the selected `MultiGP Race` into 
 #### Push Class Results (Button)
 
 Pushes the results in the selected `RotorHazard Class` to the selected `MultiGP Race`
+- If the heats were modified from their imported state, the tool will attempt organized and push all results to MultiGP. Please note, the rounds shown on MultiGP's website may not reflect the order in which the heats were ran within RotorHazard.
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 - **IMPORTANT**: Any race class with the `Rounds` field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
 #### Push Class Rankings (Button)
 
-Pushes the rankings in the selected `RotorHazard Class` to the selected `MultiGP Race`.
+Pushes the custom rankings in the selected `RotorHazard Class` to the selected `MultiGP Race`. 
+
+![Credentials](docs/ranking.png)
+
+By default, this button will not have any noticable impact on your results. This button is useful when a custom ranking method used for the class. For example, the custom ranking method (shown above) can be setup with `Best X Rounds` to only use a pilot's best 3 races, or `Last Heat Position` if a custom bracket is ran.
+
 - You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
 - This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
+
+> Potential tip: My chapter likes to use our imported class from MultiGP to run our *Qualifers* for the night. We typically use the pilots' `Best 3 Rounds` during the *Qualifers* to seed our *Mains* bracket. Our *Mains* bracket will then be ranked using the `Last Heat Position`. We will push **results** of the *Qualifier* class, and then push the **rankings** of the Mains Class. ![Credentials](docs/example.png) An example of how this looks on MultiGP's side can be found [here](https://www.multigp.com/races/view/?race=26004/Anybody-Out-There)
 
 #### Finalize Event (Button)
 
