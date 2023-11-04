@@ -52,8 +52,12 @@ class RHmanager():
         self.setup_main_tools()
 
     def auto_tools(self, args):
-        self.auto_slot_score(args)
-        self.auto_zippyq(args)
+        race_info = self._rhapi.db.race_by_id(args['race_id'])
+
+        # Verify the rounds meet ZippyQ criteria
+        if self._rhapi.db.raceclass_by_id(race_info.class_id).rounds <= 1: 
+            self.auto_slot_score(race_info, args)
+            self.auto_zippyq(race_info, args)
 
     def setup_main_tools(self):
         # Panel   
@@ -190,7 +194,7 @@ class RHmanager():
             self._rhapi.db.slots_alter_fast(slot_list)
             
         else:
-            num_rounds = 1
+            num_rounds = 0
             heat_advance_type = 0
             race_class = self._rhapi.db.raceclass_add(name=selected_race, raceformat=format_id, description=race_description, rounds=num_rounds, heat_advance_type=heat_advance_type)
 
@@ -267,7 +271,8 @@ class RHmanager():
         self.zippyq(selected_class, selected_race, self._rhapi.db.option('zippyq_round'))
 
     # Automatically trigger next ZippyQ round configuration
-    def auto_zippyq(self, args): 
+    def auto_zippyq(self, race_info, args): 
+
         if self._rhapi.db.option('auto_zippy') == "1":
 
             message = "Automatically downloading next ZippyQ round..."
@@ -307,7 +312,7 @@ class RHmanager():
             fastestConsecutiveLapsTime = result["consecutives_raw"] * .001
             consecutives_base = result["consecutives_base"]
 
-            if num_rounds < 2:
+            if num_rounds <= 1:
                 round = race_info.heat_id
                 heat = 1
             elif self.override_round_heat:
@@ -329,14 +334,17 @@ class RHmanager():
             return True
 
     # Automatially push results of ZippyQ heat
-    def auto_slot_score(self, args):
+    def auto_slot_score(self, race_info, _args):
 
-        race_info = self._rhapi.db.race_by_id(args['race_id'])
+        self.override_round_heat = False
+        self.round_pilots = []
+        self.custom_round_number = 1
+        self.custom_heat_number = 1
+
         class_id = race_info.class_id
         selected_race = self._rhapi.db.raceclass_by_id(class_id).name
-        num_rounds = self._rhapi.db.raceclass_by_id(class_id).rounds
 
-        if self._rhapi.db.option('auto_slot_score') == "1" and num_rounds < 2:
+        if self._rhapi.db.option('auto_slot_score') == "1":
 
             message = "Automatically uploading results..."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -348,13 +356,16 @@ class RHmanager():
     # Push class results
     def push_results(self, args):
 
+        def sort_by_id(race_info):
+            return race_info.id
+
         selected_race = self._rhapi.db.option('race_select')
         selected_class = self._rhapi.db.option('class_select')
         
-        self.custom_round_number = 1
-        self.custom_heat_number = 1
         self.override_round_heat = False
         self.round_pilots = []
+        self.custom_round_number = 1
+        self.custom_heat_number = 1
 
         if not selected_race or not selected_class:
             message = "Select a RH Class to pull results from and a MultiGP Race to send results to"
@@ -365,10 +376,9 @@ class RHmanager():
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
         races = self._rhapi.db.races_by_raceclass(selected_class)
+        races.sort(key=sort_by_id)
 
-        temp_list = []
         for race_info in races:
-            temp_list.append(race_info.id)
             if not self.slot_score(race_info, selected_race):
                 return
 

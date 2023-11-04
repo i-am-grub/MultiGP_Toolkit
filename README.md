@@ -110,7 +110,7 @@ Imports the entered `ZippyQ round number` from the selected `MultiGP Race` into 
 #### Push Class Results (Button)
 
 Pushes the results in the selected `RotorHazard Class` to the selected `MultiGP Race`
-- If the heats were modified from their imported state, the tool will attempt organized and push all results to MultiGP. Please note, the rounds shown on MultiGP's website may not reflect the order in which the heats were ran within RotorHazard.
+- If the heats were modified from their imported state, the tool will attempt to organize and push all results to MultiGP.
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 - **IMPORTANT**: Any race class with the `Rounds` field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
