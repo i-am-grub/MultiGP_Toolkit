@@ -76,7 +76,7 @@ class RHmanager():
         auto_slot_score = UIField('auto_slot_score', auto_slot_score_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_slot_score, 'multigp_tools')
 
-        auto_zippy_text = self._rhapi.language.__('Automatically pull next ZippyQ round')
+        auto_zippy_text = self._rhapi.language.__('Automatically setup next ZippyQ round')
         auto_zippy = UIField('auto_zippy', auto_zippy_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_zippy, 'multigp_tools')
 
@@ -259,6 +259,8 @@ class RHmanager():
         message = "ZippyQ round imported."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
+        return heat_data
+
     # Manually trigger ZippyQ round configuration
     def manual_zippyq(self, args):
         selected_race = self._rhapi.db.option('race_select')
@@ -283,7 +285,10 @@ class RHmanager():
             selected_race = self._rhapi.db.raceclass_by_id(class_id).name
             next_round = race_info.heat_id + 1
 
-            self.zippyq(class_id, selected_race, next_round)
+            heat_data = self.zippyq(class_id, selected_race, next_round)
+            data = {}
+            data['heat'] = heat_data.id
+            self._rhapi.race._heat_set(data)
 
     # Slot and Score
     def slot_score(self, race_info, selected_race):

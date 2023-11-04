@@ -61,13 +61,16 @@ Once the race is saved (or a race is marshaled), automatically push the race res
 - This setting is **NOT** influenced by the `MultiGP Race` or `RotorHazard Class` selectors
 - **IMPORTANT**: Any race class with the `Rounds` field set to a value **less than 2** will have it's results pushed with the MultiGP round number set to the race's heat number, and the MultiGP heat set to 1. This special formating is required for ZippyQ results.
 
-#### Automatically pull ZippyQ rounds (Checkbox)
+#### Automatically setup ZippyQ rounds (Checkbox)
+
+Once the race is saved, automatically pull the next ZippyQ round from MultiGP and import it into the same ***RotorHazard Class*** of the completed race. The next round will then be set as the active Heat.
 
 Once the race is saved, automatically pull the next ZippyQ round from MultiGP and import it into the same ***RotorHazard Class*** of the completed race
 - When using this feature make sure the following class settings are properly set:
     - `Rounds`: Should be set to 0 or 1 (See notes under `Automatically push heat results` or `Push Class Results`)
     - `Advance Heat`: Should be set to`Never`
         - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
+        - After importing the next round, it will automatically be set at the active heat
 - This setting is **NOT** influenced by the `MultiGP Race` or `RotorHazard Class` selectors
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
     - This import includes the pilot's MultiGP pilot id. The MultiGP pilot id is mandatory for pushing results
