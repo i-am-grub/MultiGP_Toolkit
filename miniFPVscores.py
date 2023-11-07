@@ -17,8 +17,10 @@ def getURLfromFPVS(rhapi):
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
+       rhapi.ui.message_notify(rhapi.__('Event URL found.'))
        return r.text
     else:
+        rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered FPVScores Event UUID.'))
         return None
 
 def uploadToFPVS(rhapi):

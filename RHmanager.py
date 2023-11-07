@@ -382,9 +382,10 @@ class RHmanager():
             return race_info.id
 
         eventURL = None
-        FPSeventURL = getURLfromFPVS(self._rhapi)
-        if FPSeventURL:
-            eventURL = FPSeventURL
+        if self._rhapi.db.option('event_uuid'):
+            FPSeventURL = getURLfromFPVS(self._rhapi)
+            if FPSeventURL:
+                eventURL = FPSeventURL
 
         selected_race = self._rhapi.db.option('race_select')
         selected_class = self._rhapi.db.option('class_select')
