@@ -63,11 +63,7 @@ class RHmanager():
         # Export Tools
         self.results_class_selector()
 
-        auto_slot_score_text = self._rhapi.language.__('Automatically push ZippyQ race results')
-        auto_slot_score = UIField('auto_slot_score', auto_slot_score_text, field_type = UIFieldType.CHECKBOX)
-        self._rhapi.fields.register_option(auto_slot_score, 'multigp_tools')
-
-        auto_zippy_text = self._rhapi.language.__('Automatically setup next ZippyQ round')
+        auto_zippy_text = self._rhapi.language.__('Use Automatic ZippyQ Tools')
         auto_zippy = UIField('auto_zippy', auto_zippy_text, field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_zippy, 'multigp_tools')
 
@@ -92,8 +88,8 @@ class RHmanager():
 
         # Verify the rounds meet ZippyQ criteria
         if self._rhapi.db.raceclass_by_id(race_info.class_id).rounds <= 1: 
-            self.auto_slot_score(race_info, args)
-            self.auto_zippyq(race_info, args)
+            self.auto_slot_score(args)
+            self.auto_zippyq(args)
 
     # Race selector
     def setup_race_selector(self, args = None):
@@ -284,21 +280,24 @@ class RHmanager():
         self.zippyq(selected_class, selected_race, self._rhapi.db.option('zippyq_round'))
 
     # Automatically trigger next ZippyQ round configuration
-    def auto_zippyq(self, race_info, args): 
+    def auto_zippyq(self, args): 
 
-        if self._rhapi.db.option('auto_zippy') == "1":
+        if self._rhapi.db.option('auto_zippy') != "1":
+            return
 
-            message = "Automatically downloading next ZippyQ round..."
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-            
-            class_id = race_info.class_id
-            selected_race = self._rhapi.db.raceclass_by_id(class_id).name
-            next_round = race_info.heat_id + 1
+        message = "Automatically downloading next ZippyQ round..."
+        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-            heat_data = self.zippyq(class_id, selected_race, next_round)
-            data = {}
-            data['heat'] = heat_data.id
-            self._rhapi.race._heat_set(data)
+        race_info = self._rhapi.db.race_by_id(args['race_id'])
+        
+        class_id = race_info.class_id
+        selected_race = self._rhapi.db.raceclass_by_id(class_id).name
+        next_round = race_info.heat_id + 1
+
+        heat_data = self.zippyq(class_id, selected_race, next_round)
+        data = {}
+        data['heat'] = heat_data.id
+        self._rhapi.race._heat_set(data)
 
     # Slot and Score
     def slot_score(self, race_info, selected_race, eventURL = None):
@@ -356,24 +355,29 @@ class RHmanager():
             return True
 
     # Automatially push results of ZippyQ heat
-    def auto_slot_score(self, race_info, _args):
+    def auto_slot_score(self, args):
 
         self.override_round_heat = False
         self.round_pilots = []
         self.custom_round_number = 1
         self.custom_heat_number = 1
 
+        race_info = self._rhapi.db.race_by_id(args['race_id'])
         class_id = race_info.class_id
+
+        if self._rhapi.db.raceclass_by_id(class_id).rounds >= 2:
+            return
+        elif self._rhapi.db.option('auto_zippy') != "1":
+            return
+        
         selected_race = self._rhapi.db.raceclass_by_id(class_id).name
 
-        if self._rhapi.db.option('auto_slot_score') == "1":
+        message = "Automatically uploading results..."
+        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-            message = "Automatically uploading results..."
+        if self.slot_score(race_info, selected_race):
+            message = "Results successfully pushed to MultiGP."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-
-            if self.slot_score(race_info, selected_race):
-                message = "Results successfully pushed to MultiGP."
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
     # Push class results
     def push_results(self, _args):

@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 #
 
 def getURLfromFPVS(rhapi):
+    rhapi.ui.message_notify(rhapi.__('Getting event URL from FPVScores.'))
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=fpvs_get_event_url'
     json_data = '{"event_uuid":"' + rhapi.db.option('event_uuid') + '"}'
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
@@ -20,7 +21,7 @@ def getURLfromFPVS(rhapi):
        rhapi.ui.message_notify(rhapi.__('Event URL found.'))
        return r.text
     else:
-        rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered FPVScores Event UUID.'))
+        rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered UUID.'))
         return None
 
 def uploadToFPVS(rhapi):
