@@ -1,33 +1,48 @@
 # This file is a stripped down version of
 # https://github.com/FPVScores/FPVScores/blob/d6bd2ab96bf44e637726e66233f6acfcbb7b5ec5/fpvscores/__init__.py
 
+import logging
 import requests
 import json
 from data_export import DataExporter
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
+logger = logging.getLogger(__name__)
+
 #
 # FPVScores interface
 #
 
 def getURLfromFPVS(rhapi):
+
+    if not rhapi.db.option('event_uuid'):
+        return None
+
     rhapi.ui.message_notify(rhapi.__('Getting event URL from FPVScores.'))
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=fpvs_get_event_url'
     json_data = '{"event_uuid":"' + rhapi.db.option('event_uuid') + '"}'
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
-       rhapi.ui.message_notify(rhapi.__('Event URL found.'))
-       return r.text
+        if r.text == 'no event found':
+           rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered UUID.'))
+           return None
+        else:
+            rhapi.ui.message_notify(rhapi.__('Event URL found.'))
+            logger.info(f'FPVScores event URL: {r.text}')
+            return r.text
     else:
-        rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered UUID.'))
         return None
 
 def uploadToFPVS(rhapi):
+    
+    if not rhapi.db.option('event_uuid'):
+        rhapi.ui.message_notify(rhapi.__('Please enter a FPVScores Event UUID'))
+        return
+
     rhapi.ui.message_notify(rhapi.__('Event data upload to FPVScores started.'))
     input_data = rhapi.io.run_export('JSON_FPVScores_Upload')
-    #print('upload results to FPVScores.com')   
     json_data =  input_data['data']
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=rh_push'
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
@@ -43,6 +58,11 @@ def uploadToFPVS(rhapi):
             rhapi.ui.message_notify(r.text)
 
 def runClearFPVS(rhapi):
+    
+    if not rhapi.db.option('event_uuid'):
+        rhapi.ui.message_notify(rhapi.__('Please enter a FPVScores Event UUID'))
+        return
+
     rhapi.ui.message_notify(rhapi.__('Clear FPVScores event data request has been send.'))
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=rh_clear'
     json_data = '{"event_uuid":"' + rhapi.db.option('event_uuid') + '"}'
@@ -59,6 +79,11 @@ def runClearFPVS(rhapi):
 #
 # Payload Generation
 #
+
+def register_handlers(args):
+    if 'register_fn' in args:
+        for exporter in discover():
+            args['register_fn'](exporter)
 
 def discover(*args, **kwargs):
     return [
@@ -123,9 +148,6 @@ def assemble_heatnodes_complete(rhapi):
 
 def assemble_classes_complete(rhapi):
     return rhapi.db.raceclasses
-
-def assemble_racelap_complete(rhapi):
-    return rhapi.db.laps
 
 def assemble_settings_complete(rhapi):
     return rhapi.db.options

@@ -1,7 +1,6 @@
 import logging
 from RHUI import UIField, UIFieldType
 from plugins.MultiGP_Toolkit.RHmanager import RHmanager
-from plugins.MultiGP_Toolkit.miniFPVscores import discover
 
 logger = logging.getLogger(__name__)
 
@@ -22,8 +21,3 @@ def initialize(rhapi):
     rhapi.fields.register_option(apikey_field, 'multigp_cred')
 
     rhapi.ui.register_quickbutton('multigp_cred', 'submit_apikey', 'Verify Credentials', RH.verify_creds)
-
-def register_handlers(args):
-    if 'register_fn' in args:
-        for exporter in discover():
-            args['register_fn'](exporter)

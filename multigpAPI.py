@@ -111,6 +111,9 @@ class multigpAPI():
             'apiKey' : self._apiKey
         }
 
+        with open('results.json', 'w') as file:
+            file.write(json.dumps(data, indent=4))
+
         json_request = json.dumps(data)
         returned_json = self._request_and_download(url, json_request)
 

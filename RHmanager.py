@@ -1,11 +1,13 @@
+import sys
 import logging
 from dataclasses import dataclass
 from eventmanager import Evt
+from Database import HeatAdvanceType
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
 from RHRace import WinCondition, StartBehavior
 
 from plugins.MultiGP_Toolkit.multigpAPI import multigpAPI
-from plugins.MultiGP_Toolkit.miniFPVscores import getURLfromFPVS, uploadToFPVS, runClearFPVS
+import plugins.MultiGP_Toolkit.miniFPVscores as miniFPVscores
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,21 @@ class RHmanager():
     def __init__(self, rhapi):
         self._rhapi = rhapi
         self.multigp = multigpAPI()
+        self.FPVscores_installed = 'plugins.fpvscores' in sys.modules
+
+        if not self.FPVscores_installed:
+            rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, miniFPVscores.register_handlers)
+
+    def _get_MGPpilotID(self, pilot_id):
+        entry = self._rhapi.db.pilot_attribute_value(pilot_id, 'multigp_id')
+        if entry:
+            return entry.strip()
+        else:
+            return None
+
+    #
+    # Chapter API Key Verification
+    #
 
     def verify_creds(self, args):
 
@@ -42,6 +59,10 @@ class RHmanager():
             self.setup_plugin()
             message = "MultiGP tools can now be accessed under the Format tab."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+
+    #
+    # Setup Plugin's Tools
+    #
 
     def setup_plugin(self):
         self._rhapi.events.on(Evt.LAPS_SAVE, self.auto_tools)
@@ -71,25 +92,18 @@ class RHmanager():
         zippyq_round = UIField('zippyq_round', zippyq_round_text, field_type = UIFieldType.BASIC_INT, value = 1)
         self._rhapi.fields.register_option(zippyq_round, 'multigp_tools')
 
-        zippyq_round_text = self._rhapi.language.__('FPVScores Event UUID')
-        fpv_scores = UIField('event_uuid', zippyq_round_text, UIFieldType.TEXT)
-        self._rhapi.fields.register_option(fpv_scores, 'multigp_tools')
-
         self._rhapi.ui.register_quickbutton('multigp_tools', 'zippyq_import', 'Import ZippyQ Round', self.manual_zippyq)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_results', 'Push Class Results', self.push_results)
         self._rhapi.ui.register_quickbutton('multigp_tools', 'push_bracket', 'Push Class Rankings', self.push_bracketed_rankings)     
         self._rhapi.ui.register_quickbutton('multigp_tools', 'finalize_results', 'Finalize Event', self.finalize_results)
-        self._rhapi.ui.register_quickbutton('multigp_tools', 'fpvscores_upload', 'Upload FPVScores Data', uploadToFPVS, self._rhapi)
-        self._rhapi.ui.register_quickbutton('multigp_tools', 'fpvscores_clear', 'Clear FPVScores Data', runClearFPVS, self._rhapi)
 
-    # Automatic ZippyQ tools
-    def auto_tools(self, args):
-        race_info = self._rhapi.db.race_by_id(args['race_id'])
+        if not self.FPVscores_installed:
+            fpv_scores_text = self._rhapi.language.__('FPVScores Event UUID')
+            fpv_scores = UIField('event_uuid', fpv_scores_text, UIFieldType.TEXT)
+            self._rhapi.fields.register_option(fpv_scores, 'multigp_tools')
 
-        # Verify the rounds meet ZippyQ criteria
-        if self._rhapi.db.raceclass_by_id(race_info.class_id).rounds <= 1: 
-            self.auto_slot_score(args)
-            self.auto_zippyq(args)
+            self._rhapi.ui.register_quickbutton('multigp_tools', 'fpvscores_upload', 'Upload FPVScores Data', miniFPVscores.uploadToFPVS, self._rhapi)
+            self._rhapi.ui.register_quickbutton('multigp_tools', 'fpvscores_clear', 'Clear FPVScores Data', miniFPVscores.runClearFPVS, self._rhapi)
 
     # Race selector
     def setup_race_selector(self, args = None):
@@ -104,7 +118,48 @@ class RHmanager():
 
         self._rhapi.ui.broadcast_ui('format')
 
-    # Import pilots and set MultiGP PilotID
+    # Setup RH Class selector
+    def results_class_selector(self, args = None):
+        class_list = [UIFieldSelectOption(value = None, label = "")]
+        
+        for event_class in self._rhapi.db.raceclasses:
+            race_class = UIFieldSelectOption(value = event_class.id, label = event_class.name)
+            class_list.append(race_class)
+        
+        class_selector = UIField('class_select', 'RotorHazard Class', field_type = UIFieldType.SELECT, options = class_list)
+        self._rhapi.fields.register_option(class_selector, 'multigp_tools')
+
+        self._rhapi.ui.broadcast_ui('format')
+
+    # Automatic ZippyQ tools
+    def auto_tools(self, args):
+        race_info = self._rhapi.db.race_by_id(args['race_id'])
+
+        # Verify the rounds meet ZippyQ criteria
+        if self._rhapi.db.raceclass_by_id(race_info.class_id).rounds == 1: 
+            self.auto_slot_score(args)
+            self.auto_zippyq(args)
+
+    #
+    # Event Setup
+    #
+
+    def pilot_serach(self, db_pilots, mgp_pilot):
+        
+        for db_pilot in db_pilots:
+            if mgp_pilot['pilotId'] == self._get_MGPpilotID(db_pilot.id):
+                break
+            elif mgp_pilot['userName'] == db_pilot.callsign:
+                self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': mgp_pilot['pilotId']})
+                break
+        else:
+            mgp_pilot_name = mgp_pilot['firstName'] + " " + mgp_pilot['lastName']
+            db_pilot = self._rhapi.db.pilot_add(name = mgp_pilot_name, callsign = mgp_pilot['userName'])
+            self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': mgp_pilot['pilotId']})
+
+        return db_pilot
+
+    # Import pilots
     def import_pilots(self, args):
         selected_race = self._rhapi.db.option('race_select')
         if not selected_race:
@@ -115,16 +170,7 @@ class RHmanager():
         race_data = self.multigp.pull_race_data(selected_race)
 
         for mgp_pilot in race_data['entries']:
-            mgp_pilot_name = f"{mgp_pilot['firstName']} {mgp_pilot['lastName']}"
-
-            for db_pilot in db_pilots:
-                if db_pilot.callsign == mgp_pilot['userName']:
-                    db_pilot, _ = self._rhapi.db.pilot_alter(db_pilot.id, name = mgp_pilot_name)
-                    break
-            else:
-                db_pilot = self._rhapi.db.pilot_add(name = mgp_pilot_name, callsign = mgp_pilot['userName'])
-
-            self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': mgp_pilot['pilotId']})
+            self.pilot_serach(db_pilots, mgp_pilot)
 
         self._rhapi.ui.broadcast_pilots()
         message = "Pilots imported"
@@ -150,50 +196,43 @@ class RHmanager():
         race_description = race_data['description']
 
         if MGP_format == '0':
-            set_format = race_format('MGP: Aggregate Laps', WinCondition.MOST_PROGRESS)
+            mgp_format = race_format('MGP: Aggregate Laps', WinCondition.MOST_PROGRESS)
         elif MGP_format == '1':
-            set_format = race_format('MGP: Fastest Lap', WinCondition.FASTEST_LAP)
+            mgp_format = race_format('MGP: Fastest Lap', WinCondition.FASTEST_LAP)
         else:
-            set_format = race_format('MGP: Fastest Consecutive Laps', WinCondition.FASTEST_CONSECUTIVE)
+            mgp_format = race_format('MGP: Fastest Consecutive Laps', WinCondition.FASTEST_CONSECUTIVE)
 
         # Register Race Formats
         rh_formats = self._rhapi.db.raceformats
         for rh_format in rh_formats:
-            if rh_format.name == set_format.name:
+            if rh_format.name == mgp_format.name:
                 format_id = rh_format.id
                 break
         else:
-            format_id = self._rhapi.db.raceformat_add(name=set_format.name, win_condition=set_format.win_condition, 
-                                    race_time_sec = 120, staging_fixed_tones = 3, start_behavior=StartBehavior.HOLESHOT)
+            format_id = self._rhapi.db.raceformat_add(name=mgp_format.name, win_condition=mgp_format.win_condition, 
+                                    race_time_sec = 120, staging_fixed_tones = 3, start_behavior=StartBehavior.HOLESHOT).id
             
         # Adjust points for format
         if race_data['scoringDisabled'] == "0":
             self._rhapi.db.raceformat_alter(format_id, points_method="Position", points_settings={"points_list": "10,6,4,2,1,0"})
         else:
-            self._rhapi.db.raceformat_alter(format_id, points_method="Position", points_settings={"points_list": "0,0,0,0,0,0"})
+            self._rhapi.db.raceformat_alter(format_id, points_method=False)
 
         # Import Class
         if race_data['disableSlotAutoPopulation'] == "0":
             num_rounds = len(schedule['rounds'])
-            heat_advance_type = 1
-
-            race_class = self._rhapi.db.raceclass_add(name=selected_race, raceformat=format_id, description=race_description, rounds=num_rounds, heat_advance_type=heat_advance_type)
+        
+            race_class = self._rhapi.db.raceclass_add(name=selected_race, raceformat=format_id,
+                                                      description=race_description, rounds=num_rounds, heat_advance_type=HeatAdvanceType.NEXT_HEAT)
             db_pilots = self._rhapi.db.pilots
             slot_list = []
             for heat in schedule['rounds'][0]['heats']:
                 heat_data = self._rhapi.db.heat_add(name=heat['name'], raceclass=race_class.id)
                 rh_slots = self._rhapi.db.slots_by_heat(heat_data.id)
                 
-                for index, entry in enumerate(heat['entries']):
-                    if 'pilotId' in entry:
-                        mgp_pilot_name = entry['firstName'] + " " + entry['lastName']
-                        for db_pilot in db_pilots:
-                            if db_pilot.callsign == entry['userName']:
-                                break
-                        else:
-                            db_pilot = self._rhapi.db.pilot_add(name = mgp_pilot_name, callsign = entry['userName'])
-
-                        self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': entry['pilotId']})
+                for index, mgp_pilot in enumerate(heat['entries']):
+                    if 'pilotId' in mgp_pilot:
+                        db_pilot = self.pilot_serach(db_pilots, mgp_pilot)
                         slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_pilot.id})
                     else:
                         continue
@@ -201,9 +240,8 @@ class RHmanager():
             self._rhapi.db.slots_alter_fast(slot_list)
             
         else:
-            num_rounds = 0
-            heat_advance_type = 0
-            race_class = self._rhapi.db.raceclass_add(name=selected_race, raceformat=format_id, description=race_description, rounds=num_rounds, heat_advance_type=heat_advance_type)
+            race_class = self._rhapi.db.raceclass_add(name=selected_race, raceformat=format_id, win_condition='From Race Format', 
+                                                      description=race_description, rounds=1, heat_advance_type=HeatAdvanceType.NONE)
 
         self._rhapi.ui.broadcast_raceclasses()
         self._rhapi.ui.broadcast_raceformats()
@@ -212,18 +250,9 @@ class RHmanager():
         message = "Race class imported."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    # Setup RH Class selector
-    def results_class_selector(self, args = None):
-        class_list = [UIFieldSelectOption(value = None, label = "")]
-        
-        for event_class in self._rhapi.db.raceclasses:
-            race_class = UIFieldSelectOption(value = event_class.id, label = event_class.name)
-            class_list.append(race_class)
-        
-        class_selector = UIField('class_select', 'RotorHazard Class', field_type = UIFieldType.SELECT, options = class_list)
-        self._rhapi.fields.register_option(class_selector, 'multigp_tools')
-
-        self._rhapi.ui.broadcast_ui('format')
+    #
+    # ZippyQ
+    #
 
     # Configure ZippyQ round
     def zippyq(self, raceclass_id, selected_race, heat_num):
@@ -242,23 +271,13 @@ class RHmanager():
             heat_data = self._rhapi.db.heat_add(name=heat_name, raceclass=raceclass_id)
             rh_slots = self._rhapi.db.slots_by_heat(heat_data.id)
             
-            for index, entry in enumerate(heat['entries']):
-                db_match = None
+            for index, mgp_pilot in enumerate(heat['entries']):
                 try:
-                    for db_pilot in db_pilots:
-                        if db_pilot.callsign == entry['userName']:
-                            db_match = db_pilot
-                            break
-
-                    if db_match:
-                        slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_match.id})
-                    else:
-                        mgp_pilot_name = entry['firstName'] + " " + entry['lastName']
-                        db_pilot = self._rhapi.db.pilot_add(name = mgp_pilot_name, callsign = entry['userName'])
-                        self._rhapi.db.pilot_alter(db_pilot.id, attributes = {'multigp_id': entry['pilotId']})
-                        slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_pilot.id})
+                    db_pilot = self.pilot_serach(db_pilots, mgp_pilot)              
                 except:
                     continue
+                else:
+                    slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_pilot.id})  
         
         self._rhapi.db.slots_alter_fast(slot_list)
         self._rhapi.ui.broadcast_pilots()
@@ -272,6 +291,7 @@ class RHmanager():
     def manual_zippyq(self, args):
         selected_race = self._rhapi.db.option('race_select')
         selected_class = self._rhapi.db.option('class_select')
+ 
         if not selected_race or not selected_class:
             message = "Select a MultiGP Race to import round from and a RH Class to add the round to"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -292,22 +312,31 @@ class RHmanager():
         
         class_id = race_info.class_id
         selected_race = self._rhapi.db.raceclass_by_id(class_id).name
-        next_round = race_info.heat_id + 1
+        next_round = len(self._rhapi.db.heats_by_class(class_id)) + 1
 
         heat_data = self.zippyq(class_id, selected_race, next_round)
         data = {}
-        data['heat'] = heat_data.id
-        self._rhapi.race._heat_set(data)
+        try:
+            data['heat'] = heat_data.id
+        except:
+            pass
+        else:
+            self._rhapi.race._heat_set(data)
+
+    #
+    # Event Results
+    #
 
     # Slot and Score
-    def slot_score(self, race_info, selected_race, eventURL = None):
-        num_rounds = self._rhapi.db.raceclass_by_id(race_info.class_id).rounds
+    def slot_score(self, race_info, selected_race, multi_round, auto_round_num = 1, eventURL = None):
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
 
-        if num_rounds >= 2:
+        if multi_round:
             for result in results:
+
                 if self.custom_round_number < race_info.round_id:
                     self.custom_round_number = race_info.round_id
+                    self.custom_heat_number = 1
                     self.round_pilots = []
 
                 if result["pilot_id"] in self.round_pilots:
@@ -315,41 +344,51 @@ class RHmanager():
                     self.custom_round_number += 1
                     self.custom_heat_number = 1
                     self.round_pilots = []
+                    break
 
         for result in results:
 
-            if num_rounds <= 1:
-                round = race_info.heat_id
-                heat = 1
+            if not multi_round:
+                round_num = auto_round_num
+                heat_num = 1
             elif self.override_round_heat:
-                round = self.custom_round_number
-                heat = self.custom_heat_number
+                round_num = self.custom_round_number
+                heat_num = self.custom_heat_number
             else:
-                round = race_info.round_id
-                heat = race_info.heat_id
-            slot = result["node"] + 1
+                round_num = race_info.round_id
+                heat_num = self.custom_heat_number
+
+            slot_num = result["node"] + 1
 
             race_data = {}
-            race_data['pilotId'] = self._rhapi.db.pilot_attribute_value(result["pilot_id"], 'multigp_id')
+
+            mgp_pilot_id = self._get_MGPpilotID(result["pilot_id"])
+            if mgp_pilot_id:
+                race_data['pilotId'] = mgp_pilot_id
+            else:
+                logger.warning(f'Pilot {result["pilot_id"]} does not have a MultiGP Pilot ID. Skipping')
+                continue
+
             race_data['score'] = result["points"]
             race_data['totalLaps'] = result["laps"]
-            race_data['totalTime'] = result["total_time_raw"] * .001
-            race_data['fastestLapTime'] = result["fastest_lap_raw"] * .001
+            race_data['totalTime'] = round(result["total_time_raw"] * .001, 3)
+            race_data['fastestLapTime'] = round(result["fastest_lap_raw"] * .001, 3)
 
             if result["consecutives_base"] == 3:
-                race_data['fastest3ConsecutiveLapsTime'] = result["consecutives_raw"] * .001
+                race_data['fastest3ConsecutiveLapsTime'] = round(result["consecutives_raw"] * .001, 3)
             elif result["consecutives_base"] == 2:
-                race_data['fastest2ConsecutiveLapsTime'] = result["consecutives_raw"] * .001
-
+                race_data['fastest2ConsecutiveLapsTime'] = round(result["consecutives_raw"] * .001, 3)
             if eventURL:
                 race_data['liveTimeEventUrl'] = eventURL
 
             self.round_pilots.append(result["pilot_id"])
                 
-            if not self.multigp.push_slot_and_score(selected_race, round, heat, slot, race_data):
+            if not self.multigp.push_slot_and_score(selected_race, round_num, heat_num, slot_num, race_data):
                 message = "Results push to MultiGP FAILED. Check the timer's internet connection."
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                 return False
+            
+            logger.info(f'Pushed results for {selected_race}: Round {round_num}, Heat {heat_num}, Solt {slot_num}')
         else:
             self.custom_heat_number += 1
             return True
@@ -365,17 +404,21 @@ class RHmanager():
         race_info = self._rhapi.db.race_by_id(args['race_id'])
         class_id = race_info.class_id
 
-        if self._rhapi.db.raceclass_by_id(class_id).rounds >= 2:
+        if self._rhapi.db.raceclass_by_id(class_id).rounds != 1:
             return
         elif self._rhapi.db.option('auto_zippy') != "1":
             return
         
+        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi)
+
         selected_race = self._rhapi.db.raceclass_by_id(class_id).name
 
         message = "Automatically uploading results..."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        heat_info = self._rhapi.db.heat_by_id(race_info.heat_id)
+        round_num = self._rhapi.db.heats_by_class(class_id).index(heat_info) + 1
 
-        if self.slot_score(race_info, selected_race):
+        if self.slot_score(race_info, selected_race, False, auto_round_num=round_num, eventURL=eventURL):
             message = "Results successfully pushed to MultiGP."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
@@ -384,12 +427,6 @@ class RHmanager():
 
         def sort_by_id(race_info):
             return race_info.id
-
-        eventURL = None
-        if self._rhapi.db.option('event_uuid'):
-            FPSeventURL = getURLfromFPVS(self._rhapi)
-            if FPSeventURL:
-                eventURL = FPSeventURL
 
         selected_race = self._rhapi.db.option('race_select')
         selected_class = self._rhapi.db.option('class_select')
@@ -403,16 +440,24 @@ class RHmanager():
             message = "Select a RH Class to pull results from and a MultiGP Race to send results to"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
-        else:
-            message = "Starting to push results to MultiGP..."
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        
+        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi)
+        message = "Starting to push results to MultiGP... This may take some time..."
+        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
         races = self._rhapi.db.races_by_raceclass(selected_class)
         races.sort(key=sort_by_id)
 
         for race_info in races:
-            if not self.slot_score(race_info, selected_race, eventURL):
-                return
+            if race_info.round_id > 1:
+                multi_round = True
+                break
+        else:
+            multi_round = False
+
+        for race_info in races:
+            if not self.slot_score(race_info, selected_race, multi_round, eventURL=eventURL):
+                break
 
         message = "Results successfully pushed to MultiGP."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
