@@ -61,10 +61,12 @@ Used to select which class the system will interact with on ***RotorHazard***'s 
 
 The checkbox will enable the following tools when a ***RotorHazard Class***'s `Rounds` setting is set to 1:
 - Once the race is saved (or a race is marshaled), automatically push the race results to MultiGP
-- Automactically pull in the next ZippyQ round
-- Set the newly pulled round to the active heat
+- Automatically pull in the next ZippyQ round
+- Set the newly pulled round as the active heat
+- Automatically upload marshaled race info
 
 Please note:
+- The name of the class needs to match the MultiGP race. This is only required when using the Automatic ZippyQ Tools.
 - If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 - This setting is **NOT** influenced by the [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) or [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) selectors
 - If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
@@ -177,7 +179,7 @@ Please Note:
 
 ### Pushing Multi-Class Results
 
-MultiGP allows you to create events with multiple races. If you have several different ***RotorHazard Classes*** within your event, this is one way to add them all. If you go to your event's page and click the dropdown menu, you should have the ability to add a race to your event. Repeat this until you have all your races added. Th plugin will reconginze the added races individually, allowing you to push your individual [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) to its own [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) all under the same event.
+MultiGP allows you to create [events with multiple races] (https://www.multigp.com/races/view/?race=25935/BITS-Hyderabad-ATMOS-%2723-FPV-Race). If you have several different ***RotorHazard Classes*** within your event, this is one way to add them all. If you go to your event's page and click the dropdown menu, you should have the ability to add a race to your event. Repeat this until you have all your races added. The plugin will reconginze the added races individually, allowing you to push your individual [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) to its own [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) all under the same event.
 
 ![Multi-Class](docs/multi-class.png)
 

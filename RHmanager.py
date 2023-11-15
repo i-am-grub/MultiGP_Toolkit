@@ -144,7 +144,7 @@ class RHmanager():
     # Event Setup
     #
 
-    def pilot_serach(self, db_pilots, mgp_pilot):
+    def pilot_search(self, db_pilots, mgp_pilot):
         
         for db_pilot in db_pilots:
             if mgp_pilot['pilotId'] == self._get_MGPpilotID(db_pilot.id):
@@ -170,7 +170,7 @@ class RHmanager():
         race_data = self.multigp.pull_race_data(selected_race)
 
         for mgp_pilot in race_data['entries']:
-            self.pilot_serach(db_pilots, mgp_pilot)
+            self.pilot_search(db_pilots, mgp_pilot)
 
         self._rhapi.ui.broadcast_pilots()
         message = "Pilots imported"
@@ -232,7 +232,7 @@ class RHmanager():
                 
                 for index, mgp_pilot in enumerate(heat['entries']):
                     if 'pilotId' in mgp_pilot:
-                        db_pilot = self.pilot_serach(db_pilots, mgp_pilot)
+                        db_pilot = self.pilot_search(db_pilots, mgp_pilot)
                         slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_pilot.id})
                     else:
                         continue
@@ -273,7 +273,7 @@ class RHmanager():
             
             for index, mgp_pilot in enumerate(heat['entries']):
                 try:
-                    db_pilot = self.pilot_serach(db_pilots, mgp_pilot)              
+                    db_pilot = self.pilot_search(db_pilots, mgp_pilot)              
                 except:
                     continue
                 else:
@@ -328,7 +328,7 @@ class RHmanager():
     #
 
     # Slot and Score
-    def slot_score(self, race_info, selected_race, multi_round, auto_round_num = 1, eventURL = None):
+    def slot_score(self, race_info, selected_race, multi_round, set_round_num, eventURL = None):
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
 
         if multi_round:
@@ -349,7 +349,7 @@ class RHmanager():
         for result in results:
 
             if not multi_round:
-                round_num = auto_round_num
+                round_num = set_round_num
                 heat_num = 1
             elif self.override_round_heat:
                 round_num = self.custom_round_number
@@ -418,7 +418,7 @@ class RHmanager():
         heat_info = self._rhapi.db.heat_by_id(race_info.heat_id)
         round_num = self._rhapi.db.heats_by_class(class_id).index(heat_info) + 1
 
-        if self.slot_score(race_info, selected_race, False, auto_round_num=round_num, eventURL=eventURL):
+        if self.slot_score(race_info, selected_race, False, round_num, eventURL=eventURL):
             message = "Results successfully pushed to MultiGP."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
@@ -455,8 +455,8 @@ class RHmanager():
         else:
             multi_round = False
 
-        for race_info in races:
-            if not self.slot_score(race_info, selected_race, multi_round, eventURL=eventURL):
+        for index, race_info in enumerate(races):
+            if not self.slot_score(race_info, selected_race, multi_round, index + 1, eventURL=eventURL):
                 break
 
         message = "Results successfully pushed to MultiGP."
@@ -472,19 +472,23 @@ class RHmanager():
             return
 
         results_class = self._rhapi.db.raceclass_ranking(selected_class)
-        results = []
-        for pilot in results_class["ranking"]:
-            multigp_id = int(self._rhapi.db.pilot_attribute_value(pilot['pilot_id'], 'multigp_id'))
-            class_position = (pilot['position'])
-            result_dict = {"orderNumber" : class_position, "pilotId" : multigp_id}
-            results.append(result_dict)
+        if results_class:
+            results = []
+            for pilot in results_class["ranking"]:
+                multigp_id = int(self._rhapi.db.pilot_attribute_value(pilot['pilot_id'], 'multigp_id'))
+                class_position = (pilot['position'])
+                result_dict = {"orderNumber" : class_position, "pilotId" : multigp_id}
+                results.append(result_dict)
 
-        push_status = self.multigp.push_overall_race_results(selected_race, results)
-        if push_status:
-            message = "Rankings pushed to MultiGP"
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            push_status = self.multigp.push_overall_race_results(selected_race, results)
+            if push_status:
+                message = "Rankings pushed to MultiGP"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            else:
+                message = "Failed to push rankings to MultiGP"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
         else:
-            message = "Failed to push rankings to MultiGP"
+            message = "A custom ranking method was not set for the selected RotorHazard Class. Ranking push not available."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
     # Finalize race results
