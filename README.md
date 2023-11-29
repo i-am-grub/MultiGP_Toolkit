@@ -1,5 +1,8 @@
 # MultiGP Toolkit for RotorHazard
 
+> [!CAUTION]
+> Please be aware that this plugin is not approved for MultiGP Global Qualifers, but the RotorHazard development team is currently in communication with MultiGP to potentially make this a future capability for the upcoming season. 
+
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
 This plugin now comes packaged with a mini version of [FPVScores](https://github.com/FPVScores/FPVScores) plugin allowing you to push your event results without the need to install the full version. If more features from the [FPVScores](https://github.com/FPVScores/FPVScores) plugin are needed, you can install the full version alongside the MultiGP Toolkit without issues.
@@ -50,8 +53,8 @@ Used to check the entered credentials. If the credentials are valid, the user wi
 
 Used to select which race the system will interact with on ***MultiGP***'s side
 
-Please Note:
-- Races will typically stop appearing when the day of their scheduled event is about 2 months in the past. This characteristic is determined by MultiGP and not the plugin.
+> [!NOTE]
+> Races will typically stop appearing when the day of their scheduled event is about 2 months in the past. This characteristic is determined by MultiGP and not the plugin.
 
 #### RotorHazard Class (Selector)
 
@@ -65,28 +68,30 @@ The checkbox will enable the following tools when a ***RotorHazard Class***'s `R
 - Set the newly pulled round as the active heat
 - Automatically upload marshaled race info
 
-Please note:
-- The name of the class needs to match the MultiGP race. This is only required when using the Automatic ZippyQ Tools.
-- If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
-- This setting is **NOT** influenced by the [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) or [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) selectors
-- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
-    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
+> [!IMPORTANT]
+>- The name of the class needs to match the MultiGP race. This is only required when using the Automatic ZippyQ Tools.
+>When using this feature make sure the following ***RotorHazard Class*** settings are properly set:
+>- `Rounds`: Should be set to 1
+>- `Advance Heat`: Should be set to `Never`
+>    - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
+>    - If this setting is active, the heat will be autoadvanced to to imported heat even with the setting set to `Never`
 
-When using this feature make sure the following ***RotorHazard Class*** settings are properly set:
-- `Rounds`: Should be set to 1
-- `Advance Heat`: Should be set to `Never`
-    - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
-    - If this setting is active, the heat will be autoadvanced to to imported heat even with the setting set to `Never`
+> [!TIP]
+>- If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
+>- This setting is **NOT** influenced by the [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) or [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) selectors
+>- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+>    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
 
 #### ZippyQ round number (Integer)
 
 Set the round number ZippyQ will use when using `Import ZippyQ Round`
 
-When using this feature make sure the following ***RotorHazard Class*** settings are properly set:
-- `Rounds`: Should be set to 1
-- `Advance Heat`: Should be set to `Never`
-    - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
-    - If using `Automatic ZippyQ Tools`, the heat will be autoadvanced to to imported heat even with the setting set to `Never`
+> [!IMPORTANT]
+>When using this feature make sure the following ***RotorHazard Class*** settings are properly set:
+>- `Rounds`: Should be set to 1
+>- `Advance Heat`: Should be set to `Never`
+>    - If set to `Always` or `After All Rounds`, the RotorHazard will try to advance the heat before the next ZippyQ round is imported.
+>    - If using `Automatic ZippyQ Tools`, the heat will be autoadvanced to to imported heat even with the setting set to `Never`
 
 #### FPVScores Event UUID (Integer)
 
@@ -94,8 +99,8 @@ When using this feature make sure the following ***RotorHazard Class*** settings
 
 Set the Event UUID to use when pushing data to [FPVScores](https://fpvscores.com/)
 
-Please Note:
-- Currently, you must retreive the Event UUID from [FPVScores](https://fpvscores.com/) manually.
+> [!IMPORTANT]
+> Currently, you must retreive the Event UUID from [FPVScores](https://fpvscores.com/) manually in order to use this feature
 
 #### Refresh MultiGP Races (Button)
 
@@ -105,38 +110,41 @@ Refresh the options in the [MultiGP Race](https://github.com/i-am-grub/MultiGP_T
 
 Import pilots from the selected [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector)
 
-Please Note:
-- This import includes the pilot's `MultiGP Pilot ID`. The `MultiGP Pilot ID` is mandatory for pushing results
-- The tool will try to find the pilot in the database by searching for a matching `MultiGP Pilot ID` or `Callsign`. If one can not be found, the pilot will then be added.
+> [!NOTE]
+>- This import includes the pilot's `MultiGP Pilot ID`. The `MultiGP Pilot ID` is mandatory for pushing results
+>- The tool will try to find the pilot in the database by searching for a matching `MultiGP Pilot ID` or `Callsign`. If one can not be found, the pilot will then be added.
 
 #### Import Race (Button)
 
 Import the selected [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector)
 
-Please Note:
-- When pilots are added to their heats, they are assigned to their race slot by MultiGP's slot number, NOT their frequency.
-    - You can change the ***MultiGP Race***'s slot configuration by navigating to `Manage >> Manage Race >> Frequency Profile` on the MultiGP event's page. This should be configured before importing a ***MultiGP Race***.
-- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
-    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
-- If importing a ZippyQ race, heats will not be set up. You must import them using [Import ZippyQ Round](https://github.com/i-am-grub/MultiGP_Toolkit#zippyq-round-number-integer) and [Import ZippyQ Round](https://github.com/i-am-grub/MultiGP_Toolkit#import-zippyq-round-button)
+> [!IMPORTANT]
+>- When pilots are added to their heats, they are assigned to their race slot by MultiGP's slot number, NOT their frequency.
+>    - You can change the ***MultiGP Race***'s slot configuration by navigating to `Manage >> Manage Race >> Frequency Profile` on the MultiGP event's page. This should be configured before importing a ***MultiGP Race***.
+>- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+>    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
+
+> [!IMPORTANT]
+>If importing a ZippyQ race, heats will not be set up. You must import them using [Import ZippyQ Round](https://github.com/i-am-grub/MultiGP_Toolkit#zippyq-round-number-integer) and [Import ZippyQ Round](https://github.com/i-am-grub/MultiGP_Toolkit#import-zippyq-round-button)
 
 #### Import ZippyQ Round (Button)
 
 Imports the entered `ZippyQ round number` from the selected [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) into the selected [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector)
 
-Please Note:
-- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
-    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
+> [!NOTE]
+>- If a pilot is not in the RotorHazard system and is needed in the race setup, they will automatially be imported
+>    - Please see Notes under [Import Pilots](https://github.com/i-am-grub/MultiGP_Toolkit#import-pilots-button)
 
 #### Push Class Results (Button)
 
 Pushes the results in the selected [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) to the selected [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector)
 
-Please Note:
-- If the heats were modified from their imported state, the tool will attempt to organize and push all results to MultiGP.
-- If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
+> [!NOTE]
+>- If the heats were modified from their imported state, the tool will attempt to organize and push all results to MultiGP.
+>- If you set up points in RotorHazard's race format, they will also be transfered to MultiGP
 
-> Potential tip: See [Pushing Multi-Class Results](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-multi-class-results)
+> [!TIP]
+> See [Pushing Multi-Class Results](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-multi-class-results)
 
 #### Push Class Rankings (Button)
 
@@ -146,11 +154,10 @@ Pushes the custom rankings in the selected [RotorHazard Class](https://github.co
 
 By default, this button will not have any noticable impact on your results. This button is useful when a custom ranking method used for the class. For example, the custom ranking method (shown above) can be setup with `Best X Rounds` to only use a pilot's best 3 races, or `Last Heat Position` if a custom bracket is ran.
 
-Please Note:
-- You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
-- This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
-
-> Potential tip: See [Pushing Rankings](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-rankings)
+> [!TIP]
+>- You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
+>- This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
+> See [Pushing Rankings](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-rankings)
 
 #### Finalize Event (Button)
 
@@ -159,21 +166,23 @@ Finalizes the selected `MultiGP Race`
 
 #### Upload FPVScores Data (Button)
 
+> [!NOTE]
 > This setting will not be visable when the [FPVScores](https://github.com/FPVScores/FPVScores) plugin is also installed on the system
 
 Pushes the event's data to [FPVScores](https://fpvscores.com/)
 
-Please Note:
-- Needs a [FPVScores Event UUID](https://github.com/i-am-grub/MultiGP_Toolkit#fpvscores-event-uuid) to function
+> [!IMPORTANT]
+> Needs a [FPVScores Event UUID](https://github.com/i-am-grub/MultiGP_Toolkit#fpvscores-event-uuid) to function
 
 #### Clear FPVScores Data (Button)
 
+> [!NOTE]
 > This setting will not be visable when the [FPVScores](https://github.com/FPVScores/FPVScores) plugin is also installed on the system
 
 Clears the event's data on [FPVScores](https://fpvscores.com/)
 
-Please Note:
-- Needs a [FPVScores Event UUID](https://github.com/i-am-grub/MultiGP_Toolkit#fpvscores-event-uuid) to function
+> [!IMPORTANT]
+> Needs a [FPVScores Event UUID](https://github.com/i-am-grub/MultiGP_Toolkit#fpvscores-event-uuid) to function
 
 ## Developer Notes
 
