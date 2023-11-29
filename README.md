@@ -1,6 +1,6 @@
 # MultiGP Toolkit for RotorHazard
 
-> [!CAUTION]
+> [!WARNING]
 > Please be aware that this plugin is not approved for MultiGP Global Qualifers, but the RotorHazard development team is currently in communication with MultiGP to potentially make this a future capability for the upcoming 2024 Global Qualifers season. 
 
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
