@@ -1,7 +1,7 @@
 # MultiGP Toolkit for RotorHazard
 
 > [!CAUTION]
-> Please be aware that this plugin is not approved for MultiGP Global Qualifers, but the RotorHazard development team is currently in communication with MultiGP to potentially make this a future capability for the upcoming season. 
+> Please be aware that this plugin is not approved for MultiGP Global Qualifers, but the RotorHazard development team is currently in communication with MultiGP to potentially make this a future capability for the upcoming 2024 Global Qualifers season. 
 
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
@@ -157,7 +157,7 @@ By default, this button will not have any noticable impact on your results. This
 > [!TIP]
 >- You can push the class results to MultiGP and then use the ***RotorHazard Class*** rankings to override the final race rankings on ***MultiGP***'s side
 >- This action is equivalent to the ***Add Overall Results*** feature in the ***MultiGP Race***'s settings
-> See [Pushing Rankings](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-rankings)
+>- See [Pushing Rankings](https://github.com/i-am-grub/MultiGP_Toolkit#pushing-rankings)
 
 #### Finalize Event (Button)
 
