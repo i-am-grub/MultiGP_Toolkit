@@ -4,16 +4,17 @@ from plugins.MultiGP_Toolkit.RHmanager import RHmanager
 
 logger = logging.getLogger(__name__)
 
-PLUGIN_VERSION = 'v1.3.0-dev'
-
 def initialize(rhapi):
-
-    logger.info(PLUGIN_VERSION)
 
     RH = RHmanager(rhapi)
 
-    multigp_id = UIField(name = 'multigp_id', label = 'MultiGP Pilot ID', field_type = UIFieldType.TEXT)
-    rhapi.fields.register_pilot_attribute(multigp_id)
+    mgp_pilot_id = UIField(name = 'mgp_pilot_id', label = 'MultiGP Pilot ID', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_pilot_attribute(mgp_pilot_id)
+    
+    mpg_race_id = UIField(name = 'mgp_race_id', label = 'MultiGP Race ID', field_type = UIFieldType.TEXT)
+    rhapi.fields.register_raceclass_attribute(mpg_race_id)
+    mpg_race_id = UIField(name = 'zippyq_class', label = 'ZippyQ Race', field_type = UIFieldType.CHECKBOX)
+    rhapi.fields.register_raceclass_attribute(mpg_race_id)
 
     rhapi.ui.register_panel('multigp_cred', 'MultiGP Credentials', 'settings')
 

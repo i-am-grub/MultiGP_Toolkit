@@ -9,7 +9,6 @@ class multigpAPI():
     # https://www.multigp.com/apidocumentation/
     _apiKey = None
     _chapterId = None
-    _events_keys = {}
 
     def _request_and_download(self, url, json_request):
         header = {'Content-type': 'application/json'}
@@ -59,20 +58,18 @@ class multigpAPI():
         returned_json = self._request_and_download(url, json_request)
 
         if returned_json['status']:
-            races = []
-            self._events_keys = {}
+            races = {}
 
             for race in returned_json['data']:
-                races.append(race['name'])
-                self._events_keys[race['name']] = race['id']
+                races[race['id']] = race['name']
 
             return races
         else:
             return None
     
-    def pull_race_data(self, selected_race:str):
+    def pull_race_data(self, race_id:str):
 
-        url = f'https://www.multigp.com/mgp/multigpwebservice/race/view?id={self._events_keys[selected_race]}'
+        url = f'https://www.multigp.com/mgp/multigpwebservice/race/view?id={race_id}'
         data = {
             'apiKey' : self._apiKey
         }
@@ -85,8 +82,8 @@ class multigpAPI():
         else:
             return None
 
-    def pull_additional_rounds(self, selected_race:str, round:int):
-        url = f'https://www.multigp.com/mgp/multigpwebservice/race/getAdditionalRounds?id={self._events_keys[selected_race]}&startFromRound={round}'
+    def pull_additional_rounds(self, race_id:str, round:int):
+        url = f'https://www.multigp.com/mgp/multigpwebservice/race/getAdditionalRounds?id={race_id}&startFromRound={round}'
         data = {
             'apiKey' : self._apiKey
         }
@@ -103,9 +100,9 @@ class multigpAPI():
     #
 
     # Capture pilots times and scores
-    def push_slot_and_score(self, selected_race:str, round:int, heat:int, slot:int, race_data:dict):
+    def push_slot_and_score(self, race_id:str, round:int, heat:int, slot:int, race_data:dict):
 
-        url = f'https://www.multigp.com/mgp/multigpwebservice/race/assignslot/id/{self._events_keys[selected_race]}/cycle/{round}/heat/{heat}/slot/{slot}'
+        url = f'https://www.multigp.com/mgp/multigpwebservice/race/assignslot/id/{race_id}/cycle/{round}/heat/{heat}/slot/{slot}'
         data = {
             'data' : race_data,
             'apiKey' : self._apiKey
@@ -117,25 +114,14 @@ class multigpAPI():
         return returned_json['status']
 
     # Final results from brackets
-    def push_overall_race_results(self, selected_race:str, bracket_results:list):
+    def push_overall_race_results(self, race_id:str, bracket_results:list):
 
-        url = f'https://www.multigp.com/mgp/multigpwebservice/race/captureOverallRaceResult?id={self._events_keys[selected_race]}'
+        url = f'https://www.multigp.com/mgp/multigpwebservice/race/captureOverallRaceResult?id={race_id}'
         data = {
             'data' : {
-                'raceId' : self._events_keys[selected_race],
+                'raceId' : race_id,
                 'bracketResults' : bracket_results 
             },
-            'apiKey' : self._apiKey
-        }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_download(url, json_request)
-
-        return returned_json['status']
-    
-    def finalize_results(self, selected_race:str):
-
-        url = f'https://www.multigp.com/mgp/multigpwebservice/race/finalize?id={self._events_keys[selected_race]}'
-        data = {
             'apiKey' : self._apiKey
         }
         json_request = json.dumps(data)
