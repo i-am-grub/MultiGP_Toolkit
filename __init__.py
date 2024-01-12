@@ -13,8 +13,13 @@ def initialize(rhapi):
     
     mpg_race_id = UIField(name = 'mgp_race_id', label = 'MultiGP Race ID', field_type = UIFieldType.TEXT)
     rhapi.fields.register_raceclass_attribute(mpg_race_id)
-    mpg_race_id = UIField(name = 'zippyq_class', label = 'ZippyQ Race', field_type = UIFieldType.CHECKBOX)
-    rhapi.fields.register_raceclass_attribute(mpg_race_id)
+    zippyq_class = UIField(name = 'zippyq_class', label = 'ZippyQ Race', field_type = UIFieldType.CHECKBOX)
+    rhapi.fields.register_raceclass_attribute(zippyq_class)
+    gq_class = UIField(name = 'gq_class', label = 'GQ Class', field_type = UIFieldType.CHECKBOX)
+    rhapi.fields.register_raceclass_attribute(gq_class)
+
+    gq_format = UIField(name = 'gq_format', label = 'GQ Format', field_type = UIFieldType.CHECKBOX)
+    rhapi.fields.register_raceformat_attribute(gq_format)
 
     rhapi.ui.register_panel('multigp_cred', 'MultiGP Credentials', 'settings')
 

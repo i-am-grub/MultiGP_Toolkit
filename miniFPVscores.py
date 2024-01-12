@@ -34,6 +34,21 @@ def getURLfromFPVS(rhapi):
             return r.text
     else:
         return None
+    
+def runPushMGP(rhapi, data):
+
+    rhapi.ui.message_notify(rhapi.__('Clear FPVScores event data request has been send.'))
+    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push'
+    json_data = data
+    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
+    r = requests.post(url, data=json_data, headers=headers)
+    if r.status_code == 200:
+        if r.text == 'no event found':
+            rhapi.ui.message_notify(rhapi.__('No event found. Check your event UUID on FPVScores.com.'))
+        elif r.text == 'Data Cleared':
+            rhapi.ui.message_notify(rhapi.__('Event data is cleared on FPVScores.com.'))
+        else:
+            rhapi.ui.message_notify(r.text)
 
 def uploadToFPVS(rhapi):
     
