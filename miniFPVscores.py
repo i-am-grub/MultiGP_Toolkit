@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 # FPVScores interface
 #
 
-def getURLfromFPVS(rhapi):
+def getURLfromFPVS(rhapi, uuid):
 
-    if not rhapi.db.option('event_uuid'):
+    if not uuid:
         return None
 
     rhapi.ui.message_notify(rhapi.__('Getting event URL from FPVScores.'))
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=fpvs_get_event_url'
-    json_data = '{"event_uuid":"' + rhapi.db.option('event_uuid') + '"}'
+    json_data = json.dumps({"event_uuid": uuid})
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
@@ -35,20 +35,23 @@ def getURLfromFPVS(rhapi):
     else:
         return None
     
-def runPushMGP(rhapi, data):
+def runPushMGP(rhapi):
 
-    rhapi.ui.message_notify(rhapi.__('Clear FPVScores event data request has been send.'))
+    rhapi.ui.message_notify(rhapi.__('Uploading event to FPVScores.'))
     url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push'
-    json_data = data
+    input_data = rhapi.io.run_export('JSON_FPVScores_Upload')
+    json_data =  input_data['data']
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
-        if r.text == 'no event found':
-            rhapi.ui.message_notify(rhapi.__('No event found. Check your event UUID on FPVScores.com.'))
-        elif r.text == 'Data Cleared':
-            rhapi.ui.message_notify(rhapi.__('Event data is cleared on FPVScores.com.'))
+        data = json.loads(r.text)
+        print(data)
+        if data["status"] == "error":
+            return data["message"], None
+        elif data["status"] == 'success':
+            return data["message"], data["event_uuid"]
         else:
-            rhapi.ui.message_notify(r.text)
+            return "Failed to push to FPVScores", None
 
 def uploadToFPVS(rhapi):
     

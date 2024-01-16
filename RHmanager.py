@@ -10,6 +10,8 @@ from RHRace import WinCondition, StartBehavior
 from plugins.MultiGP_Toolkit.multigpAPI import multigpAPI
 import plugins.MultiGP_Toolkit.miniFPVscores as miniFPVscores
 
+logger = logging.getLogger(__name__)
+
 try:
     import plugins.MultiGP_Toolkit.systemVerification as systemVerification
 except ModuleNotFoundError:
@@ -25,16 +27,16 @@ except ModuleNotFoundError:
         elif sys.version_info.minor == 3.8:
             import plugins.MultiGP_Toolkit.systemVerification.py38 as systemVerification
     except ModuleNotFoundError:
-        pass
-
-logger = logging.getLogger(__name__)
+        logger.warning("Verification module not imported")
 
 @dataclass
 class race_format():
     name: str
     win_condition: WinCondition
     race_time_sec: int = 120
+    unlimited_time: bool = False
     start_behavior: StartBehavior = StartBehavior.HOLESHOT
+    team_racing_mode: bool = False
     mgp_gq: bool = False
 
 class RHmanager():
@@ -52,7 +54,6 @@ class RHmanager():
 
         self._rhapi.events.on(Evt.RACE_STAGE, self.verify_race, name='verify_race')
         self._rhapi.events.on(Evt.CLASS_ALTER, self.verify_class, name='verify_class')
-        self._rhapi.events.on(Evt.RACE_FORMAT_DELETE, self.verify_class, name='verify_class')
         self._rhapi.events.on(Evt.RACE_FORMAT_ALTER, self.verify_format, name='verify_format')
 
     def _get_MGPpilotID(self, pilot_id):
@@ -68,21 +69,29 @@ class RHmanager():
 
     def verify_creds(self, args):
 
-        if self._multigp_cred_set is False:
+        if self._multigp_cred_set:
+            return
 
-            self.multigp.set_apiKey(self._rhapi.db.option('apiKey'))
+        self.multigp.set_apiKey(self._rhapi.db.option('mgp_api_key'))
 
-            chapter_name = self.multigp.pull_chapter()
-            if chapter_name:
-                message = f"API key for {chapter_name} has been recognized"
+        chapter_name = self.multigp.pull_chapter()
+        if chapter_name:
+            message = f"API key for {chapter_name} has been recognized"
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        else:
+            message = "API key cannot be verified. Please check the entered key or the RotorHazard system's internet connection"
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            return
+        
+        verification_status = systemVerification.check_for_new_versions()
+        for key, value in verification_status.items():
+            if not value:
+                message = f"Plugin tools were not setup - {key}"
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-            else:
-                message = "API key cannot be verified. Please check the entered key or the RotorHazard system's internet connection"
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-                return
-
+                logger.warning(message)
+                break
+        else:
             self._multigp_cred_set = True
-
             self.setup_plugin()
             message = "MultiGP tools can now be accessed under the Format tab."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -95,15 +104,10 @@ class RHmanager():
         self._rhapi.events.on(Evt.LAPS_SAVE, self.auto_zippyq, name='auto_zippyq')
         self._rhapi.events.on(Evt.LAPS_SAVE, self.auto_slot_score, name='auto_slot_score')
         self._rhapi.events.on(Evt.LAPS_RESAVE, self.auto_slot_score, name='auto_slot_score')
-
-        self._rhapi.events.on(Evt.CLASS_ADD, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.CLASS_DUPLICATE, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.CLASS_ALTER, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.CLASS_DELETE, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.DATABASE_RESET, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.DATABASE_RECOVER, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.DATABASE_RESTORE, self.results_class_selector, name='update_class_selector')
-        self._rhapi.events.on(Evt.DATABASE_IMPORT, self.results_class_selector, name='update_class_selector')
+        self._rhapi.events.on(Evt.CLASS_ADD, self.results_class_selector)
+        self._rhapi.events.on(Evt.CLASS_DUPLICATE, self.results_class_selector)
+        self._rhapi.events.on(Evt.CLASS_ALTER, self.results_class_selector, name='update_selector')
+        self._rhapi.events.on(Evt.CLASS_DELETE, self.results_class_selector)
 
         # Panel   
         self._rhapi.ui.register_panel('multigp_tools', 'MultiGP Tools', 'format', order=0)
@@ -145,7 +149,7 @@ class RHmanager():
             race_selection = UIFieldSelectOption(value = id, label = f"({id}) {name}")
             race_list.append(race_selection)
 
-        race_selector = UIField('race_select', 'MultiGP Race', field_type = UIFieldType.SELECT, options = race_list)
+        race_selector = UIField('mgp_race_id', 'MultiGP Race', field_type = UIFieldType.SELECT, options = race_list)
         self._rhapi.fields.register_option(race_selector, 'multigp_tools')
 
         self._rhapi.ui.broadcast_ui('format')
@@ -199,15 +203,16 @@ class RHmanager():
                 format_id = rh_format.id
                 break
         else:
-            format_id = self._rhapi.db.raceformat_add(name=mgp_format.name, win_condition=mgp_format.win_condition, 
-                                    race_time_sec = mgp_format.race_time_sec, staging_fixed_tones = 3, start_behavior=mgp_format.start_behavior).id
+            format_id = self._rhapi.db.raceformat_add(name=mgp_format.name, win_condition=mgp_format.win_condition, unlimited_time=mgp_format.unlimited_time,
+                                    race_time_sec = mgp_format.race_time_sec, start_behavior=mgp_format.start_behavior,
+                                    team_racing_mode=mgp_format.team_racing_mode).id
             self._rhapi.db.raceformat_alter(format_id, attributes={'gq_format':mgp_format.mgp_gq})
 
         return format_id
 
     # Import pilots
     def import_pilots(self, args):
-        selected_race = self._rhapi.db.option('race_select')
+        selected_race = self._rhapi.db.option('mgp_race_id')
         if not selected_race:
             message = "Select a MultiGP Race to import pilots from"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -224,7 +229,7 @@ class RHmanager():
 
     # Import classes from event
     def import_class(self, args):
-        selected_race = self._rhapi.db.option('race_select')
+        selected_race = self._rhapi.db.option('mgp_race_id')
         if not selected_race:
             message = "Select a MultiGP Race to import"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -244,6 +249,8 @@ class RHmanager():
             mgp_format = race_format('MGP: Aggregate Laps', WinCondition.MOST_PROGRESS)
         elif MGP_format == '1':
             mgp_format = race_format('MGP: Fastest Lap', WinCondition.FASTEST_LAP)
+        elif MGP_format == '6':
+            mgp_format = race_format("2024 Global Qualifiers", WinCondition.FASTEST_CONSECUTIVE, mgp_gq=True)
         else:
             mgp_format = race_format('MGP: Fastest Consecutive Laps', WinCondition.FASTEST_CONSECUTIVE)
 
@@ -261,7 +268,7 @@ class RHmanager():
         if race_data['disableSlotAutoPopulation'] == "0":
             num_rounds = len(schedule['rounds'])
         
-            race_class = self._rhapi.db.raceclass_add(name=self._mgp_races[selected_race], raceformat=format_id,
+            race_class = self._rhapi.db.raceclass_add(name=self._mgp_races[selected_race], raceformat=format_id, win_condition='',
                                                       description="Imported Controlled class from MultiGP", rounds=num_rounds, heat_advance_type=HeatAdvanceType.NEXT_HEAT)
             db_pilots = self._rhapi.db.pilots
             slot_list = []
@@ -277,13 +284,13 @@ class RHmanager():
                         continue
             
             self._rhapi.db.slots_alter_fast(slot_list)
-            self._rhapi.db.raceclass_alter(race_class.id, attributes = {'mgp_race_id': selected_race, 'zippyq_class' : False})
+            self._rhapi.db.raceclass_alter(race_class.id, attributes = {'mgp_raceclass_id': selected_race, 'zippyq_class' : False, 'gq_class' : mgp_format.mgp_gq})
             
         else:
             race_class = self._rhapi.db.raceclass_add(name=self._mgp_races[selected_race], raceformat=format_id, win_condition='From Race Format', 
                                                       description="Imported ZippyQ class from MultiGP", rounds=1, heat_advance_type=HeatAdvanceType.NONE)
         
-            self._rhapi.db.raceclass_alter(race_class.id, attributes = {'mgp_race_id': selected_race, 'zippyq_class' : True})
+            self._rhapi.db.raceclass_alter(race_class.id, attributes = {'mgp_raceclass_id': selected_race, 'zippyq_class' : True, 'gq_class' : mgp_format.mgp_gq})
 
         self._rhapi.ui.broadcast_raceclasses()
         self._rhapi.ui.broadcast_raceformats()
@@ -331,7 +338,7 @@ class RHmanager():
 
     # Manually trigger ZippyQ round configuration
     def manual_zippyq(self, args):
-        selected_race = self._rhapi.db.option('race_select')
+        selected_race = self._rhapi.db.option('mgp_race_id')
         selected_class = self._rhapi.db.option('class_select')
  
         if not selected_race or not selected_class:
@@ -351,9 +358,9 @@ class RHmanager():
 
         race_info = self._rhapi.db.race_by_id(args['race_id'])
         class_id = race_info.class_id
-        selected_race = self._rhapi.db.raceclass_attribute_value(class_id, 'mgp_race_id')
+        selected_race = self._rhapi.db.raceclass_attribute_value(class_id, 'mgp_raceclass_id')
 
-        if self._rhapi.db.raceclass_attribute_value(class_id, 'zippyq_class') == "1" and self._rhapi.db.option('auto_zippy') == "1":
+        if self._rhapi.db.raceclass_attribute_value(class_id, 'zippyq_class') != "1" or self._rhapi.db.option('auto_zippy') != "1":
             return
 
         message = "Automatically downloading next ZippyQ round..."
@@ -453,12 +460,22 @@ class RHmanager():
         race_info = self._rhapi.db.race_by_id(args['race_id'])
         class_id = race_info.class_id
 
-        if self._rhapi.db.raceclass_attribute_value(class_id, 'zippyq_class') == "1" and self._rhapi.db.option('auto_zippy') == "1":
+        if self._rhapi.db.raceclass_attribute_value(class_id, 'zippyq_class') != "1" or self._rhapi.db.option('auto_zippy') != "1":
             return
-        
-        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi)
 
-        selected_race = self._rhapi.db.raceclass_attribute_value(class_id, 'mgp_race_id')
+        if self._rhapi.db.raceclass_attribute_value(class_id, 'gq_class') == "1":
+            self._rhapi.db.option_set('event_uuid', None)
+            mgp_raceclass_id = self._rhapi.db.raceclass_attribute_value(class_id, 'mgp_raceclass_id')
+            self._rhapi.db.option_set('mgp_race_id', mgp_raceclass_id)
+            message, uuid = miniFPVscores.runPushMGP(self._rhapi)
+            if uuid is None:
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        else:
+            uuid = self._rhapi.db.option('event_uuid')
+        
+        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi, uuid)
+
+        selected_race = self._rhapi.db.raceclass_attribute_value(class_id, 'mgp_raceclass_id')
 
         message = "Automatically uploading results..."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -475,7 +492,7 @@ class RHmanager():
         def sort_by_id(race_info):
             return race_info.id
 
-        selected_race = self._rhapi.db.option('race_select')
+        selected_race = self._rhapi.db.option('mgp_race_id')
         selected_class = self._rhapi.db.option('class_select')
         
         self.override_round_heat = False
@@ -488,7 +505,23 @@ class RHmanager():
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
         
-        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi)
+        mgp_raceclass_id = self._rhapi.db.raceclass_attribute_value(selected_class, 'mgp_raceclass_id')
+        if self._rhapi.db.option('mgp_race_id') != mgp_raceclass_id and mgp_raceclass_id != None:
+            message = "Selected MultiGP Race does not match selected RotorHazard class"
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            return
+        
+        # Add a check for attempting to upload to a GQ race from non GQ race
+        
+        if self._rhapi.db.raceclass_attribute_value(selected_class, 'gq_class') == "1":
+            self._rhapi.db.option_set('event_uuid', None)
+            message, uuid = miniFPVscores.runPushMGP(self._rhapi)
+            if uuid is None:
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        else:
+            uuid = self._rhapi.db.option('event_uuid')
+        
+        eventURL = miniFPVscores.getURLfromFPVS(self._rhapi, uuid)
         message = "Starting to push results to MultiGP... This may take some time..."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
@@ -511,7 +544,7 @@ class RHmanager():
 
     # Push class ranking
     def push_bracketed_rankings(self, _args):
-        selected_race = self._rhapi.db.option('race_select')
+        selected_race = self._rhapi.db.option('mgp_race_id')
         selected_class = self._rhapi.db.option('class_select')
         if not selected_race or not selected_class:
             message = "Select a RH Class to pull rankings from and a MultiGP Race to send rankings to"
@@ -540,8 +573,12 @@ class RHmanager():
         else:
             message = "A custom ranking method was not set for the selected RotorHazard Class. Ranking push not available."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-
+    
+    #
     # Global Qualifier Verification
+    #
+    
+    # stop race conditions
     def verify_race(self, args):
 
         heat_id = args['heat_id']
@@ -557,7 +594,7 @@ class RHmanager():
             elif slot_info.pilot_id in heat_pilots:
                 self._rhapi.race.stop()
                 pilot_info = self._rhapi.db.pilot_by_id(slot_info.pilot_id)
-                message = f"{pilot_info.callsign} occupies more than one slot in current heat"
+                message = f"MGP Toolkit: {pilot_info.callsign} occupies more than one slot in current heat"
                 self._rhapi.ui.message_alert(self._rhapi.language.__(message))
                 return
             else:
@@ -565,6 +602,12 @@ class RHmanager():
                 pilot_counter += 1
 
         if self._rhapi.db.raceclass_attribute_value(heat_info.class_id, 'gq_class') != "1":
+            return
+        
+        if not systemVerification.get_integrity_check():
+            self._rhapi.race.stop()
+            message = f"Your system's codebase has been modified and is not approved to run Global Qualifier races"
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
             return
 
         if pilot_counter < 3:
@@ -574,16 +617,19 @@ class RHmanager():
             return
         
         class_results = self._rhapi.db.raceclass_results(heat_info.class_id)
-        for pilot in class_results['by_race_time']:
-            if pilot['pilot_id'] in heat_pilots and pilot['starts'] >= 10:
-                self._rhapi.race.stop()
-                pilot_info = self._rhapi.db.pilot_by_id(pilot['pilot_id'])
-                message = f"GQ Rules: {pilot_info.callsign} has already completed 10 rounds"
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
-            else:
-                continue
 
+        if class_results:
+            for pilot in class_results['by_race_time']:
+                if pilot['pilot_id'] in heat_pilots and pilot['starts'] >= 10:
+                    self._rhapi.race.stop()
+                    pilot_info = self._rhapi.db.pilot_by_id(pilot['pilot_id'])
+                    message = f"GQ Rules: {pilot_info.callsign} has already completed 10 rounds"
+                    self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                    return
+                else:
+                    continue
+
+    # verify class settings
     def verify_class(self, args):
         class_id = args['class_id']
 
@@ -594,17 +640,22 @@ class RHmanager():
 
         if self._rhapi.db.raceformat_attribute_value(class_info.format_id, 'gq_format') != "1":
             pass
-        elif class_info.round > 10 or class_info.round < 1:
+        elif class_info.rounds > 10 or class_info.rounds < 1:
+            pass
+        elif class_info.win_condition != '':
             pass
         else:
             return
         
         rh_formats = self._rhapi.db.raceformats
-        gq_format = race_format("2024 Global Qualifiers", WinCondition.MOST_LAPS)
+        gq_format = race_format("2024 Global Qualifiers", WinCondition.FASTEST_CONSECUTIVE, mgp_gq=True)
         rh_format = self.format_search(rh_formats, gq_format)
 
-        self._rhapi.db.raceclass_alter(class_info.id, raceformat=rh_format, rounds=10)
-            
+        self._rhapi.db.raceclass_alter(class_info.id, raceformat=rh_format, rounds=10, win_condition='')
+        self._rhapi.ui.broadcast_raceclasses()
+        self._rhapi.ui.broadcast_raceformats()
+
+    # verify format settings
     def verify_format(self, args):
         format_id = args['race_format']
 
@@ -612,7 +663,7 @@ class RHmanager():
             return
         
         format_info = self._rhapi.db.raceformat_by_id(format_id)
-        gq_format = race_format("2024 Global Qualifiers", WinCondition.MOST_LAPS)
+        gq_format = race_format("2024 Global Qualifiers", WinCondition.FASTEST_CONSECUTIVE, mgp_gq=True)
 
         if format_info.name != gq_format.name:
             pass
@@ -620,7 +671,16 @@ class RHmanager():
             pass
         elif format_info.win_condition != gq_format.win_condition:
             pass
+        elif format_info.unlimited_time != gq_format.unlimited_time:
+            pass
+        elif format_info.start_behavior != gq_format.start_behavior:
+            pass
+        elif format_info.team_racing_mode != gq_format.team_racing_mode:
+            pass
         else:
             return
 
-        self._rhapi.db.raceformat_alter(format_info.id, name=gq_format.name, race_time_sec=gq_format.race_time_sec, win_condition=gq_format.win_condition)
+        self._rhapi.db.raceformat_alter(format_info.id, name=gq_format.name, race_time_sec=gq_format.race_time_sec, 
+                                        unlimited_time=gq_format.unlimited_time, win_condition=gq_format.win_condition,
+                                        start_behavior=gq_format.start_behavior, team_racing_mode=gq_format.team_racing_mode)
+        self._rhapi.ui.broadcast_raceformats()
