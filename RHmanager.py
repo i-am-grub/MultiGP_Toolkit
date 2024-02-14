@@ -12,19 +12,16 @@ from RHRace import WinCondition, StartBehavior
 from plugins.MultiGP_Toolkit.multigpAPI import multigpAPI
 import plugins.MultiGP_Toolkit.miniFPVscores as miniFPVscores
 
-try:
-    import plugins.MultiGP_Toolkit.systemVerification as systemVerification
-except ModuleNotFoundError:
-    if sys.version_info.minor == 3.12:
-        import plugins.MultiGP_Toolkit.systemVerification.py312 as systemVerification
-    elif sys.version_info.minor == 3.11:
-        import plugins.MultiGP_Toolkit.systemVerification.py311 as systemVerification
-    elif sys.version_info.minor == 3.10:
-        import plugins.MultiGP_Toolkit.systemVerification.py310 as systemVerification
-    elif sys.version_info.minor == 3.9:
-        import plugins.MultiGP_Toolkit.systemVerification.py39 as systemVerification
-    elif sys.version_info.minor == 3.8:
-        import plugins.MultiGP_Toolkit.systemVerification.py38 as systemVerification
+if sys.version_info.minor == 12:
+    import plugins.MultiGP_Toolkit.systemVerification.py312 as systemVerification
+elif sys.version_info.minor == 11:
+    import plugins.MultiGP_Toolkit.systemVerification.py311 as systemVerification
+elif sys.version_info.minor == 10:
+    import plugins.MultiGP_Toolkit.systemVerification.py310 as systemVerification
+elif sys.version_info.minor == 9:
+    import plugins.MultiGP_Toolkit.systemVerification.py39 as systemVerification
+elif sys.version_info.minor == 8:
+    import plugins.MultiGP_Toolkit.systemVerification.py38 as systemVerification
 
 logger = logging.getLogger(__name__)
 
