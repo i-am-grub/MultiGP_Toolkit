@@ -1,12 +1,12 @@
 {
     "name": "MultiGP Toolkit",
-    "author" : "GRUBBY",
+    "author" : "Bryce \"GRUBBY\" Gruber",
     "author_uri" : "https://github.com/i-am-grub",
-    "description" : "Interact with the MultiGP API directly from the RotorHazard UI",
+    "description" : "Interact with the MultiGP API directly from RotorHazard",
     "info_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit",
     "license" : "MIT",
     "license_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit/blob/master/LICENSE",
-    "version" : "v1.3.0-dev",
+    "version" : "v2.0.0-beta.1",
     "required_rhapi_version" : "1.1",
     "update_uri" : null,
     "text_domain" : null

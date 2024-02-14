@@ -39,7 +39,6 @@ class multigpAPI():
         if returned_json['status']:
             self._chapterId = returned_json['chapterId']
             chapterName = returned_json['chapterName']
-            logger.info(chapterName)
             return chapterName
         else:
             return None
