@@ -37,15 +37,14 @@ def getURLfromFPVS(rhapi, uuid):
     
 def runPushMGP(rhapi):
 
-    rhapi.ui.message_notify(rhapi.__('Uploading event to FPVScores.'))
-    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push'
-    input_data = rhapi.io.run_export('JSON_FPVScores_Upload')
+    rhapi.ui.message_notify(rhapi.__('Uploading to FPVScores...'))
+    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push&dev=1'
+    input_data = rhapi.io.run_export('JSON_FPVScores_MGP_Upload')
     json_data =  input_data['data']
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
         data = json.loads(r.text)
-        print(data)
         if data["status"] == "error":
             return data["message"], None
         elif data["status"] == 'success':
@@ -53,46 +52,17 @@ def runPushMGP(rhapi):
         else:
             return "Failed to push to FPVScores", None
 
-def uploadToFPVS(rhapi):
-    
-    if not rhapi.db.option('event_uuid'):
-        rhapi.ui.message_notify(rhapi.__('Please enter a FPVScores Event UUID'))
-        return
+def linkedMGPOrg(rhapi):
 
-    rhapi.ui.message_notify(rhapi.__('Event data upload to FPVScores started.'))
-    input_data = rhapi.io.run_export('JSON_FPVScores_Upload')
-    json_data =  input_data['data']
-    url = 'https://api.fpvscores.com/rh/0.0.2/?action=rh_push'
+    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_api_check'
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
+    json_data = json.dumps({"mgp_api_key": rhapi.db.option('mgp_api_key')})
     r = requests.post(url, data=json_data, headers=headers)
     if r.status_code == 200:
-        if r.text == 'no import!':
-            rhapi.ui.message_notify(rhapi.__('No import data found, add data (pilots, classes, heats) first.'))
-        elif r.text == 'no event found':
-            rhapi.ui.message_notify(rhapi.__('No event found - Check your event UUID on FPVScores.com.'))
-        elif r.text == 'import succesfull':
-            rhapi.ui.message_notify(rhapi.__('Uploaded data successfully.'))
-        else:
-            rhapi.ui.message_notify(r.text)
-
-def runClearFPVS(rhapi):
-    
-    if not rhapi.db.option('event_uuid'):
-        rhapi.ui.message_notify(rhapi.__('Please enter a FPVScores Event UUID'))
-        return
-
-    rhapi.ui.message_notify(rhapi.__('Clear FPVScores event data request has been send.'))
-    url = 'https://api.fpvscores.com/rh/0.0.2/?action=rh_clear'
-    json_data = '{"event_uuid":"' + rhapi.db.option('event_uuid') + '"}'
-    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
-    r = requests.post(url, data=json_data, headers=headers)
-    if r.status_code == 200:
-        if r.text == 'no event found':
-            rhapi.ui.message_notify(rhapi.__('No event found. Check your event UUID on FPVScores.com.'))
-        elif r.text == 'Data Cleared':
-            rhapi.ui.message_notify(rhapi.__('Event data is cleared on FPVScores.com.'))
-        else:
-            rhapi.ui.message_notify(r.text)
+        data = json.loads(r.text)
+        return data["exist"] == "true"
+    else:
+        return None
 
 #
 # Payload Generation
@@ -106,7 +76,7 @@ def register_handlers(args):
 def discover(*args, **kwargs):
     return [
         DataExporter(
-            'JSON FPVScores Upload',
+            'JSON FPVScores MGP Upload',
             write_json,
             assemble_fpvscoresUpload
         )
@@ -136,16 +106,7 @@ def assemble_fpvscoresUpload(rhapi):
 def assemble_pilots_complete(rhapi):
     payload = rhapi.db.pilots
     for pilot in payload:
-    
-        try:
-            pilot.fpvsuuid = rhapi.db.pilot_attribute_value(pilot.id, 'fpvs_uuid')
-        except:
-            pilot.fpvsuuid = None  
-    
-        try:
-            pilot.country = rhapi.db.pilot_attribute_value(pilot.id, 'country')
-        except:
-            pilot.country = None
+        pilot.mgpid = rhapi.db.pilot_attribute_value(pilot.id, 'mgp_pilot_id')
     
     return payload
 
@@ -172,7 +133,7 @@ def assemble_settings_complete(rhapi):
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
-        custom_vars = ['fpvsuuid','country','node_frequency_band','node_frequency_c','node_frequency_f']
+        custom_vars = ['node_frequency_band','node_frequency_c','node_frequency_f', 'mgpid']
         if isinstance(obj.__class__, DeclarativeMeta):
             mapped_instance = inspect(obj)
             fields = {}
