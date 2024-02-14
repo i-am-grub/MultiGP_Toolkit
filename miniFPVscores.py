@@ -38,7 +38,7 @@ def getURLfromFPVS(rhapi, uuid):
 def runPushMGP(rhapi):
 
     rhapi.ui.message_notify(rhapi.__('Uploading to FPVScores...'))
-    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push&dev=1'
+    url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push'
     input_data = rhapi.io.run_export('JSON_FPVScores_MGP_Upload')
     json_data =  input_data['data']
     headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
