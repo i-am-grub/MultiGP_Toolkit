@@ -26,6 +26,10 @@ def initialize(rhapi):
     gq_format = UIField(name = 'gq_format', label = 'GQ Format', field_type = UIFieldType.CHECKBOX)
     rhapi.fields.register_raceformat_attribute(gq_format)
 
+    # Race attributes
+    result_list = UIField(name = 'race_pilots', label = 'Pilot Result List', field_type = UIFieldType.TEXT, value = '')
+    rhapi.fields.register_race_attribute(result_list)
+
     # Global attributes
     mgp_race_id = UIField(name = 'mgp_race_id', label = 'Import Race ID', field_type = UIFieldType.TEXT, value='')
     rhapi.fields.register_option(mgp_race_id)
