@@ -49,6 +49,10 @@ class UImanager():
     def create_race_import_menu(self):
         self._rhapi.ui.register_panel('multigp_race_import', f'MultiGP Race Import - {self._chapter_name}', '', order=0)
         self.mgp_race_selector()
+
+        auto_logo = UIField('auto_logo', "Download Logo", desc="Download and set chapter logo from MultiGP on [Import Race]", field_type = UIFieldType.CHECKBOX, value='0')
+        self._rhapi.fields.register_option(auto_logo, 'multigp_race_import')
+
         self._rhapi.ui.register_quickbutton('multigp_race_import', 'refresh_events', 'Refresh MultiGP Races', self.mgp_race_selector, args = {'refreshed':True})
         self._rhapi.ui.register_quickbutton('multigp_race_import', 'import_class', 'Import Race', self.import_class)
 

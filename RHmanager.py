@@ -1,6 +1,8 @@
 import sys
 import logging
 import json
+import gevent
+import requests
 from dataclasses import dataclass
 from eventmanager import Evt
 from enum import Enum
@@ -112,6 +114,9 @@ class RHmanager(UImanager):
     #
 
     def verify_creds(self, args):
+
+        # Give the timer time to connect to the internet on reboot
+        gevent.sleep(10)
 
         key = self._rhapi.db.option('mgp_api_key')
         if key:
@@ -245,6 +250,17 @@ class RHmanager(UImanager):
         MGP_format = race_data['scoringFormat']
         rh_race_name = "Imported MultiGP Race"
         
+        if self._rhapi.db.option('auto_logo') == '1':
+            url = race_data['chapterImageFileName']
+            file_name = url.split("/")[-1]
+            save_location = "static/user/" + file_name
+            response = requests.get(url)
+
+            with open(save_location, mode="wb") as file:
+                file.write(response.content)
+
+            self._rhapi.db.option_set('timerLogo', file_name)
+
         rh_db = [
             self._rhapi.db.races,
             self._rhapi.db.heats,
@@ -756,9 +772,6 @@ class RHmanager(UImanager):
         heat_id = args['heat_id']
         heat_info = self._rhapi.db.heat_by_id(heat_id)
 
-        for item in self._rhapi.db.raceclass_attributes(heat_info.class_id):
-            print(item.name, item.value)
-
         # Verify pilot only occupy one slot in heat
         slots = self._rhapi.db.slots_by_heat(heat_id)
         heat_pilots = []
@@ -783,10 +796,18 @@ class RHmanager(UImanager):
             heat_rounds = self._rhapi.db.heat_max_round(heat.id)
             round_difference = num_completed_rounds - heat_rounds
             
-            # ZippyQ
-            if zq_state == "1" and heat_rounds > 0:
+            # ZippyQ - Repeated Round Check
+            if zq_state == "1" and self._rhapi.db.heat_max_round(heat_id) > 0:
                 self._rhapi.race.stop()
-                message = f"MultiGP Toolkit: ZippyQ round cannot be repeated"
+                message = f"ZippyQ: Round cannot be repeated"
+                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                return
+            
+            # ZippyQ - Round Order Check
+            elif zq_state == "1" and heat.id < heat_id and self._rhapi.db.heat_max_round(heat.id) == 0:
+                self._rhapi.race.stop()
+                check_heat = self._rhapi.db.heat_by_id(heat.id)
+                message = f"ZippyQ: Complete {check_heat.name} before starting {heat_info.name}"
                 self._rhapi.ui.message_alert(self._rhapi.language.__(message))
                 return
             
