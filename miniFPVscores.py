@@ -1,4 +1,4 @@
-# This file is a stripped down version of
+# This file is a modified lite version of
 # https://github.com/FPVScores/FPVScores/blob/d6bd2ab96bf44e637726e66233f6acfcbb7b5ec5/fpvscores/__init__.py
 
 import logging

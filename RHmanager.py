@@ -447,7 +447,7 @@ class RHmanager(UImanager):
 
     # Manually trigger ZippyQ round configuration
     def manual_zippyq(self, args):
-        selected_race = selected_race = self._rhapi.db.option('mgp_race_id')
+        selected_race = self._rhapi.db.option('mgp_race_id')
 
         for rh_class in self._rhapi.db.raceclasses:
                 zq_state = self._rhapi.db.raceclass_attribute_value(rh_class.id, 'zippyq_class')
@@ -459,7 +459,25 @@ class RHmanager(UImanager):
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
         
-        self.zippyq(selected_class, selected_race, self._rhapi.db.option('zippyq_round'))
+        
+        class_races = self._rhapi.db.races_by_raceclass(rh_class.id)
+        races_length = len(class_races)
+
+        class_heats = self._rhapi.db.heats_by_class(rh_class.id)
+        heats_length = len(class_heats)
+
+        if races_length != heats_length:
+            message = "ZippyQ: Complete all races before importing next round"
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+            return
+        
+        heat_data = self.zippyq(selected_class, selected_race, races_length + 1)
+        
+        if self._rhapi.db.option('active_import') == '1':
+            try:
+                self._rhapi.race.heat = heat_data.id
+            finally:
+                pass
 
     # Automatically trigger next ZippyQ round configuration
     def auto_zippyq(self, args): 
@@ -476,10 +494,12 @@ class RHmanager(UImanager):
 
         selected_race = selected_race = self._rhapi.db.option('mgp_race_id')
         heat_data = self.zippyq(class_id, selected_race, next_round)
-        try:
-            self._rhapi.race.heat = heat_data.id
-        finally:
-            pass
+
+        if self._rhapi.db.option('active_import') == '1':
+            try:
+                self._rhapi.race.heat = heat_data.id
+            finally:
+                pass
 
     #
     # Event Results
@@ -792,7 +812,7 @@ class RHmanager(UImanager):
         # Verify rounds for respective formats
         zq_state = self._rhapi.db.raceclass_attribute_value(heat_info.class_id, 'zippyq_class')
         num_completed_rounds = len(self._rhapi.db.races_by_heat(heat_id))
-        for heat in self._rhapi.db.heats:
+        for heat in self._rhapi.db.heats_by_class(heat_info.class_id):
             heat_rounds = self._rhapi.db.heat_max_round(heat.id)
             round_difference = num_completed_rounds - heat_rounds
             

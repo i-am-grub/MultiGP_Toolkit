@@ -3,8 +3,6 @@ from RHUI import UIField, UIFieldType, UIFieldSelectOption
 
 class UImanager():
 
-    _rhapi = None
-
     def __init__(self):
         self.create_race_import_menu()
         self.create_pilot_import_menu()
@@ -79,11 +77,11 @@ class UImanager():
         auto_zippy = UIField('auto_zippy', auto_zippy_text, desc="Automatically downloads and sets the next ZippyQ round on race finish.", field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_zippy, 'zippyq_controls')
 
-        zippyq_round_text = self._rhapi.language.__('ZippyQ round number')
-        zippyq_round = UIField('zippyq_round', zippyq_round_text, desc="Round to be imported by [Import ZippyQ Round]", field_type = UIFieldType.BASIC_INT, value = 1)
-        self._rhapi.fields.register_option(zippyq_round, 'zippyq_controls')
+        active_import_text = self._rhapi.language.__('Active Race on Import')
+        active_import = UIField('active_import', active_import_text, desc="Automatically set the downloaded round as the active race on import", field_type = UIFieldType.CHECKBOX)
+        self._rhapi.fields.register_option(active_import, 'zippyq_controls')
 
-        self._rhapi.ui.register_quickbutton('zippyq_controls', 'zippyq_import', 'Import ZippyQ Round', self.manual_zippyq)
+        self._rhapi.ui.register_quickbutton('zippyq_controls', 'zippyq_import', 'Import Next ZippyQ Round', self.manual_zippyq)
 
     def show_zippyq_controls(self, show = True):
         if show:
@@ -204,3 +202,26 @@ class UImanager():
 
         if args is not None and args['option'] == 'zq_race_select':
             self._rhapi.ui.broadcast_ui('marshal')
+
+    #
+    # Class Placeholders
+    #
+            
+    _rhapi = None
+    _chapter_name = None
+    multigp = None
+            
+    def import_class(self, _args = None):
+        pass
+
+    def import_pilots(self, _args = None):
+        pass
+
+    def manual_zippyq(self, _args = None):
+        pass
+
+    def push_results(self, _args = None):
+        pass
+
+    def return_pack(self, _args = None):
+        pass
