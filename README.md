@@ -3,6 +3,8 @@
 > [!WARNING]
 > Please be aware that this plugin is not approved for MultiGP Global Qualifers, but the RotorHazard development team is currently in communication with MultiGP to potentially make this a future capability for the upcoming 2024 Global Qualifers season. 
 
+[![Documentation Status](https://readthedocs.org/projects/multigp-toolkit/badge/?version=latest)](https://multigp-toolkit.readthedocs.io/en/latest/?badge=latest)
+
 This is a plugin developed for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
 This plugin now comes packaged with a mini version of [FPVScores](https://github.com/FPVScores/FPVScores) plugin allowing you to push your event results without the need to install the full version. If more features from the [FPVScores](https://github.com/FPVScores/FPVScores) plugin are needed, you can install the full version alongside the MultiGP Toolkit without issues.
@@ -29,7 +31,7 @@ The plugin's functionality is split between the Settings and Format tabs in the 
 
 ### Settings - MultiGP Credentials
 
-![Credentials](docs/settings.png)
+![Credentials](docs/images/settings.png)
 
 This screen is used to authenticate the RotorHarzard system to MultiGP. **Each time the system is restarted, the user must sign in again to activate the plugin's toolkit**
 
@@ -45,7 +47,7 @@ Used to check the entered credentials. If the credentials are valid, the user wi
 
 ### Format - MultiGP Tools
 
-![MultiGP Tools](docs/format.png)
+![MultiGP Tools](docs/images/format.png)
 
 > Note: The terminology for a ***MultiGP Race*** is equivalent to a ***RotorHazard Class***
 
@@ -150,7 +152,7 @@ Pushes the results in the selected [RotorHazard Class](https://github.com/i-am-g
 
 Pushes the custom rankings in the selected [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) to the selected [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector). 
 
-![Rankings](docs/ranking.png)
+![Rankings](docs/images/ranking.png)
 
 By default, this button will not have any noticable impact on your results. This button is useful when a custom ranking method used for the class. For example, the custom ranking method (shown above) can be setup with `Best X Rounds` to only use a pilot's best 3 races, or `Last Heat Position` if a custom bracket is ran.
 
@@ -190,10 +192,10 @@ Clears the event's data on [FPVScores](https://fpvscores.com/)
 
 MultiGP allows you to create events with multiple races (see [example](https://www.multigp.com/races/view/?race=25935/BITS-Hyderabad-ATMOS-%2723-FPV-Race)). If you have several different ***RotorHazard Classes*** within your event, this is one way to add them all. If you go to your event's page and click the dropdown menu, you should have the ability to add a race to your event. Repeat this until you have all your races added. The plugin will reconginze the added races individually, allowing you to push your individual [RotorHazard Class](https://github.com/i-am-grub/MultiGP_Toolkit#rotorhazard-class-selector) to its own [MultiGP Race](https://github.com/i-am-grub/MultiGP_Toolkit#multigp-race-selector) all under the same event.
 
-![Multi-Class](docs/multi-class.png)
+![Multi-Class](docs/images/multi-class.png)
 
 ### Pushing Rankings
 
 My chapter likes to use our imported class from MultiGP to run our *Qualifers* for the night. We typically use the pilots' `Best 3 Rounds` during the *Qualifers* to seed our *Mains* bracket. Our *Mains* bracket will then be ranked using the `Last Heat Position`. We will push **results** of the *Qualifier* class, and then push the **rankings** of the Mains Class. An example of how this looks on MultiGP's side can be found [here](https://www.multigp.com/races/view/?race=26004/Anybody-Out-There)
 
-![Credentials](docs/example.png)
+![Credentials](docs/images/example.png)
