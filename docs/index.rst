@@ -10,11 +10,10 @@ MultiGP Toolkit plugin for RotorHazard
    :maxdepth: 2
    :caption: Contents:
 
-   usage/installation
+   install
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
