@@ -30,8 +30,6 @@ extensions = []
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
@@ -42,10 +40,10 @@ html_theme_options = {
     'nav_title': 'MultiGP Toolkit',
 
     'color_primary': '#ffffff',
-    'color_accent': '#8d181b',
+    'color_accent': '#212b5c',
 
     'repo_url': 'https://github.com/i-am-grub/MultiGP_Toolkit',
-    'repo_name': 'MultiGP_Toolkit',
+    'repo_name': 'MultiGP Toolkit',
     'repo_type': 'github',
 
     'globaltoc_depth': 2,

@@ -3,14 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MultiGP Toolkit's documentation!
+MultiGP Toolkit plugin for RotorHazard
 ===========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+   usage/installation
 
 Indices and tables
 ==================
