@@ -2,7 +2,7 @@ MultiGP Toolkit plugin for RotorHazard
 ===========================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    usage/install/index
