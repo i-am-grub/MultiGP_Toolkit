@@ -22,7 +22,7 @@ author = 'Bryce Gruber'
 version = VERSION_INFO.split("-")[0]
 release = VERSION_INFO
 
-rst_epilog = '.. |project_version| replace:: %d' % release
+rst_prolog = """.. |project_version| replace:: release"""
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
