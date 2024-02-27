@@ -10,7 +10,7 @@ There are currently two methods for installing and updating the MultiGP Toolkit 
 CLI Installation
 -------------------------------------------
 
-These instructions assume that your RotorHazard instance is installed in the ``~/`` directory as outlined by the `RotorHazard Installation instructions<https://github.com/RotorHazard/RotorHazard/blob/main/doc/Software%20Setup.md#7-install-the-rotorhazard-server>`.
+These instructions assume that your RotorHazard instance is installed in the ``~/`` directory as outlined by the `RotorHazard Installation instructions <https://github.com/RotorHazard/RotorHazard/blob/main/doc/Software%20Setup.md#7-install-the-rotorhazard-server>`_.
 
 1. Navigate to the ``~/`` directory::
 
@@ -20,9 +20,9 @@ These instructions assume that your RotorHazard instance is installed in the ``~
 
     sudo rm -r RotorHazard/src/server/plugins/MultiGP_Toolkit
 
-3. Download the latest release's ``zip file`` from `GitHub<https://github.com/i-am-grub/MultiGP_Toolkit/releases>`::
+3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_::
 
-    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/|project_version|/MultiGP_Toolkit.zip
+    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/\ |project_version|\ /MultiGP_Toolkit.zip
 
 4. Unzip the download::
 
@@ -47,4 +47,4 @@ If installation is successful, ``MultiGP Toolkit`` should be listed under the ``
 Manual Installation
 -------------------------------------------
 
-Navigate to the `MultiGP Toolkit's Releases<https://github.com/i-am-grub/MultiGP_Toolkit/releases>` page
+Navigate to the `MultiGP Toolkit's Releases <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_ page
