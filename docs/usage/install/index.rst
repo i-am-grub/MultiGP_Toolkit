@@ -2,7 +2,7 @@ Plugin Installation
 ===========================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
 There are currently two methods for installing and updating the MultiGP Toolkit on the RotorHazard server. Either using a CLI method or by manually downloading the files from GitHub and copying them over to the raspberry pi.
@@ -20,10 +20,9 @@ These instructions assume that your RotorHazard instance is installed in the ``~
 
     sudo rm -r RotorHazard/src/server/plugins/MultiGP_Toolkit
 
-3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_. Replace VERSION within link with ``|project_version|``::
+3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_. Replace ``VERSION`` within th link with |project_version| for the lastest version::
 
-    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/|project_version|/MultiGP_Toolkit.zip
-    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/\ |project_version|\ /MultiGP_Toolkit.zip
+    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/VERSION/MultiGP_Toolkit.zip
 
 4. Unzip the download::
 
