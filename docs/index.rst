@@ -10,7 +10,7 @@ MultiGP Toolkit plugin for RotorHazard
    :maxdepth: 2
    :caption: Contents:
 
-   install
+   usage/install
 
 Indices and tables
 ==================
