@@ -7,6 +7,10 @@ Setting Up FPVScores
 
 We have partnered with `FPVScores <https://fpvscores.com/>`_, a Live FPV Race Solution, to provide a platform to host your race results!
 
+.. image:: mgp_link.png
+        :width: 400
+        :alt: FPVScores Event Link
+
 .. list-table:: Ability to Upload Results
    :widths: 25 25 50
    :header-rows: 1
@@ -19,7 +23,7 @@ We have partnered with `FPVScores <https://fpvscores.com/>`_, a Live FPV Race So
      - Required when FPVScores Event UUID isn't provided at upload
    * - MultiGP Global Qualifier
      - Not Required
-     - Not Required - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results will not be capable of being managed by the user in the future.
+     - Not Required - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results will not be capable of being managed by an Organisation once uploaded.
 
 Linking a FPVScores Organisation
 -------------------------------------------
@@ -65,13 +69,7 @@ Finding and Event UUID for a race
         :width: 400
         :alt: Organisation Events
 
-4. Open the events tab
-
-    .. image:: events.png
-        :width: 400
-        :alt: Organisation Events
-
-5. Click the ``COPY`` button for the event with the UUID you desire
+4. Click the ``COPY`` button for the event with the UUID you desire
 
     .. image:: uuid_copy.png
         :width: 400
