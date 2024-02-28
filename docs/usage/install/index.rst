@@ -40,6 +40,10 @@ CLI Installation
 
 If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` tab after rebooting
 
+.. image:: install_verify.png
+        :width: 500
+        :alt: Installation Verification
+
 Manual Installation
 -------------------------------------------
 
@@ -64,3 +68,7 @@ Manual Installation
 6. Restart the server::
 
 If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` tab after rebooting
+
+.. image:: install_verify.png
+        :width: 500
+        :alt: Installation Verification

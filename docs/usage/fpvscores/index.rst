@@ -8,7 +8,7 @@ Setting Up FPVScores
 We have partnered with `FPVScores <https://fpvscores.com/>`_, a Live FPV Race Solution, to provide a platform to host your race results!
 
 .. image:: mgp_link.png
-        :width: 400
+        :width: 1000
         :alt: FPVScores Event Link
 
 .. list-table:: Ability to Upload Results
