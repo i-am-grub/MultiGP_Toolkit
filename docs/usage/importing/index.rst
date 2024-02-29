@@ -1,4 +1,4 @@
-Importing a your Race into RotorHazard
+Importing a Event into RotorHazard
 ==========================================
 
 All instructions under this section will be performed under the ``Format`` tab
@@ -70,7 +70,7 @@ be added to your timer's home page.
             :alt: Race Import
 
 After importing, your race's name and description should be visable under the ``Event`` panel,
-pilots imported under the ``Pilots`` panel, and a raceclass setup under the ``Classes and Heats`` panel.
+pilots imported under the ``Pilots`` panel, and a Class setup under the ``Classes and Heats`` panel.
 
 
 
