@@ -6,8 +6,12 @@ MultiGP Toolkit plugin for RotorHazard
    :caption: Contents:
 
    usage/install/index
-   usage/setup/index
    usage/fpvscores/index
+   usage/setup/index
+   usage/importing/index
+   usage/zippyq/index
+   usage/pushing/index
+   usage/global_qualifiers/index
 
 Indices and tables
 ==================

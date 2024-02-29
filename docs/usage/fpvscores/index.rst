@@ -5,7 +5,7 @@ Setting Up FPVScores
    :maxdepth: 2
    :caption: Contents:
 
-We have partnered with `FPVScores <https://fpvscores.com/>`_, a Live FPV Race Solution, to provide a platform to host your race results!
+We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platform to host your race results!
 
 .. image:: mgp_link.png
         :width: 1000

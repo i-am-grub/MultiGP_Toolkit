@@ -38,12 +38,6 @@ CLI Installation
 
     sudo reboot
 
-If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` tab after rebooting
-
-.. image:: install_verify.png
-        :width: 500
-        :alt: Installation Verification
-
 Manual Installation
 -------------------------------------------
 
@@ -66,6 +60,9 @@ Manual Installation
 5. Install the ``MultiGP_Toolkit`` folder into the ``~/RotorHazard/src/server/plugins`` folder within your RotorHazard installation
 
 6. Restart the server::
+
+Verifying your Installation
+-------------------------------------------
 
 If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` tab after rebooting
 
