@@ -10,6 +10,9 @@ Importing a Event into RotorHazard
         .. image:: format.png
                 :width: 500
                 :alt: RotorHazard Format page
+                :align: center
+
+        :raw-html:`<br />`
 
 Waiting for Plugin Activation
 -------------------------------------------
@@ -30,24 +33,28 @@ your previous event start by locating the ``Event`` panel.
     .. image:: archive.png
             :width: 500
             :alt: Archive Panel
+            :align: center
 
 2. Select ``Races, Heats, Classes, and Pilots`` from the drop-down selector
 
     .. image:: archive_selection.png
             :width: 500
             :alt: Archive Selection
+            :align: center
 
 3. Press ``Archive Event`` to backup your race data
 
     .. image:: archive_button.png
             :width: 500
             :alt: Archive Selection
+            :align: center
 
 Your previous event can now be seen under the ``Archived Events`` menu
 
 .. image:: archived_events.png
             :width: 500
             :alt: Archive Selection
+            :align: center
 
 Import a MultiGP Event
 -------------------------------------------
@@ -58,6 +65,7 @@ associated with the entered MultiGP API key.
     .. image:: race_panel.png
             :width: 500
             :alt: Race Panel
+            :align: center
 
 2. Select the race that you would like to import from MultiGP from the drop-down selector
 and then click ``Import Race``
@@ -65,13 +73,17 @@ and then click ``Import Race``
     .. image:: race_import.png
             :width: 500
             :alt: Race Import
+            :align: center
 
-*Optional:* Turn on ``Download Logo`` to download the chapter's logo to the timer. It will automatically
-be added to your timer's home page.
+.. tip::
 
-    .. image:: home_page.png
-            :width: 500
-            :alt: Race Import
+        Turn on ``Download Logo`` to download the chapter's logo to the timer. It will automatically
+        be added to your timer's home page.
+
+        .. image:: home_page.png
+                :width: 500
+                :alt: Race Import
+                :align: center
 
 After importing, your race's name and description should be visable under the ``Event`` panel,
 pilots imported under the ``Pilots`` panel, and a Class setup under the ``Classes and Heats`` panel.

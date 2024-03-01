@@ -18,6 +18,8 @@ Import ZippyQ Rounds
                 :alt: RotorHazard Format page
                 :align: center
 
+        :raw-html:`<br />`
+
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
 
@@ -68,6 +70,8 @@ ZippyQ Pack Return
                 :width: 500
                 :alt: RotorHazard Marshal page
                 :align: center
+
+        :raw-html:`<br />`
 
 The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 
