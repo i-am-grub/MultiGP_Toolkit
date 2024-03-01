@@ -3,17 +3,20 @@ Using MultiGP's ZippyQ System
 
 .. note::
 
-    The ``ZippyQ Controls`` and ``ZippyQ Pack Return Panel`` panels are only visable when a ZippyQ
+    The ``ZippyQ Controls`` and ``ZippyQ Pack Return`` panels are only visable when a ZippyQ
     race has been imported.
 
 Import ZippyQ Rounds
 ------------------------------
 
-All instructions under this subsection will be performed under the ``Format`` page
+.. important::
 
-.. image:: ../importing/format.png
-        :width: 500
-        :alt: RotorHazard Format page
+        All instructions under this subsection will be performed under the ``Format`` page
+
+        .. image:: ../importing/format.png
+                :width: 500
+                :alt: RotorHazard Format page
+                :align: center
 
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
@@ -21,47 +24,57 @@ be created. This class will not have any heats under it.
 .. image:: zippyq_class.png
         :width: 500
         :alt: ZippyQ Class
+        :align: center
 
 1. To import rounds from MultiGP, locate the ``ZippyQ Controls`` panel. *Note:* This panel is only visable when a ZippyQ race has been imported
 
     .. image:: zippyq_controls.png
             :width: 500
             :alt: ZippyQ Controls Panel
+            :align: center
 
 2. Open the ``ZippyQ Controls`` panel and click the ``Import Next ZippyQ Round`` button
 
     .. image:: import_round.png
             :width: 500
             :alt: Import ZippyQ round
+            :align: center
 
 You should now have the first ZippyQ round imported into the imported MultiGP race
 
 .. image:: imported_round.png
         :width: 500
         :alt: Imported ZippyQ round
+        :align: center
 
-*Optional:* Turn on ``Use Automatic ZippyQ Import``. This feature will automatically download the next
-ZippyQ round when the race for the previous one has finished. This prevents the need to click the ``Import Next ZippyQ Round``
-after every round.
+.. hint::
+        Turning on ``Use Automatic ZippyQ Import`` will automatically download the next
+        ZippyQ round when the race for the previous one has finished. This prevents the need to click the 
+        ``Import Next ZippyQ Round`` after every round.
 
-*Optional:* Turn on ``Active Race on Import``. This feature will automatically set the next round as the
-active race after downloading either manually or automatically. This feature will trigger the ``Heat Change``
-event within RotorHazard if you have an ``Event Action`` setup under the ``Settings`` page.
+.. hint::
+        Turning on ``Active Race on Import`` will automatically set the next round as the
+        active race after downloading either manually or automatically. This feature will trigger the ``Heat Change``
+        event within RotorHazard if you have an ``Event Action`` setup under the ``Settings`` page.
 
 ZippyQ Pack Return
 ------------------------------
 
-All instructions under this subsection will be performed under the ``Marshal`` page
+.. important::
 
-.. image:: marshal_page.png
-        :width: 500
-        :alt: RotorHazard Marshal page
+        All instructions under this subsection will be performed under the ``Marshal`` page
+
+        .. image:: marshal_page.png
+                :width: 500
+                :alt: RotorHazard Marshal page
+                :align: center
 
 The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 
 .. image:: pack_return.png
         :width: 500
         :alt: Pack Reutrn
+        :align: center
 
 1. Open the ``ZippyQ Pack Return Panel``.
 

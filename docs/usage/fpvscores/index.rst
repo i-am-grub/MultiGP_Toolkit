@@ -10,20 +10,25 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
 .. image:: mgp_link.png
     :width: 1000
     :alt: FPVScores Event Link
+    :align: center
 
 .. _fpvscores table:
 
 .. list-table:: MultiGP Toolkit's Ability to Upload to FPVScores
-    :widths: 25 25 50
+    :widths: 15 15 25 45
     :header-rows: 1
+    :stub-columns: 1
 
     * - 
+      - Uploading to FPVScores is Optional
       - FPVScores Event UUID
       - Linking MultiGP Chapter API key to FPVScores Organisation
     * - **Standard MultiGP Race**
+      - **Yes**
       - *Required* when FPVScores Organisation **is not** linked **or** *Optional* when FPVScores Organisation **is** linked
       - *Required* when FPVScores Event UUID **is not** provided at upload
     * - **MultiGP Global Qualifier**
+      - **No**
       - *Not Required*
       - *Not Required* - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.::
 
@@ -37,18 +42,21 @@ Linking a FPVScores Organisation
     .. image:: event_manager.png
         :width: 400
         :alt: Event Manager
+        :align: center
 
 3. Open your Organisation's settings
 
     .. image:: organisation_settings.png
         :width: 400
         :alt: Event Manager
+        :align: center
 
 4. Enter your MultiGP Chapter's timer API key
 
     .. image:: chapter_apikey.png
         :width: 400
         :alt: MultiGP Chapter API key
+        :align: center
 
 5. Click the ``Update Settings`` button
 
@@ -64,17 +72,20 @@ Finding and Event UUID for a race
     .. image:: event_manager.png
         :width: 400
         :alt: Event Manager
+        :align: center
 
 3. Open the events page
 
     .. image:: events.png
         :width: 400
         :alt: Organisation Events
+        :align: center
 
 4. Click the ``COPY`` button for the event with the UUID you desire
 
     .. image:: uuid_copy.png
         :width: 400
         :alt: UUID Copy
+        :align: center
 
 Your UUID should now be stored within your Clipboard

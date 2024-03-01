@@ -6,6 +6,7 @@ All instructions under this subsection will be performed under the ``Format`` pa
 .. image:: ../importing/format.png
         :width: 500
         :alt: RotorHazard Format page
+        :align: center
 
 MultiGP Results Controls Panel
 --------------------------------
@@ -13,6 +14,7 @@ MultiGP Results Controls Panel
 .. image:: results_panel.png
     :width: 500
     :alt: Results Control Panel
+    :align: center
 
 Results Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -22,6 +24,7 @@ This drop-down selector is used to select the class to use for the race results 
 .. image:: mgp_results.png
     :width: 500
     :alt: MultiGP Results
+    :align: center
 
 Rankings Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -32,6 +35,7 @@ the ``Update Scores`` setting for your race.
 .. image:: mgp_rankings.png
     :width: 500
     :alt: MultiGP Rankings
+    :align: center
 
 .. note::
 
@@ -42,6 +46,7 @@ the ``Update Scores`` setting for your race.
     .. image:: rh_ranking.png
         :width: 500
         :alt: RotorHazard Ranking
+        :align: center
 
 FPVScores Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

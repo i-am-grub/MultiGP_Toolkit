@@ -48,12 +48,14 @@ Manual Installation
     .. image:: assets.png
         :width: 400
         :alt: GitHub's Assets Tab
+        :align: center
 
 3. Download the ``MultiGP_Toolkit.zip`` file
 
     .. image:: toolkit_zip.png
         :width: 400
         :alt: MultiGP Toolkit's zip file location
+        :align: center
 
 4. Unzip the downloaded file. Once unzipped, you should have a folder named ``MultiGP_Toolkit``. When opened, there should be several files within it.
 
@@ -69,3 +71,4 @@ If installation is successful, ``MultiGP Toolkit`` should be listed under the ``
 .. image:: install_verify.png
         :width: 500
         :alt: Installation Verification
+        :align: center
