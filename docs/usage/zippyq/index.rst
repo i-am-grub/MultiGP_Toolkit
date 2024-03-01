@@ -3,7 +3,8 @@ Using MultiGP's ZippyQ System
 
 .. note::
 
-    The ``ZippyQ Controls``
+    The ``ZippyQ Controls`` and ``ZippyQ Pack Return Panel`` panels are only visable when a ZippyQ
+    race has been imported.
 
 Import ZippyQ Rounds
 ------------------------------
@@ -33,7 +34,7 @@ be created. This class will not have any heats under it.
             :width: 500
             :alt: Import ZippyQ round
 
-You should now have the first ZippyQ round imported
+You should now have the first ZippyQ round imported into the imported MultiGP race
 
 .. image:: imported_round.png
         :width: 500
