@@ -8,8 +8,8 @@ Setting Up FPVScores
 We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platform to host your race results!
 
 .. image:: mgp_link.png
-        :width: 1000
-        :alt: FPVScores Event Link
+    :width: 1000
+    :alt: FPVScores Event Link
 
 
 .. _fpvscores table:
