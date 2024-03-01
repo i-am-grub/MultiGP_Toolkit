@@ -1,14 +1,18 @@
 Using MultiGP's ZippyQ System
 ==============================
 
+.. note::
+
+    The ``ZippyQ Controls``
+
 Import ZippyQ Rounds
 ------------------------------
 
-All instructions under this subsection will be performed under the ``Format`` tab
+All instructions under this subsection will be performed under the ``Format`` page
 
 .. image:: ../importing/format.png
         :width: 500
-        :alt: RotorHazard Format Tab
+        :alt: RotorHazard Format page
 
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
@@ -41,28 +45,30 @@ after every round.
 
 *Optional:* Turn on ``Active Race on Import``. This feature will automatically set the next round as the
 active race after downloading either manually or automatically. This feature will trigger the ``Heat Change``
-event within RotorHazard if you have an ``Event Action`` setup under the ``Settings`` tab.
+event within RotorHazard if you have an ``Event Action`` setup under the ``Settings`` page.
 
 ZippyQ Pack Return
 ------------------------------
 
-All instructions under this subsection will be performed under the ``Marshal`` tab
+All instructions under this subsection will be performed under the ``Marshal`` page
 
-.. image:: marshal_tab.png
+.. image:: marshal_page.png
         :width: 500
-        :alt: RotorHazard Marshal Tab
+        :alt: RotorHazard Marshal page
 
-The toolkit supports the functionality to give a pilot their pack back after a race if needed.
+The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 
 .. image:: pack_return.png
         :width: 500
         :alt: Pack Reutrn
 
-1. Select the Race the pilot particpated in from the ``Race Result`` selector
+1. Open the ``ZippyQ Pack Return Panel``.
 
-2. Select the pilot in the ``Pilot`` selector
+2. Select the Race the pilot particpated in from the ``Race Result`` selector
 
-3. Click the ``Return Pack`` button
+3. Select the pilot in the ``Pilot`` selector
+
+4. Click the ``Return Pack`` button
 
 .. note::
 

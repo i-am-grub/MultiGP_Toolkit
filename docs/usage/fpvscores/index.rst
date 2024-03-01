@@ -11,19 +11,21 @@ We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platfo
         :width: 1000
         :alt: FPVScores Event Link
 
+
+.. _fpvscores table:
 .. list-table:: Ability to Upload Results
-   :widths: 25 25 50
-   :header-rows: 1
+    :widths: 25 25 50
+    :header-rows: 1
 
    * - 
      - FPVScores Event UUID
      - Linking MultiGP Chapter API key to FPVScores Organisation
    * - Standard MultiGP Race
-     - Required when FPVScores Organisation isn't linked
-     - Required when FPVScores Event UUID isn't provided at upload
+     - Required when FPVScores Organisation **is not** linked or Optional when FPVScores Organisation **is** linked
+     - Required when FPVScores Event UUID **is not** provided at upload
    * - MultiGP Global Qualifier
      - Not Required
-     - Not Required - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results will not be capable of being managed by an Organisation once uploaded.
+     - Not Required - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.
 
 Linking a FPVScores Organisation
 -------------------------------------------
@@ -63,7 +65,7 @@ Finding and Event UUID for a race
         :width: 400
         :alt: Event Manager
 
-3. Open the events tab
+3. Open the events page
 
     .. image:: events.png
         :width: 400

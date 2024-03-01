@@ -7,7 +7,7 @@ In order to activate most of the MultiGP Toolkit's functionality, your MultiGP c
         :width: 1000
         :alt: MultiGP API Key
 
-1. Navigate to the ``Settings`` tab within RotorHazard
+1. Navigate to the ``Settings`` page within RotorHazard
 
 2. Open the ``MultiGP Credentials`` panel
 

@@ -1,11 +1,11 @@
 Importing a Event into RotorHazard
 ==========================================
 
-All instructions under this section will be performed under the ``Format`` tab
+All instructions under this section will be performed under the ``Format`` page
 
 .. image:: format.png
         :width: 500
-        :alt: RotorHazard Format Tab
+        :alt: RotorHazard Format page
 
 Waiting for Plugin Activation
 -------------------------------------------

@@ -64,7 +64,7 @@ Manual Installation
 Verifying your Installation
 -------------------------------------------
 
-If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` tab after rebooting
+If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` page after rebooting
 
 .. image:: install_verify.png
         :width: 500
