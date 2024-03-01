@@ -13,7 +13,8 @@ Importing an Event into RotorHazard
                 :align: center
 
         If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot the system
+        connection and reboot the system. After rebooting, there may be a delay before an internet connection
+        is established.
 
 Waiting for Plugin Activation
 -------------------------------------------
@@ -86,8 +87,47 @@ and then click ``Import Race``
                 :alt: Race Import
                 :align: center
 
-After importing, your race's name and description should be visable under the ``Event`` panel,
-pilots imported under the ``Pilots`` panel, and a Class setup under the ``Classes and Heats`` panel.
+After importing, you should see a few changes made to the RotorHazard user interface. The following table outlines
+the type of changes that should be shown depending on the type of race that was imported.
+
+.. list-table:: What's visable after importing a race?
+    :widths: 30 10 10
+    :header-rows: 1
+    :stub-columns: 1
+
+    * - 
+      - Controlled Race
+      - ZippyQ Race
+    * - Event Name Change
+      - Yes
+      - Yes
+    * - Event Description Change
+      - Yes
+      - Yes
+    * - Imported Pilots under the ``Pilots`` panel
+      - Yes
+      - No
+    * - An imported class under the ``Classes and Heats`` panel
+      - Yes
+      - Yes
+    * - Heats set up under the newly imported class
+      - Yes
+      - No
+    * - A ``MultiGP Pilot Import`` panel
+      - Yes
+      - Yes
+    * - A ``ZippyQ Controls`` panel
+      - No
+      - Yes
+    * - A ``MultiGP Results Controls`` panel
+      - Yes
+      - Yes
+    * - A ``ZippyQ Pack Return`` panel (under the ``Marshal`` page)
+      - No
+      - Yes
+
+
+      
 
 
 
