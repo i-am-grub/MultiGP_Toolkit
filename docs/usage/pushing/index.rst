@@ -17,7 +17,7 @@ MultiGP Results Controls Panel
 Results Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This selector is used to select the class to use for the race results on MultiGP's website.
+This drop-down selector is used to select the class to use for the race results on MultiGP's website.
 
 .. image:: mgp_results.png
     :width: 500
@@ -26,7 +26,7 @@ This selector is used to select the class to use for the race results on MultiGP
 Rankings Class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This selecotr is used to select the class to use for the ``Overall Results`` on MultiGP's website under 
+This drop-down selector is used to select the class to use for the ``Overall Results`` on MultiGP's website under 
 the ``Update Scores`` setting for your race.
 
 .. image:: mgp_rankings.png
@@ -39,16 +39,16 @@ the ``Update Scores`` setting for your race.
     setting, otherwise, it will be skipped and MultiGP will automatically calculate the rankings based
     on the race format.
 
-    .. image:: rh_rankings.png
+    .. image:: rh_ranking.png
         :width: 500
-        :alt: MultiGP Rankings
+        :alt: RotorHazard Ranking
 
 FPVScores Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are two FPVScores related settings under the ``MultiGP Results Controls``. The first setting
+There are two FPVScores related settings under the ``MultiGP Results Controls`` panels. The first setting
 will either activate or deactivate the ability to push Results to FPVScores.
 
 The second setting allows you to provide a FPVScores Event UUID to allow you to push your results
-to a specific FPVScores event. See the :ref:`Ability to Upload Results <fpvscores table>` 
-table to show the mapped functionality.
+to a specific FPVScores event. See the table showing the mapped functionality of the :ref:`MultiGP 
+Toolkit's Ability to Upload to FPVScores <fpvscores table>`.

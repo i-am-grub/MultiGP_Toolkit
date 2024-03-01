@@ -5,16 +5,15 @@ Setting Up FPVScores
    :maxdepth: 2
    :caption: Contents:
 
-We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platform to host your race results!
+The RotorHazard Development Team has teamed up with with `FPVScores <https://fpvscores.com/>`_ to provide a platform to host your race results!
 
 .. image:: mgp_link.png
     :width: 1000
     :alt: FPVScores Event Link
 
-
 .. _fpvscores table:
 
-.. list-table:: Ability to Upload Results
+.. list-table:: MultiGP Toolkit's Ability to Upload to FPVScores
     :widths: 25 25 50
     :header-rows: 1
 
