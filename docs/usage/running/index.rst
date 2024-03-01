@@ -32,23 +32,23 @@ by importing a ZippyQ race.
 - Each heat within a class must advance to the max round currently in
 the class before any class currently at the highest round can advance.
     
-    .. admonition:: Example
+.. admonition:: Example
 
-        Heat 1 has completed 3 rounds, Heat 2 has completed
-        2 rounds and Heat 3 has completed 2 rounds. 
-        
-        Heat 1 cannot run a fouth round until Heat 2 and Heat 3 have
-        completed 3 rounds.
+    Heat 1 has completed 3 rounds, Heat 2 has completed
+    2 rounds, and Heat 3 has completed 2 rounds. 
+    
+    Heat 1 cannot run a 4th round until Heat 2 **and** Heat 3 have
+    completed 3 rounds.
 
 - Each pilot will only be able to participate in one heat per class
 
-    .. note::
+.. note::
 
-        This rule is not enforced due to situations where a minimum
-        of pilots per heat is enforced. Instead, a warning will be
-        produced by the system warning about how a pilot's MultiGP result 
-        for a given round (on MultiGP's side) will be obtained by the last heat 
-        they participate in that round (on RotorHazard's side).
+    This rule is not enforced due to situations where a minimum
+    of pilots per heat is enforced. Instead, a warning will be
+    produced by the system warning about how a pilot's MultiGP result 
+    for a given round (on MultiGP's side) will be obtained by the last heat 
+    they participate in that round (on RotorHazard's side).
 
 
 ZippyQ Races
@@ -62,9 +62,9 @@ created
 - ZippyQ completed rounds cannot be repeated. The expection is when
 a race needs to be re-ran.
 
-    .. seealso::
+.. seealso::
 
-        `Re-Running Races <rerunning races>`
+    `Re-Running Races <rerunning races>`_
 
 Global Qualifiers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -77,12 +77,12 @@ a class that was imported as a Global Qualifier (Controlled or ZippyQ).
 This includes the primiary RotorHazard codebase as well as the 
 MultiGP Toolkit's codebase.
 
-    .. note::
+.. note::
 
-        The MultiGP Toolkit contains a system to notify the
-        race director to update the system when there is
-        an update available for either RotorHazard or
-        the MultiGP Toolkit
+    The MultiGP Toolkit contains a system to notify the
+    race director to update the system when there is
+    an update available for either RotorHazard or
+    the MultiGP Toolkit
 
 - A minimum of 3 pilots are required per heat 
 
