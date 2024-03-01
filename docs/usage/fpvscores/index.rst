@@ -23,14 +23,14 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
       - Uploading to FPVScores is Optional
       - FPVScores Event UUID
       - Linking MultiGP Chapter API key to FPVScores Organisation
-    * - **Standard MultiGP Race**
+    * - Standard MultiGP Race
       - **Yes**
       - *Required* when FPVScores Organisation **is not** linked **or** *Optional* when FPVScores Organisation **is** linked
       - *Required* when FPVScores Event UUID **is not** provided at upload
-    * - **MultiGP Global Qualifier**
+    * - MultiGP Global Qualifier
       - **No**
       - *Not Required*
-      - *Not Required* - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.::
+      - *Not Required*; when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.::
 
 Linking a FPVScores Organisation
 -------------------------------------------

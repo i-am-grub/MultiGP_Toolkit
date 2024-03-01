@@ -18,8 +18,6 @@ Import ZippyQ Rounds
                 :alt: RotorHazard Format page
                 :align: center
 
-        :raw-html:`<br />`
-
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
 
@@ -28,7 +26,12 @@ be created. This class will not have any heats under it.
         :alt: ZippyQ Class
         :align: center
 
-1. To import rounds from MultiGP, locate the ``ZippyQ Controls`` panel. *Note:* This panel is only visable when a ZippyQ race has been imported
+.. important::
+        The ZippyQ tools will only work with the class that was setup for you at the time
+        of importing the MultiGP race. Deleting this class will prevent you from being
+        able to use ZippyQ.
+
+1. To import rounds from MultiGP, locate the ``ZippyQ Controls`` panel.
 
     .. image:: zippyq_controls.png
             :width: 500
@@ -42,7 +45,7 @@ be created. This class will not have any heats under it.
             :alt: Import ZippyQ round
             :align: center
 
-You should now have the first ZippyQ round imported into the imported MultiGP race
+The first ZippyQ round should now be setup under the imported MultiGP race within RotorHazard
 
 .. image:: imported_round.png
         :width: 500
@@ -71,8 +74,6 @@ ZippyQ Pack Return
                 :alt: RotorHazard Marshal page
                 :align: center
 
-        :raw-html:`<br />`
-
 The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 
 .. image:: pack_return.png
@@ -90,7 +91,7 @@ The toolkit supports the functionality to give a pilot their pack back after a r
 
 .. note::
 
-    The race director will still need to manually remove the pack from ZippyQ through
+    The race director will still need to manually remove the pack through
     the MultiGP ZippyQ admin kiosk for the race.
 
 .. note::

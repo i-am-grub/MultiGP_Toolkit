@@ -12,8 +12,6 @@ Importing a Event into RotorHazard
                 :alt: RotorHazard Format page
                 :align: center
 
-        :raw-html:`<br />`
-
 Waiting for Plugin Activation
 -------------------------------------------
 
