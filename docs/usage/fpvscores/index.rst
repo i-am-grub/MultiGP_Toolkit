@@ -13,6 +13,7 @@ We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platfo
 
 
 .. _fpvscores table:
+
 .. list-table:: Ability to Upload Results
     :widths: 25 25 50
     :header-rows: 1
@@ -20,12 +21,12 @@ We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platfo
    * - 
      - FPVScores Event UUID
      - Linking MultiGP Chapter API key to FPVScores Organisation
-   * - Standard MultiGP Race
-     - Required when FPVScores Organisation **is not** linked or Optional when FPVScores Organisation **is** linked
-     - Required when FPVScores Event UUID **is not** provided at upload
-   * - MultiGP Global Qualifier
-     - Not Required
-     - Not Required - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.
+   * - **Standard MultiGP Race**
+     - *Required* when FPVScores Organisation **is not** linked **or** *Optional* when FPVScores Organisation **is** linked
+     - *Required* when FPVScores Event UUID **is not** provided at upload
+   * - **MultiGP Global Qualifier**
+     - *Not Required*
+     - *Not Required* - when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.
 
 Linking a FPVScores Organisation
 -------------------------------------------
