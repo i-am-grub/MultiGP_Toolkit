@@ -64,7 +64,7 @@ a race needs to be re-ran.
 
 .. seealso::
 
-    `Re-Running Races <rerunning races>`_
+    :ref:`ReRunning Races <rerunning races>`
 
 Global Qualifiers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -84,9 +84,16 @@ MultiGP Toolkit's codebase.
     an update available for either RotorHazard or
     the MultiGP Toolkit
 
-- A minimum of 3 pilots are required per heat 
+- A minimum of 3 pilots are required per heat
+- The imported class from MultiGP's can not
+be altered
+- The format assigned to the imported class from
+MultiGP cannot be altered with exception to the
+settings that manage the start/stop behavior of
+the timer
 
-.. _rerunning races::
 
-Re-Running Races
+.. _rerunning races:
+
+ReRunning Races
 -------------------------------------------
