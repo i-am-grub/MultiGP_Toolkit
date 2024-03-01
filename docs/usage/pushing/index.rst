@@ -1,12 +1,17 @@
 Pushing Results to MultiGP
 =============================
 
-All instructions under this subsection will be performed under the ``Format`` page
+.. important::
 
-.. image:: ../importing/format.png
-        :width: 500
-        :alt: RotorHazard Format page
-        :align: center
+        All instructions under this section will be performed under the ``Format`` page
+
+        .. image:: format.png
+                :width: 500
+                :alt: RotorHazard Format page
+                :align: center
+
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system
 
 MultiGP Results Controls Panel
 --------------------------------

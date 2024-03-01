@@ -8,7 +8,7 @@ Setting Up FPVScores
 The RotorHazard Development Team has teamed up with with `FPVScores <https://fpvscores.com/>`_ to provide a platform to host your race results!
 
 .. image:: mgp_link.png
-    :width: 1000
+    :width: 800
     :alt: FPVScores Event Link
     :align: center
 
@@ -40,21 +40,21 @@ Linking a FPVScores Organisation
 2. When signed in as a Organisation Organisator, open the event manager
 
     .. image:: event_manager.png
-        :width: 400
+        :width: 600
         :alt: Event Manager
         :align: center
 
 3. Open your Organisation's settings
 
     .. image:: organisation_settings.png
-        :width: 400
+        :width: 600
         :alt: Event Manager
         :align: center
 
 4. Enter your MultiGP Chapter's timer API key
 
     .. image:: chapter_apikey.png
-        :width: 400
+        :width: 600
         :alt: MultiGP Chapter API key
         :align: center
 
@@ -70,21 +70,21 @@ Finding and Event UUID for a race
 2. When signed in as a Organisation Organisator, open the event manager
 
     .. image:: event_manager.png
-        :width: 400
+        :width: 600
         :alt: Event Manager
         :align: center
 
 3. Open the events page
 
     .. image:: events.png
-        :width: 400
+        :width: 600
         :alt: Organisation Events
         :align: center
 
 4. Click the ``COPY`` button for the event with the UUID you desire
 
     .. image:: uuid_copy.png
-        :width: 400
+        :width: 600
         :alt: UUID Copy
         :align: center
 

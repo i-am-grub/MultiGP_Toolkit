@@ -46,14 +46,14 @@ Manual Installation
 2. Navigate to the release for |project_version| (the latest stable release) and open the ``Assets`` tab.
 
     .. image:: assets.png
-        :width: 400
+        :width: 600
         :alt: GitHub's Assets Tab
         :align: center
 
 3. Download the ``MultiGP_Toolkit.zip`` file
 
     .. image:: toolkit_zip.png
-        :width: 400
+        :width: 600
         :alt: MultiGP Toolkit's zip file location
         :align: center
 
@@ -69,6 +69,6 @@ Verifying your Installation
 If installation is successful, ``MultiGP Toolkit`` should be listed under the ``Plugins`` panel under the ``Settings`` page after rebooting
 
 .. image:: install_verify.png
-        :width: 500
+        :width: 600
         :alt: Installation Verification
         :align: center

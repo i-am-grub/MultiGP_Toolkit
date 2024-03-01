@@ -11,18 +11,21 @@ Import ZippyQ Rounds
 
 .. important::
 
+        All instructions under this subsection will be performed under the ``Format`` page
+
         .. image:: ../importing/format.png
                 :width: 500
                 :alt: RotorHazard Format page
                 :align: center
 
-        All instructions under this subsection will be performed under the ``Format`` page
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system
 
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
 
 .. image:: zippyq_class.png
-        :width: 500
+        :width: 600
         :alt: ZippyQ Class
         :align: center
 
@@ -34,21 +37,21 @@ be created. This class will not have any heats under it.
 1. To import rounds from MultiGP, locate the ``ZippyQ Controls`` panel.
 
     .. image:: zippyq_controls.png
-            :width: 500
+            :width: 600
             :alt: ZippyQ Controls Panel
             :align: center
 
 2. Open the ``ZippyQ Controls`` panel and click the ``Import Next ZippyQ Round`` button
 
     .. image:: import_round.png
-            :width: 500
+            :width: 600
             :alt: Import ZippyQ round
             :align: center
 
 The first ZippyQ round should now be setup under the imported MultiGP race within RotorHazard
 
 .. image:: imported_round.png
-        :width: 500
+        :width: 600
         :alt: Imported ZippyQ round
         :align: center
 
@@ -67,17 +70,20 @@ ZippyQ Pack Return
 
 .. important::
 
+        All instructions under this subsection will be performed under the ``Marshal`` page
+
         .. image:: marshal_page.png
                 :width: 500
                 :alt: RotorHazard Marshal page
                 :align: center
 
-        All instructions under this subsection will be performed under the ``Marshal`` page
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system
 
 The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 
 .. image:: pack_return.png
-        :width: 500
+        :width: 600
         :alt: Pack Reutrn
         :align: center
 

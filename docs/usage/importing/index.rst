@@ -5,12 +5,15 @@ Importing an Event into RotorHazard
 
 .. important::
 
+        All instructions under this section will be performed under the ``Format`` page
+
         .. image:: format.png
                 :width: 500
                 :alt: RotorHazard Format page
                 :align: center
 
-        All instructions under this section will be performed under the ``Format`` page
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system
 
 Waiting for Plugin Activation
 -------------------------------------------
@@ -29,28 +32,28 @@ your previous event start by locating the ``Event`` panel.
 1. Open up the ``Event`` panel and then click ``Archive/New Event``
 
     .. image:: archive.png
-            :width: 500
+            :width: 600
             :alt: Archive Panel
             :align: center
 
 2. Select ``Races, Heats, Classes, and Pilots`` from the drop-down selector
 
     .. image:: archive_selection.png
-            :width: 500
+            :width: 400
             :alt: Archive Selection
             :align: center
 
 3. Press ``Archive Event`` to backup your race data
 
     .. image:: archive_button.png
-            :width: 500
+            :width: 400
             :alt: Archive Selection
             :align: center
 
 Your previous event can now be seen under the ``Archived Events`` menu
 
 .. image:: archived_events.png
-            :width: 500
+            :width: 600
             :alt: Archive Selection
             :align: center
 
@@ -61,7 +64,7 @@ Import a MultiGP Event
 associated with the entered MultiGP API key.
 
     .. image:: race_panel.png
-            :width: 500
+            :width: 600
             :alt: Race Panel
             :align: center
 
@@ -69,7 +72,7 @@ associated with the entered MultiGP API key.
 and then click ``Import Race``
 
     .. image:: race_import.png
-            :width: 500
+            :width: 600
             :alt: Race Import
             :align: center
 

@@ -5,7 +5,7 @@ In order to activate most of the MultiGP Toolkit's functionality, your MultiGP c
 be provided.
 
 .. image:: creds_panel.png
-        :width: 1000
+        :width: 800
         :alt: MultiGP API Key
         :align: center
 
