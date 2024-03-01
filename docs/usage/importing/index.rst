@@ -5,14 +5,12 @@ Importing an Event into RotorHazard
 
 .. important::
 
-        All instructions under this section will be performed under the ``Format`` page
-
         .. image:: format.png
                 :width: 500
                 :alt: RotorHazard Format page
                 :align: center
 
-
+        All instructions under this section will be performed under the ``Format`` page
 
 Waiting for Plugin Activation
 -------------------------------------------
