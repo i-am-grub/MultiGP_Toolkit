@@ -50,5 +50,5 @@ There are two FPVScores related settings under the ``MultiGP Results Controls``.
 will either activate or deactivate the ability to push Results to FPVScores.
 
 The second setting allows you to provide a FPVScores Event UUID to allow you to push your results
-to a specific FPVScores event. See the :ref:`Ability to Upload Results <fpvscores table>` 
+to a specific FPVScores event. See the :ref:`Ability to Upload Results <Ability to Upload Results>` 
 table to show the mapped functionality.

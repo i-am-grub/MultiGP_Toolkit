@@ -11,9 +11,6 @@ We have partnered with `FPVScores <https://fpvscores.com/>`_ to provide a platfo
         :width: 1000
         :alt: FPVScores Event Link
 
-
-.. _fpvscores table:
-
 .. list-table:: Ability to Upload Results
     :widths: 25 25 50
     :header-rows: 1
