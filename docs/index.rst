@@ -10,8 +10,8 @@ MultiGP Toolkit plugin for RotorHazard
    usage/setup/index
    usage/importing/index
    usage/zippyq/index
+   usage/running/index
    usage/pushing/index
-   usage/global_qualifiers/index
 
 Indices and tables
 ==================
