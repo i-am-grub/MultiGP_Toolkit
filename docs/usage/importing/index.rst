@@ -1,6 +1,6 @@
 .. _importing from mgp:
 
-Importing a Event into RotorHazard
+Importing an Event into RotorHazard
 ==========================================
 
 .. important::
@@ -11,6 +11,8 @@ Importing a Event into RotorHazard
                 :width: 500
                 :alt: RotorHazard Format page
                 :align: center
+
+
 
 Waiting for Plugin Activation
 -------------------------------------------
