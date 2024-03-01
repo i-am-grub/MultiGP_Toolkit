@@ -94,6 +94,7 @@ the type of changes that should be shown depending on the type of race that was 
     :widths: 30 10 10
     :header-rows: 1
     :stub-columns: 1
+    :align: center
 
     * - 
       - Controlled Race

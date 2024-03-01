@@ -18,6 +18,7 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
     :widths: 15 15 25 45
     :header-rows: 1
     :stub-columns: 1
+    :align: center
 
     * - 
       - Uploading to FPVScores is Optional
