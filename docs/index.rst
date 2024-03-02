@@ -13,7 +13,7 @@ MultiGP Toolkit plugin for RotorHazard
    usage/running/index
    usage/pushing/index
 
-.. image:: rotorhazard-logo.png
+.. image:: rotorhazard-logo.svg
    :width: 800
    :alt: RotorHazard Logo
    :align: center
