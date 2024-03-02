@@ -44,7 +44,7 @@ html_theme_options = {
     'nav_title': 'MultiGP Toolkit',
 
     'color_primary': 'orange',
-    'color_accent': 'orange',
+    'color_accent': 'grey',
 
     'repo_url': 'https://github.com/i-am-grub/MultiGP_Toolkit',
     'repo_name': 'MultiGP Toolkit',
