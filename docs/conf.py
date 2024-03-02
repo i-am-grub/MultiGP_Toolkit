@@ -52,4 +52,8 @@ html_theme_options = {
     'globaltoc_collapse': False,
 }
 
+html_sidebars = {
+    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
+}
+
 extensions = ['sphinx.ext.autosectionlabel']

@@ -80,7 +80,7 @@ a class that was imported as a Global Qualifier (Controlled or ZippyQ).
     the MultiGP Toolkit
 
 - A minimum of 3 pilots are required per heat
-- The imported class from MultiGP's can not be altered
+- The imported class from MultiGP can not be altered and must be used (results will not be uploaded otherwise)
 - The format assigned to the imported class from MultiGP cannot be altered with exception to the settings that manage the start/stop behavior of the timer
 
 
