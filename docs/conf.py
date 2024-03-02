@@ -49,7 +49,7 @@ html_theme_options = {
     'repo_type': 'github',
 
     'globaltoc_depth': 2,
-    'globaltoc_collapse': False,
+    'globaltoc_collapse': True,
 }
 
 html_sidebars = {
