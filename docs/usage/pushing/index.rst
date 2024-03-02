@@ -5,7 +5,7 @@ Pushing Results to MultiGP
 
         All instructions under this section will be performed under the ``Format`` page
 
-        .. image:: format.png
+        .. image:: ../importing/format.png
                 :width: 500
                 :alt: RotorHazard Format page
                 :align: center
