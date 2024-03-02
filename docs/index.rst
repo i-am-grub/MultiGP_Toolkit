@@ -1,6 +1,16 @@
 MultiGP Toolkit plugin for RotorHazard
 ===========================================
 
+.. image:: rotorhazard-logo.svg
+   :width: 800
+   :alt: RotorHazard Logo
+   :align: center
+
+.. image:: multigp-logo.png
+   :width: 800
+   :alt: MultiGP Logo
+   :align: center
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
@@ -12,16 +22,6 @@ MultiGP Toolkit plugin for RotorHazard
    usage/zippyq/index
    usage/running/index
    usage/pushing/index
-
-.. image:: rotorhazard-logo.svg
-   :width: 800
-   :alt: RotorHazard Logo
-   :align: center
-
-.. image:: multigp-logo.png
-   :width: 800
-   :alt: MultiGP Logo
-   :align: center
 
 Plugin Overview
 ---------------------------
