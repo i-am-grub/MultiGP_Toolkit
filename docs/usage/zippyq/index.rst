@@ -6,6 +6,11 @@ Using MultiGP's ZippyQ System
     The ``ZippyQ Controls`` and ``ZippyQ Pack Return`` panels are only visable when a ZippyQ
     race has been imported.
 
+.. note::
+
+    After a race utilizing ZippyQ has been saved - either after running the race or marshaling -
+    the result will be uploaded automatically to MultiGP.
+
 Import ZippyQ Rounds
 ------------------------------
 
@@ -49,7 +54,7 @@ be created. This class will not have any heats under it.
             :alt: Import ZippyQ round
             :align: center
 
-The first ZippyQ round should now be setup under the imported MultiGP race within RotorHazard
+The first ZippyQ round and the pilots within the round should now imported within RotorHazard
 
 .. image:: imported_round.png
         :width: 600

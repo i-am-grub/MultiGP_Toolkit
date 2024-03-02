@@ -22,7 +22,7 @@ Waiting for Plugin Activation
 After placing your MultiGP chapter's timer API key into the RotorHazard system,
 the plugin will activate if the timer has an internet connection after rebooting.
 The server will wait for a duration of time before checking the internet to give the
-timer the some extra time to establish the connection.
+timer's raspberry pi some extra time to establish the connection.
 
 Archiving any Previous Events
 -------------------------------------------
@@ -57,6 +57,14 @@ Your previous event can now be seen under the ``Archived Events`` menu
             :width: 600
             :alt: Archive Selection
             :align: center
+
+.. note::
+
+  The archived event will typically be named after the current ``Event Name``. In the
+  case that there is already a archived database, the newly archived database will be named
+  with the system's date and time it was archived at. If your timer does not have a Real Time
+  Clock installed, the system's time may not have access to the correct date and time at the time
+  of archiving. 
 
 Import a MultiGP Event
 -------------------------------------------

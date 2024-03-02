@@ -22,7 +22,9 @@ author = 'Bryce Gruber'
 version = VERSION_INFO.split("-")[0]
 release = VERSION_INFO
 
-rst_prolog = f".. |project_version| replace:: {version}"
+rst_prolog = f"""
+.. |project_version| replace:: {release}
+"""
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -41,8 +43,8 @@ html_static_path = ['_static']
 html_theme_options = {
     'nav_title': 'MultiGP Toolkit',
 
-    'color_primary': '#ffffff',
-    'color_accent': '#212b5c',
+    'color_primary': 'white',
+    'color_accent': 'red',
 
     'repo_url': 'https://github.com/i-am-grub/MultiGP_Toolkit',
     'repo_name': 'MultiGP Toolkit',
