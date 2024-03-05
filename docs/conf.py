@@ -42,7 +42,6 @@ html_static_path = ['_static']
 
 html_theme_options = {
     'nav_title': 'MultiGP Toolkit',
-
     'color_primary': 'indigo',
 
     'repo_url': 'https://github.com/i-am-grub/MultiGP_Toolkit',
