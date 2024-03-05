@@ -50,7 +50,7 @@ html_theme_options = {
 
     'globaltoc_depth': 2,
     'globaltoc_collapse': True,
-    'logo_icon': '&#xe869',
+    'logo_icon': '&#xe88a',
 }
 
 html_sidebars = {
