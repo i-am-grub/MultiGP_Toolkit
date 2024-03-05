@@ -1,7 +1,9 @@
-# MultiGP Toolkit for RotorHazard
+# MultiGP Toolkit plugin for RotorHazard
 
 > [!WARNING]
 > Please be aware that this plugin is not approved for MultiGP Global Qualifers 
+
+![MultiGP](docs/multigp-logo.png)
 
 ## Plugin Documentation
 
