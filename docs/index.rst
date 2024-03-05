@@ -1,12 +1,12 @@
 MultiGP Toolkit plugin for RotorHazard
 ===========================================
 
-.. image:: docs/rotorhazard-logo.svg
+.. image:: rotorhazard-logo.svg
    :width: 800
    :alt: RotorHazard Logo
    :align: center
 
-.. image:: docs/multigp-logo.png
+.. image:: multigp-logo.png
    :width: 800
    :alt: MultiGP Logo
    :align: center
@@ -15,13 +15,13 @@ MultiGP Toolkit plugin for RotorHazard
    :maxdepth: 1
    :caption: Contents:
 
-   docs/usage/install/index
-   docs/usage/fpvscores/index
-   docs/usage/setup/index
-   docs/usage/importing/index
-   docs/usage/zippyq/index
-   docs/usage/running/index
-   docs/usage/pushing/index
+   usage/install/index
+   usage/fpvscores/index
+   usage/setup/index
+   usage/importing/index
+   usage/zippyq/index
+   usage/running/index
+   usage/pushing/index
 
 .. warning::
 
