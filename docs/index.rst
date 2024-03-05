@@ -11,7 +11,7 @@ MultiGP Toolkit plugin for RotorHazard
    :alt: MultiGP Logo
    :align: center
 
-   .. toctree::
+.. toctree::
    :maxdepth: 1
    :caption: Contents:
 
