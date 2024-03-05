@@ -58,5 +58,3 @@ html_sidebars = {
 }
 
 extensions = ['sphinx.ext.autosectionlabel']
-
-e869
