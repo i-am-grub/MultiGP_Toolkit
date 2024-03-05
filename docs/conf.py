@@ -50,7 +50,7 @@ html_theme_options = {
 
     'globaltoc_depth': 2,
     'globaltoc_collapse': True,
-    'logo_icon': 'e88a'
+    'logo_icon': '&#xe869',
 }
 
 html_sidebars = {
@@ -58,3 +58,5 @@ html_sidebars = {
 }
 
 extensions = ['sphinx.ext.autosectionlabel']
+
+e869
