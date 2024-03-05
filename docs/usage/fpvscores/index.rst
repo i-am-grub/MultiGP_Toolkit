@@ -31,28 +31,28 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
     * - MultiGP Global Qualifier
       - **No**
       - *Not Required*
-      - *Not Required*; when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.::
+      - *Not Required*; when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.
 
 Linking a FPVScores Organisation
 -------------------------------------------
 
 1. Navigate to `FPVScores <https://fpvscores.com/>`_.
 
-2. When signed in as a Organisation Organisator, open the event manager
+2. When signed in as a Organisation Organisator, open the ``Event Manager``
 
     .. image:: event_manager.png
         :width: 600
         :alt: Event Manager
         :align: center
 
-3. Open your Organisation's settings
+3. Open ``Organisation Settings``
 
     .. image:: organisation_settings.png
         :width: 600
         :alt: Event Manager
         :align: center
 
-4. Enter your MultiGP Chapter's timer API key
+4. Scroll down to the ``MultiGP Chapter API`` field and enter your MultiGP Chapter's API key
 
     .. image:: chapter_apikey.png
         :width: 600
@@ -63,19 +63,19 @@ Linking a FPVScores Organisation
 
 You can now upload results to your FPVScores Organisation without providing an Event UUID to the MultiGP Toolkit when uploading your race results!
 
-Finding and Event UUID for a race
+Finding an Event UUID for a race
 -------------------------------------------
 
 1. Navigate to `FPVScores <https://fpvscores.com/>`_.
 
-2. When signed in as a Organisation Organisator, open the event manager
+2. When signed in as a Organisation Organisator, open the ``Event Manager``
 
     .. image:: event_manager.png
         :width: 600
         :alt: Event Manager
         :align: center
 
-3. Open the events page
+3. Open the ``Events`` page
 
     .. image:: events.png
         :width: 600
@@ -89,4 +89,4 @@ Finding and Event UUID for a race
         :alt: UUID Copy
         :align: center
 
-Your UUID should now be stored within your Clipboard
+Your UUID should now be stored within your clipboard. This value can now be pasted from the clipboard as needed.

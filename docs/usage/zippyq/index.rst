@@ -8,7 +8,7 @@ Using MultiGP's ZippyQ System
 
 .. note::
 
-    After a race utilizing ZippyQ has been saved - either after running the race or marshaling -
+    After a race utilizing ZippyQ has been saved (either after running the race or marshaling)
     the result will be uploaded automatically to MultiGP.
 
 Import ZippyQ Rounds

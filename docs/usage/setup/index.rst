@@ -23,5 +23,5 @@ be provided.
 4. Reboot the RotorHazard server.
 
 After inputting a valid MultiGP API key, anytime the timer is rebooted and a internet connection is detected
-at startup, there will be additional functionality added to the RotorHazard UI. See :ref:`Importing a Event into 
+at startup, there will be additional functionality added to the RotorHazard UI. See :ref:`Importing an Event into 
 RotorHazard <importing from mgp>` for an example of this additional functionality.

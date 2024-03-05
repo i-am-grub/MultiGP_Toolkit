@@ -61,7 +61,7 @@ Manual Installation
 
 5. Install the ``MultiGP_Toolkit`` folder into the ``~/RotorHazard/src/server/plugins`` folder within your RotorHazard installation
 
-6. Restart the server::
+6. Restart the server
 
 Verifying your Installation
 -------------------------------------------

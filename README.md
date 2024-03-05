@@ -7,10 +7,13 @@
 
 ## Plugin Documentation
 
+> [!WARNING]
+> The linked documentation reflects the `v2.0.0` release of the plugin and not the current `stable` release.
+> The documentation for `v1.2.1` can be found [here](https://github.com/i-am-grub/MultiGP_Toolkit/tree/temp) temporarily until the offical `v2.0.0` release.
+
 [![Documentation Status](https://readthedocs.org/projects/multigp-toolkit/badge/?version=latest)](https://multigp-toolkit.readthedocs.io/en/latest/?badge=latest)
 
-The documentation for this plugin can be found [here](https://multigp-toolkit.readthedocs.io/)
-
+The documentation for this plugin can be found [here](https://github.com/i-am-grub/MultiGP_Toolkit/blob/temp/README.md)
 ## Plugin Overview
 
 This is a plugin developed for the RotorHazard timing system with cooperation with MultiGP. It allows for the ability to pull and push data through the MultiGP API to assist with event management.

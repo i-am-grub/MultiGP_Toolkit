@@ -57,20 +57,22 @@ the ``Update Scores`` setting for your race.
 FPVScores Settings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are two FPVScores related settings under the ``MultiGP Results Controls`` panels. The first setting
-will either activate or deactivate the ability to push Results to FPVScores.
+There are two FPVScores related settings under the ``MultiGP Results Controls`` panels. 
 
-The second setting allows you to provide a FPVScores Event UUID to allow you to push your results
-to a specific FPVScores event. See the table showing the mapped functionality of the :ref:`MultiGP 
+- ``Upload to FPVScores on Results Push`` will either activate or deactivate the ability to push Results to FPVScores.
+- ``FPVScores Event UUID`` allows you to provide a FPVScores Event UUID to allow you to push your results to a specific FPVScores event. 
+
+.. seealso::
+See the table showing the mapped functionality of the :ref:`MultiGP 
 Toolkit's Ability to Upload to FPVScores <fpvscores table>`.
-
 
 Pushing Global Qualifier Results
 ----------------------------------
 
 When running a Global Qualifier, you will be limited to only having the ability to
 use the ``Push Event Results`` button. When this button is used, the results of
-the imported MultiGP class will be pushed to MultiGP and FPVScores.
+the imported MultiGP class will be pushed to MultiGP and FPVScores. You will need to
+use this button at least once for your Global Qualifier results to be considered valid.
 
 .. image:: gq_panel.png
         :width: 500

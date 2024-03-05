@@ -19,7 +19,7 @@ Importing an Event into RotorHazard
 Waiting for Plugin Activation
 -------------------------------------------
 
-After placing your MultiGP chapter's timer API key into the RotorHazard system,
+After placing your MultiGP chapter's API key into the RotorHazard system,
 the plugin will activate if the timer has an internet connection after rebooting.
 The server will wait for a duration of time before checking the internet to give the
 timer's raspberry pi some extra time to establish the connection.
