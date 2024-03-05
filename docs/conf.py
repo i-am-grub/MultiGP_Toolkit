@@ -57,4 +57,5 @@ html_sidebars = {
     "**": ["logo-text.html", "globaltoc.html", "searchbox.html"]
 }
 
-extensions = ['sphinx.ext.autosectionlabel']
+extensions = ['sphinx_material',
+              'sphinx.ext.autosectionlabel']
