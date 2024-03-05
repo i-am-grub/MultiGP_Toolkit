@@ -16,7 +16,7 @@
 The documentation for this plugin can be found [here](https://multigp-toolkit.readthedocs.io)
 ## Plugin Overview
 
-This is a plugin developed for the RotorHazard timing system with cooperation with MultiGP. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
+This is a plugin developed with cooperation with MultiGP for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
 
 This plugin now comes packaged with a mini version of [FPVScores](https://github.com/FPVScores/FPVScores) allowing you to push your event results without the need to install the full version.
 
