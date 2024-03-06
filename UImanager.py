@@ -39,6 +39,7 @@ class UImanager():
 
         self._rhapi.ui.broadcast_ui('format')
         self._rhapi.ui.broadcast_ui('marshal')
+        self._rhapi.ui.broadcast_ui('run')
 
     #
     # Panels
@@ -48,7 +49,7 @@ class UImanager():
         self._rhapi.ui.register_panel('multigp_race_import', f'MultiGP Race Import - {self._chapter_name}', '', order=0)
         self.mgp_race_selector()
 
-        auto_logo = UIField('auto_logo', "Download Logo", desc="Download and set chapter logo from MultiGP on [Import Race]", field_type = UIFieldType.CHECKBOX, value='0')
+        auto_logo = UIField('auto_logo', "Download Logo", desc="Download and set chapter logo from MultiGP on [Import Race]", field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_logo, 'multigp_race_import')
 
         self._rhapi.ui.register_quickbutton('multigp_race_import', 'refresh_events', 'Refresh MultiGP Races', self.mgp_race_selector, args = {'refreshed':True})
@@ -86,8 +87,10 @@ class UImanager():
     def show_zippyq_controls(self, show = True):
         if show:
             self._rhapi.ui.register_panel('zippyq_controls', f'ZippyQ Controls', 'format', order=0)
+            self._rhapi.ui.register_panel('zippyq_controls_run', f'ZippyQ Controls', 'run', order=0)
         else:
             self._rhapi.ui.register_panel('zippyq_controls', f'ZippyQ Controls', '', order=0)
+            self._rhapi.ui.register_panel('zippyq_controls_run', f'ZippyQ Controls', '', order=0)
 
     def create_zippyq_return(self):
         self._rhapi.ui.register_panel('zippyq_return', f'ZippyQ Pack Return', '', order=0)
@@ -204,7 +207,7 @@ class UImanager():
             self._rhapi.ui.broadcast_ui('marshal')
 
     #
-    # Class Placeholders
+    # Plcaholders
     #
             
     _rhapi = None

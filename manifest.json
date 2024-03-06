@@ -3,7 +3,7 @@
     "author" : "Bryce \"GRUBBY\" Gruber",
     "author_uri" : "https://github.com/i-am-grub",
     "description" : "Interact with the MultiGP API directly from RotorHazard",
-    "info_uri" : "https://multigp-toolkit.readthedocs.io/index.html",
+    "info_uri" : "https://multigp-toolkit.readthedocs.io/",
     "license" : "MIT",
     "license_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit/blob/master/LICENSE",
     "version" : "v2.0.0-dev.8",

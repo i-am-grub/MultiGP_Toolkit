@@ -1,9 +1,10 @@
-# This file is a modified lite version of
+# This file is a modified version of
 # https://github.com/FPVScores/FPVScores/blob/d6bd2ab96bf44e637726e66233f6acfcbb7b5ec5/fpvscores/__init__.py
 
 import logging
 import requests
 import json
+import gevent
 from data_export import DataExporter
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -14,6 +15,24 @@ logger = logging.getLogger(__name__)
 # FPVScores interface
 #
 
+def postFPVS(url, json_data):
+    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
+
+    count = 0
+    mex_retries = 5
+    while (count < mex_retries):
+        count += 1
+        try:
+            response = requests.post(url, headers=headers, data=json_data)
+        except requests.exceptions.ConnectionError:
+            logger.warning(f"Trying to establish connection to FPVScores - Attempt {count}/{mex_retries}")
+            if count >= mex_retries:
+                return None
+            else:
+                gevent.sleep(5)
+        else:
+            return response
+
 def getURLfromFPVS(rhapi, uuid):
 
     if not uuid:
@@ -22,9 +41,8 @@ def getURLfromFPVS(rhapi, uuid):
     rhapi.ui.message_notify(rhapi.__('Getting event URL from FPVScores.'))
     url = 'https://api.fpvscores.com/rh/0.0.2/?action=fpvs_get_event_url'
     json_data = json.dumps({"event_uuid": uuid})
-    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
-    r = requests.post(url, data=json_data, headers=headers)
-    if r.status_code == 200:
+    r = postFPVS(url, json_data)
+    if r and r.status_code == 200:
         if r.text == 'no event found':
            rhapi.ui.message_notify(rhapi.__('Event URL not found. Please check the entered UUID.'))
            return None
@@ -41,9 +59,8 @@ def runPushMGP(rhapi):
     url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_push'
     input_data = rhapi.io.run_export('JSON_FPVScores_MGP_Upload')
     json_data =  input_data['data']
-    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
-    r = requests.post(url, data=json_data, headers=headers)
-    if r.status_code == 200:
+    r = postFPVS(url, json_data)
+    if r and r.status_code == 200:
         data = json.loads(r.text)
         if data["status"] == "error":
             return data["message"], None
@@ -55,10 +72,9 @@ def runPushMGP(rhapi):
 def linkedMGPOrg(rhapi):
 
     url = 'https://api.fpvscores.com/rh/0.0.3/?action=mgp_api_check'
-    headers = {'Authorization' : 'rhconnect', 'Accept' : 'application/json', 'Content-Type' : 'application/json'}
     json_data = json.dumps({"mgp_api_key": rhapi.db.option('mgp_api_key')})
-    r = requests.post(url, data=json_data, headers=headers)
-    if r.status_code == 200:
+    r = postFPVS(url, json_data)
+    if r and r.status_code == 200:
         data = json.loads(r.text)
         return data["exist"] == "true"
     else:

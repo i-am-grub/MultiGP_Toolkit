@@ -62,7 +62,6 @@ class RHmanager(UImanager):
         self._rhapi.events.on(Evt.RACE_FORMAT_DELETE, self.verify_classes, name='verify_classes')
         self._rhapi.events.on(Evt.DATABASE_RESET, self.reset_event_metadata, name='reset_event_metadata')
         self._rhapi.events.on(Evt.DATABASE_RECOVER, self.update_panels, name='update_panels')
-        self._rhapi.events.on(Evt.HEAT_SET, self.set_frequency_profile, name='set_frequency_profile')
         self._rhapi.events.on(Evt.LAPS_SAVE, self.generate_pilot_list, name='generate_pilot_list')
 
     #
@@ -77,6 +76,8 @@ class RHmanager(UImanager):
         self._rhapi.db.option_set('mgp_race_id', '')
         self._rhapi.db.option_set('zippyq_event', '0')
         self._rhapi.db.option_set('global_qualifer_event', '0')
+        self._rhapi.db.option_set('results_select', '')
+        self._rhapi.db.option_set('ranks_select', '')
         self.update_panels()
 
     def set_frequency_profile(self, args):
@@ -115,25 +116,18 @@ class RHmanager(UImanager):
 
     def verify_creds(self, args):
 
-        # Give the timer time to connect to the internet on reboot
-        gevent.sleep(10)
-
         key = self._rhapi.db.option('mgp_api_key')
         if key:
             self.multigp.set_apiKey(key)
         else:
             return
 
-        try:
-            self._chapter_name = self.multigp.pull_chapter()
-        except:
-            logger.info(f"Please check the entered key or the RotorHazard system's internet connection")
-            return
+        self._chapter_name = self.multigp.pull_chapter()
 
         if self._chapter_name:
             logger.info(f"API key for {self._chapter_name} has been recognized")
         else:
-            logger.info(f"API key cannot be verified.")
+            logger.info(f"MultiGP API key cannot be verified.")
             return
         
         self.setup_plugin()
@@ -267,9 +261,6 @@ class RHmanager(UImanager):
             self._rhapi.db.raceclasses,
         ]
 
-        if race_data['raceType'] == '2':
-            rh_db.append(self._rhapi.db.pilots)
-
         if any(rh_db) or self._rhapi.db.option('mgp_race_id'):
             message = "Archive Race, Heat, Class, and Pilot data before continuing. Under the Event panel >> Archive/New Event >> Archive Event."
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
@@ -371,21 +362,7 @@ class RHmanager(UImanager):
 
             self._rhapi.db.slots_alter_fast(slot_list)
             self._rhapi.db.raceclass_alter(race_class.id, attributes = {'mgp_raceclass_id': selected_race, 'zippyq_class' : False, 'gq_class' : mgp_format.mgp_gq})
-
-            imported_set = json.dumps(frequencyset)
-            frequencyset_names = []
-            for fset in self._rhapi.db.frequencysets:
-                frequencyset_names.append(fset.name)
-                if json.loads(fset.frequencies)["f"] == frequencyset["f"]:
-                    self._rhapi.db.option_set('currentProfile', fset.id)
-                    break
-            else:
-                index = 1
-                base = "MultiGP Profile"
-                while(f"{base} {index}" in frequencyset_names):
-                    index += 1
-                new_profile = self._rhapi.db.frequencyset_add(name=f"{base} {index}", frequencies=imported_set)
-                self._rhapi.db.option_set('currentProfile', new_profile.id)
+            self._rhapi.race.frequencyset = fprofile_id
 
         elif race_data['disableSlotAutoPopulation'] == "0":
             num_rounds = 0
@@ -419,7 +396,7 @@ class RHmanager(UImanager):
 
         try:
             heat_name = data['rounds'][0]['name']
-        except:
+        except IndexError:
             message = "Additional ZippyQ rounds not found"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
@@ -432,7 +409,7 @@ class RHmanager(UImanager):
             for index, mgp_pilot in enumerate(heat['entries']):
                 try:
                     db_pilot_id = self.pilot_search(db_pilots, mgp_pilot)              
-                except:
+                except KeyError:
                     continue
                 else:
                     slot_list.append({'slot_id':rh_slots[index].id, 'pilot':db_pilot_id})  
@@ -720,12 +697,7 @@ class RHmanager(UImanager):
         if self._rhapi.db.raceclass_attribute_value(selected_results, 'zippyq_class') == "1":
             multi_round = False
         else:
-            for race_info in races:
-                if race_info.round_id > 1:
-                    multi_round = True
-                    break
-            else:
-                multi_round = False
+            multi_round = True
 
         if multi_round:
             class_heats = []
@@ -789,6 +761,9 @@ class RHmanager(UImanager):
     
     def verify_race(self, args):
 
+        if not self._rhapi.db.option('mgp_race_id'):
+            return
+
         heat_id = args['heat_id']
         heat_info = self._rhapi.db.heat_by_id(heat_id)
 
@@ -808,6 +783,9 @@ class RHmanager(UImanager):
             else:
                 heat_pilots.append(slot_info.pilot_id)
                 pilot_counter += 1
+
+        if pilot_counter == 0:
+            self._rhapi.race.stop()
 
         # Verify rounds for respective formats
         zq_state = self._rhapi.db.raceclass_attribute_value(heat_info.class_id, 'zippyq_class')

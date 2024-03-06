@@ -1,6 +1,7 @@
 import logging
 import json
 import requests
+import gevent
 
 logger = logging.getLogger(__name__)
 
@@ -12,11 +13,26 @@ class multigpAPI():
 
     def _request_and_download(self, url, json_request):
         header = {'Content-type': 'application/json'}
-        response = requests.post(url, headers=header, data=json_request, timeout=5)
+
+        count = 0
+        mex_retries = 10
+        while (count < mex_retries):
+            count += 1
+            try:
+                response = requests.post(url, headers=header, data=json_request)
+            except requests.exceptions.ConnectionError:
+                logger.warning(f"Trying to establish connection to MultiGP - Attempt {count}/{mex_retries}")
+                if count >= mex_retries:
+                    returned_json = {'status' : False}
+                    return returned_json
+                else:
+                    gevent.sleep(5)
+            else:
+                break
 
         try:
             returned_json = json.loads(response.text)
-        except:
+        except AttributeError:
             returned_json = {'status' : False}
         finally:
             return returned_json
