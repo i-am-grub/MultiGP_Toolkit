@@ -1,5 +1,3 @@
-.. _importing from mgp:
-
 Importing an Event into RotorHazard
 ==========================================
 
@@ -13,8 +11,8 @@ Importing an Event into RotorHazard
                 :align: center
 
         If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot the system. After rebooting, there may be a delay before an internet connection
-        is established.
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
 
 Waiting for Plugin Activation
 -------------------------------------------

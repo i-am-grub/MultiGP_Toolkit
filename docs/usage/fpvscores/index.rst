@@ -26,14 +26,14 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
       - Yes
       - No, it is mandatory to upload to FPVScores
     * - Do I need an Event UUID from FPVScores?
-      - Only when you want to upload to FPVScores and your Organisation is **not** linked
+      - Only when you want to upload to FPVScores and your Organisation **is not** linked
       - No
     * - Am I required to link my FPVScores Organisation to MultiGP
       - No
       - No
     * - Can FPVScores automatically create an event for me?
-      - When you have a linked FPVScores Organisation to MultiGP
-      - All events will be automatically created. If you have a linked FPVScores Organisation, the event will be created under your Organisation, otherwise, an ``Unlinked`` will be created to store your results. 
+      - Yes, when you have linked an FPVScores Organisation to MultiGP
+      - All events will be automatically created. If you have a linked FPVScores Organisation, the event will be created under your Organisation, otherwise, an ``Unlinked`` event will be created to store your results. 
 
 Linking a FPVScores Organisation
 -------------------------------------------
