@@ -24,8 +24,8 @@ Import ZippyQ Rounds
                 :align: center
 
         If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot the system. After rebooting, there may be a delay before an internet connection
-        is established.
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
 
 After importing a race with ZippyQ enabled, a new class under ``Classes and Heats`` will
 be created. This class will not have any heats under it.
@@ -84,8 +84,8 @@ ZippyQ Pack Return
                 :align: center
 
         If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot the system. After rebooting, there may be a delay before an internet connection
-        is established.
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
 
 The toolkit supports the functionality to give a pilot their pack back after a race if needed. 
 

@@ -58,4 +58,7 @@ html_sidebars = {
 }
 
 extensions = ['sphinx_material',
-              'sphinx.ext.autosectionlabel']
+              'sphinx.ext.autosectionlabel',
+              'sphinx_substitution_extensions',
+              'sphinx_copybutton'
+              ]

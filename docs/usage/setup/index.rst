@@ -4,6 +4,9 @@ Activating the MultiGP Toolkit
 In order to activate most of the MultiGP Toolkit's functionality, your MultiGP chapter's timer API key must 
 be provided.
 
+Adding your MultiGP Chapter's API Key
+-------------------------------------------
+
 .. image:: creds_panel.png
         :width: 800
         :alt: MultiGP API Key
@@ -22,6 +25,16 @@ be provided.
 
 4. Reboot the RotorHazard server.
 
-After inputting a valid MultiGP API key, anytime the timer is rebooted and a internet connection is detected
-at startup, there will be additional functionality added to the RotorHazard UI. See :ref:`Importing an Event into 
-RotorHazard <importing from mgp>` for an example of this additional functionality.
+.. _plugin activation:
+
+Waiting for Plugin Activation
+-------------------------------------------
+
+After inputting a MultiGP API key, anytime the timer is rebooted, the plugin will attempt to
+connect to MultiGP to verify the key. To compensate for the time it may take for timer
+to connect to the network, the plugin will make a multiple attempts to establish a connection 
+over a period of time. It will continue to attempt until it is either successful or the max number 
+of attempts has been reached.
+
+In the event that the timer has successfully connected and the MultiGP API key has been 
+verified, the plugin's user interface will activate.
