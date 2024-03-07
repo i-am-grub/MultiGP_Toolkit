@@ -59,27 +59,14 @@ Your previous event can now be seen under the ``Archived Events`` menu
 Setting Up MultiGP's Frequency Profile 
 -------------------------------------------
 
-.. important::
-
-        All instructions under this subsection will be performed under the ``Settings`` page
-
-        .. image:: format.png
-                :width: 500
-                :alt: RotorHazard Format page
-                :align: center
-
-        If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot the system. For more information, review the section on the 
-        :ref:`plugin's activation <plugin activation>`.
-
 .. image:: mgp_fprofile.png
             :width: 600
             :alt: MultiGP Frequency Profile
             :align: center
 
-The frequency profile you can use is determined by the number of nodes within your RotorHazard timer.
-The ``IMD6`` profile has 6 slots, therefore in order to use it, your timer must have at least 6 functional nodes.
-Likewise, since ``Raceband 8`` has 8 slots, you must have an 8 (or more) node timer.
+The MultiGP frequency profile you can use is determined by the number of nodes within your RotorHazard timer.
+MultiGP's ``IMD6`` profile has 6 slots, therefore in order to use it, your timer must have at least 6 functional nodes.
+Likewise, since MultiGP's ``Raceband 8`` has 8 slots, you must have an 8 (or more) node timer.
 
 Disabling Slots
 ^^^^^^^^^^^^^^^^^^^^^
@@ -88,7 +75,11 @@ Disabling Slots
             :alt: Disabling Slots
             :align: center
 
-Even when slots are disabled, your timer must have as many or nodes that the MultiGP frequency profile.
+When slots are disabled within a MultiGP frequency profile, they are not removed. For example, when disabling
+two slots in MultiGP's ``Raceband 8`` frequency profile, it is still considered an 8 slot frequency profile. 
+For this reason, even when slots are disabled, your timer must have as many or more nodes than the MultiGP 
+frequency profile.
+
 In the event there have been slots disabled from the MultiGP frequency profile, you are able to disable
 the equivalent nodes within RotorHazard's frequency profile.
 
@@ -100,7 +91,7 @@ the equivalent nodes within RotorHazard's frequency profile.
 There are a few advantages to disabling unnecessary nodes such as decluttering the RotorHazard UI and 
 reducing the overall power consumption of the timer.
 
-.. image:: disabled_nodes_UI.png
+.. image:: disabled_nodes_ui.png
             :width: 800
             :alt: Decluttering User Interface
             :align: center
