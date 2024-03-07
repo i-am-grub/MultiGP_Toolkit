@@ -30,11 +30,11 @@ Adding your MultiGP Chapter's API Key
 Waiting for Plugin Activation
 -------------------------------------------
 
-After inputting a MultiGP API key, anytime the timer is rebooted, it will attempt to
+After inputting a MultiGP API key, anytime the timer is rebooted, the plugin will attempt to
 connect to MultiGP to verify the key. To compensate for the time it may take for timer
-to setup the network, it will make a multiple attempts to establish a connection 
-over a period of time until it is either successful, or the max number of attempts has
-been reached.
+to connect to the network, the plugin will make a multiple attempts to establish a connection 
+over a period of time. It will continue to attempt until it is either successful or the max number 
+of attempts has been reached.
 
-In the event that the timer has successfully connected and the API has been verified, 
-the plugin's user interface will activate.
+In the event that the timer has successfully connected and the MultiGP API key has been 
+verified, the plugin's user interface will activate.

@@ -1,9 +1,12 @@
 Importing an Event into RotorHazard
 ==========================================
 
+Archiving any Previous Events
+-------------------------------------------
+
 .. important::
 
-        All instructions under this section will be performed under the ``Format`` page
+        All instructions under this subsection will be performed under the ``Format`` page
 
         .. image:: format.png
                 :width: 500
@@ -13,17 +16,6 @@ Importing an Event into RotorHazard
         If the panels under this subsection are not visable, verify your **timer** has an internet
         connection and reboot the system. For more information, review the section on the 
         :ref:`plugin's activation <plugin activation>`.
-
-Waiting for Plugin Activation
--------------------------------------------
-
-After placing your MultiGP chapter's API key into the RotorHazard system,
-the plugin will activate if the timer has an internet connection after rebooting.
-The server will wait for a duration of time before checking the internet to give the
-timer's raspberry pi some extra time to establish the connection.
-
-Archiving any Previous Events
--------------------------------------------
 
 Before importing a new event, it is best practice to archive your previous event. To archive
 your previous event start by locating the ``Event`` panel.
@@ -64,8 +56,70 @@ Your previous event can now be seen under the ``Archived Events`` menu
   Clock installed, the system's time may not have access to the correct date and time at the time
   of archiving. 
 
+Setting Up MultiGP's Frequency Profile 
+-------------------------------------------
+
+.. important::
+
+        All instructions under this subsection will be performed under the ``Settings`` page
+
+        .. image:: format.png
+                :width: 500
+                :alt: RotorHazard Format page
+                :align: center
+
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
+
+.. image:: mgp_fprofile.png
+            :width: 600
+            :alt: MultiGP Frequency Profile
+            :align: center
+
+The frequency profile you can use is determined by the number of nodes within your RotorHazard timer.
+The ``IMD6`` profile has 6 slots, therefore in order to use it, your timer must have at least 6 functional nodes.
+Likewise, since ``Raceband 8`` has 8 slots, you must have an 8 (or more) node timer.
+
+Disabling Slots
+^^^^^^^^^^^^^^^^^^^^^
+.. image:: disabled_slots.png
+            :width: 600
+            :alt: Disabling Slots
+            :align: center
+
+Even when slots are disabled, your timer must have as many or nodes that the MultiGP frequency profile.
+In the event there have been slots disabled from the MultiGP frequency profile, you are able to disable
+the equivalent nodes within RotorHazard's frequency profile.
+
+.. image:: disabled_nodes.png
+            :width: 800
+            :alt: Disabling Nodes
+            :align: center
+
+There are a few advantages to disabling unnecessary nodes such as decluttering the RotorHazard UI and 
+reducing the overall power consumption of the timer.
+
+.. image:: disabled_nodes_UI.png
+            :width: 800
+            :alt: Decluttering User Interface
+            :align: center
+
 Import a MultiGP Event
 -------------------------------------------
+
+.. important::
+
+        All instructions under this subsection will be performed under the ``Format`` page
+
+        .. image:: format.png
+                :width: 500
+                :alt: RotorHazard Format page
+                :align: center
+
+        If the panels under this subsection are not visable, verify your **timer** has an internet
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
 
 1. Locate the ``MultiGP Race Import`` panel. The panel will include the name of the MultiGP chapter 
 associated with the entered MultiGP API key.
