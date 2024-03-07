@@ -11,8 +11,8 @@ Pushing Results to MultiGP
                 :align: center
 
         If the panels under this subsection are not visable, verify your **timer** has an internet
-        connection and reboot it. After rebooting, there may be a delay before an internet connection
-        is established.
+        connection and reboot the system. For more information, review the section on the 
+        :ref:`plugin's activation <plugin activation>`.
 
 MultiGP Results Controls Panel
 --------------------------------
