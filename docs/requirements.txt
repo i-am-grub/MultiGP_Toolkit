@@ -1,1 +1,2 @@
 sphinx-material
+Sphinx-Substitution-Extensions
