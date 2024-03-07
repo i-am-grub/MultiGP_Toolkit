@@ -1,7 +1,7 @@
-Importing an Event into RotorHazard
+Importing Events into RotorHazard
 ==========================================
 
-Archiving any Previous Events
+Archiving Previous Events
 -------------------------------------------
 
 .. important::
@@ -76,9 +76,7 @@ Disabling Slots
             :align: center
 
 When slots are disabled within a MultiGP frequency profile, they are not removed. For example, when disabling
-two slots in MultiGP's ``Raceband 8`` frequency profile, it is still considered an 8 slot frequency profile. 
-For this reason, even when slots are disabled, your timer must have as many or more nodes than the MultiGP 
-frequency profile.
+two slots in MultiGP's ``Raceband 8`` frequency profile, it is still considered an 8 slot frequency profile.
 
 In the event there have been slots disabled from the MultiGP frequency profile, you are able to disable
 the equivalent nodes within RotorHazard's frequency profile.
@@ -91,12 +89,12 @@ the equivalent nodes within RotorHazard's frequency profile.
 There are a few advantages to disabling unnecessary nodes such as decluttering the RotorHazard UI and 
 reducing the overall power consumption of the timer.
 
-.. image:: disabled_nodes_ui.png
+.. image:: disabled-nodes-ui.png
             :width: 800
             :alt: Decluttering User Interface
             :align: center
 
-Import a MultiGP Event
+Importing an Event
 -------------------------------------------
 
 .. important::

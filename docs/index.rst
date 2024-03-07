@@ -27,7 +27,7 @@ MultiGP Toolkit plugin for RotorHazard
 
    Please be aware that this plugin is not approved for MultiGP Global Qualifers
 
-This is a plugin developed with cooperation with MultiGP for the RotorHazard timing system. It allows for the ability to pull and push data through the MultiGP API to assist with event management.
+This is a plugin developed with cooperation with MultiGP for the RotorHazard timing system. It gives RotorHazard the ability interface with MultiGP's RaceSync system for event management.
 
 This plugin comes packaged with a mini version of `FPVScores plugin <https://github.com/FPVScores/FPVScores>`_ allowing you to push your event results without the need to install the full version.
 
