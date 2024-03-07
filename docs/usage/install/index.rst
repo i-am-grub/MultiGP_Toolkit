@@ -8,49 +8,54 @@ These instructions assume that your RotorHazard instance is installed in the ``~
 CLI Installation
 -------------------------------------------
 
+This is the recommended method for installing this plugin
+
 1. Navigate to the ``~/`` directory
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        cd ~
+    cd ~
 
 2. Remove any previous versions of the plugin
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        sudo rm -r RotorHazard/src/server/plugins/MultiGP_Toolkit
+    sudo rm -r RotorHazard/src/server/plugins/MultiGP_Toolkit
 
-3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_.
+3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_
 
-    .. code-block:: bash
-        :substitutions:
+.. code-block:: bash
+    :substitutions:
 
-        wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/|project_version|/MultiGP_Toolkit.zip
+    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/|project_version|/MultiGP_Toolkit.zip
 
 4. Unzip the download
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        unzip MultiGP_Toolkit.zip
+    unzip MultiGP_Toolkit.zip
     
 5. Copy the files over to the ``~/RotorHazard/src/server/plugins`` folder
 
-    .. code-block:: bash
-    
-        cp -r MultiGP_Toolkit RotorHazard/src/server/plugins/
+.. code-block:: bash
+
+    cp -r MultiGP_Toolkit RotorHazard/src/server/plugins/
 
 6. Delete the downloaded files
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        rm -r MultiGP_Toolkit
-        rm MultiGP_Toolkit.zip
+    rm -r MultiGP_Toolkit
+
+.. code-block:: bash
+
+    rm MultiGP_Toolkit.zip
 
 7. Restart the server
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        sudo reboot
+    sudo reboot
 
 Manual Installation
 -------------------------------------------

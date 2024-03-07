@@ -14,24 +14,26 @@ The RotorHazard Development Team has teamed up with with `FPVScores <https://fpv
 
 .. _fpvscores table:
 
-.. list-table:: MultiGP Toolkit's Ability to Upload to FPVScores
-    :widths: 15 15 25 45
+.. list-table:: Uploading to FPVScores with the MultiGP Toolkit
+    :widths: 30 30 30
     :header-rows: 1
-    :stub-columns: 1
     :align: center
 
     * - 
-      - Uploading to FPVScores is Optional
-      - FPVScores Event UUID
-      - Linking MultiGP Chapter API key to FPVScores Organisation
-    * - Standard MultiGP Race
-      - **Yes**
-      - *Required* when FPVScores Organisation **is not** linked **or** *Optional* when FPVScores Organisation **is** linked
-      - *Required* when FPVScores Event UUID **is not** provided at upload
-    * - MultiGP Global Qualifier
-      - **No**
-      - *Not Required*
-      - *Not Required*; when uploading without a linked FPVScores Organisation, the results will be uploaded without being linked to an FPVScores Organisation. These results **will not** be capable of being managed by an Organisation once uploaded.
+      - Standard MultiGP Race
+      - MultiGP Global Qualifier
+    * - Is uploading to FPVScores optional?
+      - Yes
+      - No, it is mandatory to upload to FPVScores
+    * - Do I need an Event UUID from FPVScores?
+      - Only when you want to upload to FPVScores and your Organisation is **not** linked
+      - No
+    * - Am I required to link my FPVScores Organisation to MultiGP
+      - No
+      - No
+    * - Can FPVScores automatically create an event for me?
+      - When you have a linked FPVScores Organisation to MultiGP
+      - All events will be automatically created. If you have a linked FPVScores Organisation, the event will be created under your Organisation, otherwise, an ``Unlinked`` will be created to store your results. 
 
 Linking a FPVScores Organisation
 -------------------------------------------

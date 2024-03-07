@@ -1,2 +1,3 @@
 sphinx-material
 Sphinx-Substitution-Extensions
+sphinx-copybutton
