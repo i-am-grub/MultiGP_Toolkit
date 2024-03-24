@@ -20,7 +20,7 @@ project = 'MultiGP Toolkit'
 copyright = '2024, Bryce Gruber'
 author = 'Bryce Gruber'
 version = VERSION_INFO.split("-")[0]
-release = f"v{VERSION_INFO}"
+release = f"{VERSION_INFO}"
 
 rst_prolog = f"""
 .. |project_version| replace:: {release}
