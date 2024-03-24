@@ -27,7 +27,7 @@ This is the recommended method for installing this plugin
 .. code-block:: bash
     :substitutions:
 
-    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/|project_version|/MultiGP_Toolkit.zip
+    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/v|project_version|/MultiGP_Toolkit.zip
 
 4. Unzip the download
 
@@ -62,7 +62,7 @@ Manual Installation
 
 1. Navigate to the `MultiGP Toolkit's Releases <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_ page
 
-2. Navigate to the release for |project_version| (the latest stable release) and open the ``Assets`` tab.
+2. Navigate to the release for version |project_version| (the latest stable release) and open the ``Assets`` tab.
 
     .. image:: assets.png
         :width: 600

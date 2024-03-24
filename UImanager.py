@@ -20,7 +20,7 @@ class UImanager():
             self.show_race_import_menu(False)
             self.show_pilot_import_menu()
 
-            if self._rhapi.db.option('zippyq_event') == '1':
+            if self._rhapi.db.option('zippyq_races') > 0:
                 self.show_zippyq_controls()
                 self.show_zippyq_return()
 
@@ -47,13 +47,13 @@ class UImanager():
 
     def create_race_import_menu(self):
         self._rhapi.ui.register_panel('multigp_race_import', f'MultiGP Race Import - {self._chapter_name}', '', order=0)
-        self.mgp_race_selector()
+        self.mgp_event_selector()
 
-        auto_logo = UIField('auto_logo', "Download Logo", desc="Download and set chapter logo from MultiGP on [Import Race]", field_type = UIFieldType.CHECKBOX)
+        auto_logo = UIField('auto_logo', "Download Logo", desc="Download and set chapter logo from MultiGP on [Import Event]", field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(auto_logo, 'multigp_race_import')
 
-        self._rhapi.ui.register_quickbutton('multigp_race_import', 'refresh_events', 'Refresh MultiGP Races', self.mgp_race_selector, args = {'refreshed':True})
-        self._rhapi.ui.register_quickbutton('multigp_race_import', 'import_class', 'Import Race', self.import_class)
+        self._rhapi.ui.register_quickbutton('multigp_race_import', 'refresh_events', 'Refresh MultiGP Events', self.mgp_event_selector, args = {'refreshed':True})
+        self._rhapi.ui.register_quickbutton('multigp_race_import', 'import_mgp_event', 'Import Event', self.setup_event)
 
     def show_race_import_menu(self, show = True):
         if show:
@@ -82,15 +82,15 @@ class UImanager():
         active_import = UIField('active_import', active_import_text, desc="Automatically set the downloaded round as the active race on import", field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(active_import, 'zippyq_controls')
 
+        self.zq_class_selector()
+
         self._rhapi.ui.register_quickbutton('zippyq_controls', 'zippyq_import', 'Import Next ZippyQ Round', self.manual_zippyq)
 
     def show_zippyq_controls(self, show = True):
         if show:
             self._rhapi.ui.register_panel('zippyq_controls', f'ZippyQ Controls', 'format', order=0)
-            self._rhapi.ui.register_panel('zippyq_controls_run', f'ZippyQ Controls', 'run', order=0)
         else:
             self._rhapi.ui.register_panel('zippyq_controls', f'ZippyQ Controls', '', order=0)
-            self._rhapi.ui.register_panel('zippyq_controls_run', f'ZippyQ Controls', '', order=0)
 
     def create_zippyq_return(self):
         self._rhapi.ui.register_panel('zippyq_return', f'ZippyQ Pack Return', '', order=0)
@@ -108,8 +108,6 @@ class UImanager():
     def create_results_export_menu(self):
         self._rhapi.ui.register_panel('results_controls', f'MultiGP Results Controls', '', order=0)
 
-        self.results_class_selector()
-
         push_fpvs_text = self._rhapi.language.__('Upload to FPVScores on Results Push')
         push_fpvs = UIField('push_fpvs', push_fpvs_text, desc="FPVScores Event UUID is optional when your MGP Chapter is linked to an FPVScores Organization", field_type = UIFieldType.CHECKBOX)
         self._rhapi.fields.register_option(push_fpvs, 'results_controls')
@@ -118,6 +116,8 @@ class UImanager():
             fpv_scores_text = self._rhapi.language.__('FPVScores Event UUID')
             fpv_scores = UIField('event_uuid', fpv_scores_text, desc="Provided by FPVScores", value='', field_type = UIFieldType.TEXT)
             self._rhapi.fields.register_option(fpv_scores, 'results_controls')
+
+        self.results_class_selector()
 
         self._rhapi.ui.register_quickbutton('results_controls', 'push_results', 'Push Event Results', self.push_results)
 
@@ -142,14 +142,14 @@ class UImanager():
     #
 
     # Race selector
-    def mgp_race_selector(self, args = None):
+    def mgp_event_selector(self, args = None):
         self._mgp_races = self.multigp.pull_races()
         race_list = [UIFieldSelectOption(value = None, label = "")]
         for id, name in self._mgp_races.items():
             race_selection = UIFieldSelectOption(value = id, label = f"({id}) {name}")
             race_list.append(race_selection)
 
-        race_selector = UIField('sel_mgp_race_id', 'MultiGP Race', desc="Event Selection", field_type = UIFieldType.SELECT, options = race_list)
+        race_selector = UIField('sel_mgp_race_id', 'MultiGP Event', desc="Event Selection", field_type = UIFieldType.SELECT, options = race_list)
         self._rhapi.fields.register_option(race_selector, 'multigp_race_import')
 
         if args:
@@ -157,21 +157,38 @@ class UImanager():
 
     # Setup RH Class selector
     def results_class_selector(self, args = None):
-        class_list = [UIFieldSelectOption(value = None, label = "")]
+        result_class_list = [UIFieldSelectOption(value = "", label = "")]
+        rank_class_list = [UIFieldSelectOption(value = "", label = "Let MultiGP Calculate Overall Results")]
         
         for event_class in self._rhapi.db.raceclasses:
             race_class = UIFieldSelectOption(value = event_class.id, label = event_class.name)
-            class_list.append(race_class)
+            result_class_list.append(race_class)
+            rank_class_list.append(race_class)
         
-        results_selector = UIField('results_select', 'Results Class', desc="Class holding the results to be pushed to MultiGP", field_type = UIFieldType.SELECT, options = class_list)
-        self._rhapi.fields.register_option(results_selector, 'results_controls')
+        event_races = json.loads(self._rhapi.db.option('mgp_event_races'))
+        
+        for index, race in enumerate(event_races):
+            results_selector = UIField(f'results_select_{index}', f'Race Data: ({race["mgpid"]}) {race["name"]}', desc="Class holding the race data to be pushed to MultiGP", 
+                                    field_type = UIFieldType.SELECT, options = result_class_list)
+            self._rhapi.fields.register_option(results_selector, 'results_controls')
 
-        rank_descript = "Optional: Class holding the rankings to be pushed to MultiGP as the Overall Results. Active if the class is using a ranking method"
-        ranking_selector = UIField('ranks_select', 'Rankings Class', desc=rank_descript, field_type = UIFieldType.SELECT, options = class_list)
-        self._rhapi.fields.register_option(ranking_selector, 'results_controls')
+            ranking_selector = UIField(f'ranks_select_{index}', f'Overall Results: ({race["mgpid"]}) {race["name"]}', desc="Class holding the Overall Results to be pushed to MultiGP.",
+                                       field_type = UIFieldType.SELECT, options = rank_class_list)
+            self._rhapi.fields.register_option(ranking_selector, 'results_controls')
 
         if args:
             self._rhapi.ui.broadcast_ui('format')
+
+    def clear_multi_class_selector(self):
+
+        multi_event = json.loads(self._rhapi.db.option('mgp_event_races'))
+        
+        for index, event in enumerate(multi_event):
+            results_selector = UIField(f'results_select_{index}', '', field_type = UIFieldType.SELECT, options = [])
+            self._rhapi.fields.register_option(results_selector, '')
+
+            ranking_selector = UIField(f'ranks_select_{index}', '', field_type = UIFieldType.SELECT, options = [])
+            self._rhapi.fields.register_option(ranking_selector, '')
 
     def zq_race_selector(self, args = None):
         race_list = [UIFieldSelectOption(value = None, label = "")]
@@ -206,6 +223,32 @@ class UImanager():
         if args is not None and args['option'] == 'zq_race_select':
             self._rhapi.ui.broadcast_ui('marshal')
 
+    def zq_class_selector(self, args = None):
+        result_class_list = []
+        zq_count = self._rhapi.db.option('zippyq_races')
+
+        if zq_count > 1:
+            for rh_class in self._rhapi.db.raceclasses:
+                zq_state = self._rhapi.db.raceclass_attribute_value(rh_class.id, 'zippyq_class')
+                if zq_state == '1':
+                    result_class_list.append(UIFieldSelectOption(value = rh_class.id, label = rh_class.name))
+
+            zq_class_select = UIField('zq_class_select', 'ZippyQ Class', desc = "Select class to use with [Import Next ZippyQ Round]", 
+                                field_type = UIFieldType.SELECT, options = result_class_list)
+            self._rhapi.fields.register_option(zq_class_select, 'zippyq_controls')
+
+        elif zq_count == 1:
+            zq_class_select = UIField('zq_class_select', '', field_type = UIFieldType.BASIC_INT)
+            self._rhapi.fields.register_option(zq_class_select, '')
+
+            for rh_class in self._rhapi.db.raceclasses:
+                zq_state = self._rhapi.db.raceclass_attribute_value(rh_class.id, 'zippyq_class')
+                if zq_state == '1':
+                    self._rhapi.db.option_set('zq_class_select', rh_class.id)
+                    break
+            else:
+                self._rhapi.db.option_set('zq_class_select', 0)
+
     #
     # Plcaholders
     #
@@ -214,7 +257,7 @@ class UImanager():
     _chapter_name = None
     multigp = None
             
-    def import_class(self, _args = None):
+    def setup_event(self, _args = None):
         pass
 
     def import_pilots(self, _args = None):
