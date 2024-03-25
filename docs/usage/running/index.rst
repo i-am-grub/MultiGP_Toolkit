@@ -84,15 +84,19 @@ ReRunning Races
 In the event a race needs to be rerun, you should ``Stop`` the race and then ``Discard Laps``. This will prevent the race results from being saved
 into the internal database. Once the results are saved into the database, they can not be deleted.
 
-.. image:: standard.png
-    :width: 500
-    :alt: Stopping Race
-    :align: center
+1. Stop the Race
 
-.. image:: stopped.png
-    :width: 500
-    :alt: Discarding Laps
-    :align: center
+    .. image:: standard.png
+        :width: 500
+        :alt: Stopping Race
+        :align: center
+
+2. Discard Laps
+
+    .. image:: stopped.png
+        :width: 500
+        :alt: Discarding Laps
+        :align: center
 
 Move Race Results
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -106,7 +110,7 @@ another heat to prevent the race data from being associated with your MultiGP ev
 4. Add a new Heat to the class
 
     .. image:: dummy_heat.png
-        :width: 500
+        :width: 600
         :alt: Dummy Heat
         :align: center
 

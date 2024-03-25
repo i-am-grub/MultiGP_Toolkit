@@ -18,7 +18,7 @@ MultiGP Results Controls Panel
 --------------------------------
 
 .. image:: results_panel.png
-    :width: 500
+    :width: 600
     :alt: Results Control Panel
     :align: center
 
@@ -40,7 +40,7 @@ Race Data
 This drop-down selector is used to select the class to use for the race data on MultiGP's website.
 
 .. image:: mgp_results.png
-    :width: 500
+    :width: 600
     :alt: MultiGP Results
     :align: center
 
@@ -51,7 +51,7 @@ This drop-down selector is used to select the class to use for the ``Overall Res
 the ``Update Scores`` setting for your race.
 
 .. image:: mgp_rankings.png
-    :width: 500
+    :width: 600
     :alt: MultiGP Rankings
     :align: center
 
@@ -60,11 +60,11 @@ the ``Update Scores`` setting for your race.
     This setting has slightly different functionality depending on how the selected class is setup.
     
     - If the selected class has a custom ranking activated (``From Race Format`` is considered the ``OFF`` switch), then that generated ranking will be pushed to MultiGP.
-    - Otherwise, the results based on the win condition of the race format within RotorHarzard will be used
+    - Otherwise, theresults RotorHarzard generates based on the win condition of the race format will be used
     - If this option is set to ``Let MultiGP Calculate Overall Results``, the Toolkit will **not** push ``Overall Results`` to MultiGP 
 
     .. image:: rh_ranking.png
-        :width: 500
+        :width: 600
         :alt: RotorHazard Ranking
         :align: center
 
@@ -77,7 +77,7 @@ the imported MultiGP event will be pushed to MultiGP and FPVScores. You will nee
 use this button at least once for your Global Qualifier results to be considered valid.
 
 .. image:: gq_panel.png
-        :width: 500
+        :width: 600
         :alt: Global Qualifier Push
         :align: center
 
