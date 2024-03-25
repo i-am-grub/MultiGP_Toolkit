@@ -189,7 +189,7 @@ The Toolkit offers support for running multi-race MultiGP events.
 
 In the example above, ``Multi Class Testing`` is the parent event while 
 ``Multi Class Testing - Qual`` and ``Multi Class Testing - Fin`` are child
-races of that event.
+events.
 
 .. image:: rh_multi.png
             :width: 600
@@ -197,14 +197,15 @@ races of that event.
             :align: center
 
 There are two avaliable approach for fully completing the ``Multi Class Testing``
-event with the Toolkit.
+event with the MultiGP Toolkit.
 
-1. Import a child race and run its races. Upon completion of the child race,
-archive it and import the next child race. Repeat this process until all
-the child races have been completed
+1. Import and run a child event as you would for a standard MultiGP event. 
+Upon completion of the child event, archive it and import the next child event. 
+Repeat this process until all the child events have been completed.
 
 2. Import the parent event. The Toolkit will setup a seperate class within
-RotorHazard for each child race under the parent event. This is the
+RotorHazard for each child event. It will also setup the ability to individually
+push your race data and results to each child event. This is the
 recommended approach when running a multi-race event offline.
       
 

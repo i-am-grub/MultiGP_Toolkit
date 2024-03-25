@@ -810,7 +810,7 @@ class RHmanager(UImanager):
     # Push class ranking
     def push_bracketed_rankings(self, selected_mgp_race, selected_rh_class):
 
-        if selected_rh_class == "":
+        if selected_rh_class == "" or selected_rh_class is None:
             return
 
         results = []

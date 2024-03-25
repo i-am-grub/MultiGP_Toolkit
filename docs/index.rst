@@ -11,6 +11,28 @@ MultiGP Toolkit plugin for RotorHazard
    :alt: MultiGP Logo
    :align: center
 
+
+
+This is a plugin developed with cooperation from MultiGP for the `RotorHazard <https://github.com/RotorHazard/RotorHazard>`_ timing system. It gives RotorHazard the ability interface with MultiGP's RaceSync system for event management.
+
+This plugin comes packaged with a lite version of `FPVScores plugin <https://github.com/FPVScores/FPVScores>`_ allowing you to push your event results without the need to install the full version.
+
+General Requirements
+---------------------------
+- RotorHazard v4.1+ is required to run this plugin
+   - When running a Global Qualifer, v|project_version| of the MultiGP Toolkit requires `RotorHazard v4.1.0-beta <https://github.com/RotorHazard/RotorHazard/releases/tag/v4.1.0-beta.2>`_ to be used.
+- You will need your MultiGP Chapter's API key
+- An internet connection when pushing data to or pulling data from MultiGP
+
+.. note::
+
+   An internet connection is **not** required for running the event, unless ZippyQ is being used
+
+General Requirements
+---------------------------
+
+Please reach out in the `RotorHarzard discord server <https://discord.gg/ANKd2pzBKH>`_ for support.
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
@@ -22,22 +44,3 @@ MultiGP Toolkit plugin for RotorHazard
    usage/zippyq/index
    usage/running/index
    usage/pushing/index
-
-.. warning::
-
-   Please be aware that this plugin is not approved for MultiGP Global Qualifers
-
-This is a plugin developed with cooperation with MultiGP for the RotorHazard timing system. It gives RotorHazard the ability interface with MultiGP's RaceSync system for event management.
-
-This plugin comes packaged with a mini version of `FPVScores plugin <https://github.com/FPVScores/FPVScores>`_ allowing you to push your event results without the need to install the full version.
-
-General Requirements
----------------------------
-- RotorHazard v4.1+ is required to run this plugin
-   - Stricter RotorHazard version requirements are enforced for running Global Qualifers
-- You will need your MultiGP Chapter's API key
-- An internet connection when pushing or pulling data from MultiGP
-
-.. note::
-
-   An internet connection is **not** required for running the event, unless ZippyQ is being used
