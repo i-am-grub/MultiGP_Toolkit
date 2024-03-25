@@ -20,7 +20,7 @@ This plugin comes packaged with a lite version of `FPVScores plugin <https://git
 General Requirements
 ---------------------------
 - RotorHazard v4.1+ is required to run this plugin
-   - When running a Global Qualifer, version |project_version| of the MultiGP Toolkit requires `RotorHazard v4.1.0-beta <https://github.com/RotorHazard/RotorHazard/releases/tag/v4.1.0-beta.2>`_ to be used.
+   - When running a Global Qualifer, version |project_version| of the MultiGP Toolkit requires `RotorHazard v4.1.0-beta.2 <https://github.com/RotorHazard/RotorHazard/releases/tag/v4.1.0-beta.2>`_ to be used.
 - You will need your MultiGP Chapter's API key
 - An internet connection when pushing data to or pulling data from MultiGP
 
@@ -28,10 +28,11 @@ General Requirements
 
    An internet connection is **not** required for running the event, unless ZippyQ is being used
 
-General Requirements
+Support
 ---------------------------
 
 Please reach out in the `RotorHarzard discord server <https://discord.gg/ANKd2pzBKH>`_ for support.
+Issues and feature requests can be submitted `here <https://github.com/i-am-grub/MultiGP_Toolkit/issues>`_.
 
 Sections
 ---------------------------

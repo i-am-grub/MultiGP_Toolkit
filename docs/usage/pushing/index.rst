@@ -59,9 +59,9 @@ the ``Update Scores`` setting for your race.
 
     This setting has slightly different functionality depending on how the selected class is setup.
     
-    - If the selected class has a custom ranking activated (``From Race Format`` is considered the ``OFF`` switch), then that generated ranking will be pushed to MultiGP.
-    - Otherwise, theresults RotorHarzard generates based on the win condition of the race format will be used
-    - If this option is set to ``Let MultiGP Calculate Overall Results``, the Toolkit will **not** push ``Overall Results`` to MultiGP 
+    - If the selected class has a ranking activated (``From Race Format`` is considered the ``OFF`` switch), the calculated ranking will be pushed to MultiGP.
+    - If the selected class is **not** activated, the results RotorHarzard generates based on the win condition of the race format will be used
+    - If this option is set to ``Let MultiGP Calculate Overall Results``, the Toolkit will **not** push ``Overall Results`` to MultiGP
 
     .. image:: rh_ranking.png
         :width: 600
@@ -71,8 +71,8 @@ the ``Update Scores`` setting for your race.
 Pushing Global Qualifier Results
 ----------------------------------
 
-When running a Global Qualifier, you will be limited to only having the ability to
-use the ``Push Event Results`` button. When this button is used, the data and results of
+When running a Global Qualifier, you will be limited to only having a 
+``Push Event Results`` button. When this button is used, the data and results of
 the imported MultiGP event will be pushed to MultiGP and FPVScores. You will need to
 use this button at least once for your Global Qualifier results to be considered valid.
 

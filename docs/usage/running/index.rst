@@ -101,7 +101,7 @@ into the internal database. Once the results are saved into the database, they c
 Move Race Results
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the event that the results were saved to the internal database and the race needs to be reran, you will need to reassign the results to
+In the event that the results were saved to the internal database and the race needs to be rerun, you will need to reassign the results to
 another heat to prevent the race data from being associated with your MultiGP event.
 
 1. Navigate to the ``Format`` page 
