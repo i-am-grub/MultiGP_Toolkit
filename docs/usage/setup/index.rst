@@ -49,5 +49,5 @@ Store Pilot URL
 
 This is a feature that will have the Toolkit store the URL for the pilot's MultiGP 
 profile picture when importing an event from MultiGP. It is currently setup to work 
-with SkyFPV's
-`RotorHazard Pilot Photos <https://github.com/skyfpv/rh_pilot_photos>`_ plugin.
+with SkyFPV's `Pilot Photos <https://github.com/skyfpv/rh_pilot_photos>`_ plugin for
+livestreaming.

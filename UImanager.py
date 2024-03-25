@@ -194,9 +194,11 @@ class UImanager():
         race_list = [UIFieldSelectOption(value = None, label = "")]
 
         for race in self._rhapi.db.races:
-            heat_info = self._rhapi.db.heat_by_id(race.heat_id)
-            race_info = UIFieldSelectOption(value = race.id, label = heat_info.name)
-            race_list.append(race_info)
+            if self._rhapi.db.raceclass_attribute_value(race.class_id, 'zippyq_class') == "1":
+                class_info = self._rhapi.db.raceclass_by_id(race.class_id)
+                heat_info = self._rhapi.db.heat_by_id(race.heat_id)
+                race_info = UIFieldSelectOption(value = race.id, label = f"{class_info.name} - {heat_info.name}")
+                race_list.append(race_info)
 
         race_selector = UIField('zq_race_select', 'Race Result',field_type = UIFieldType.SELECT, options = race_list)
         self._rhapi.db.option_set('zq_race_select', '')

@@ -167,6 +167,7 @@ class RHmanager(UImanager):
         self._rhapi.events.on(Evt.DATABASE_RESET, self.results_class_selector, name='update_res_selector')
         self._rhapi.events.on(Evt.DATABASE_RECOVER, self.results_class_selector, name='update_res_selector')
 
+        self._rhapi.events.on(Evt.HEAT_ALTER, self.zq_race_selector, name='zq_race_selector')
         self._rhapi.events.on(Evt.LAPS_SAVE, self.zq_race_selector, name='zq_race_selector')
         self._rhapi.events.on(Evt.OPTION_SET, self.zq_pilot_selector, name='zq_pilot_selector')
 
@@ -554,9 +555,10 @@ class RHmanager(UImanager):
         
         if race_id and pilot_id:
             race_pilots = json.loads(self._rhapi.db.race_attribute_value(race_id, 'race_pilots'))
-            del race_pilots[pilot_id]
-            self._rhapi.db.race_alter(race_id, attributes={'race_pilots' : json.dumps(race_pilots)})
-            self.zq_pilot_selector(args = {'option' : 'zq_race_select'})
+            if pilot_id in race_pilots:
+                del race_pilots[pilot_id]
+                self._rhapi.db.race_alter(race_id, attributes={'race_pilots' : json.dumps(race_pilots)})
+                self.zq_pilot_selector(args = {'option' : 'zq_race_select'})
 
     # Slot and Score
     def slot_score(self, race_info, selected_race, multi_round, set_round_num, heat_number = 1, eventURL = None):
