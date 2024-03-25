@@ -27,4 +27,5 @@ This plugin now comes packaged with a mini version of [FPVScores](https://github
 ## Plugin Support
 
 Please reach out in the [RotorHarzard discord server](https://discord.gg/ANKd2pzBKH) for support.
+
 Issues and feature requests can be submitted [here](https://github.com/i-am-grub/MultiGP_Toolkit/issues).

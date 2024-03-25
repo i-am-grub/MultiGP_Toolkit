@@ -32,6 +32,7 @@ Support
 ---------------------------
 
 Please reach out in the `RotorHarzard discord server <https://discord.gg/ANKd2pzBKH>`_ for support.
+
 Issues and feature requests can be submitted `here <https://github.com/i-am-grub/MultiGP_Toolkit/issues>`_.
 
 Sections
