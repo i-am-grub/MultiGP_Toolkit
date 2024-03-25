@@ -128,13 +128,13 @@ and then click ``Import Race``
 
 .. tip::
 
-        Turn on ``Download Logo`` to download the chapter's logo to the timer. It will automatically
-        be added to your timer's home page.
+    Turn on ``Download Logo`` to download the chapter's logo to the timer. It will automatically
+    be added to your timer's home page.
 
-        .. image:: home_page.png
-                :width: 500
-                :alt: Race Import
-                :align: center
+    .. image:: home_page.png
+            :width: 500
+            :alt: Race Import
+            :align: center
 
 After importing, you should see a few changes made to the RotorHazard user interface. The following table outlines
 the type of changes that should be shown depending on the type of race that was imported.
@@ -177,6 +177,36 @@ the type of changes that should be shown depending on the type of race that was 
       - Yes
 
 
+Multi-Race Events
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Toolkit offers support for running multi-race MultiGP events.
+
+.. image:: mgp_multi.png
+            :width: 600
+            :alt: MultiGP Multi-Race
+            :align: center
+
+In the example above, ``Multi Class Testing`` is the parent event while 
+``Multi Class Testing - Qual`` and ``Multi Class Testing - Fin`` are child
+events.
+
+.. image:: rh_multi.png
+            :width: 600
+            :alt: RotorHazard Multi-Race
+            :align: center
+
+There are two avaliable approach for fully completing the ``Multi Class Testing``
+event with the MultiGP Toolkit.
+
+1. Import and run a child event as you would for a standard MultiGP event. 
+Upon completion of the child event, archive it and import the next child event. 
+Repeat this process until all the child events have been completed.
+
+2. Import the parent event. The Toolkit will setup a seperate class within
+RotorHazard for each child event. It will also setup the ability to individually
+push your race data and results to each child event. This is the
+recommended approach when running a multi-race event offline.
       
 
 

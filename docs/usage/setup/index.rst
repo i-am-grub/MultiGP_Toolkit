@@ -38,3 +38,16 @@ of attempts has been reached.
 
 In the event that the timer has successfully connected and the MultiGP API key has been 
 verified, the plugin's user interface will activate.
+
+Store Pilot URL
+-------------------------------------------
+
+.. image:: store_url.png
+        :width: 600
+        :alt: MultiGP API Key
+        :align: center
+
+This is a feature that will have the Toolkit store the URL for the pilot's MultiGP 
+profile picture when importing an event from MultiGP. It is currently setup to work 
+with SkyFPV's `Pilot Photos <https://github.com/skyfpv/rh_pilot_photos>`_ plugin for
+livestreaming.
