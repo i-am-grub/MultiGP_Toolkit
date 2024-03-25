@@ -35,6 +35,16 @@ Please reach out in the `RotorHarzard discord server <https://discord.gg/ANKd2pz
 
 Issues and feature requests can be submitted `here <https://github.com/i-am-grub/MultiGP_Toolkit/issues>`_.
 
+Noteworthy RotorHarzard Best Practices 
+---------------------------
+
+You may notice the performance of certain aspects of the timer's user interface degrade as more race data is collected throughout the event. A few things can be done to combat this issue.
+- Limit user access to the timer. Avoid letting pilots login to the raspberry pi to check results.
+   - If you have access to an internet connection, consider uploading your race data to MultiGP, FPVScores, or [RHCloudlink](https://rhcloudlink.com/home) for pilots to view
+- Use a higher model raspberry pi in the timer. The raspberry pi 3B is currently recommended up to 100 pilot-races (number of pilots per race * number of races).
+   - Above the 100 pilot-races threshold, a raspberry pi 4B or 5 is advised (the more RAM, the better)
+
+
 Sections
 ---------------------------
 
