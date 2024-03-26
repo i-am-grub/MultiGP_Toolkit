@@ -24,6 +24,19 @@ This plugin now comes packaged with a mini version of [FPVScores](https://github
 > [!NOTE]
 > An internet connection is not required for running the event, unless ZippyQ is being used
 
+## Installing the Plugin
+
+Please reference the [installation documentation](https://multigp-toolkit.readthedocs.io/stable/usage/install/index.html) when installing this plugin. 
+
+Downloading the repository's source code from GitHub is not a valid installation method as a closed source module is bundled in at the time
+of the release.
+
+> [!NOTE]
+> Due to our agreement with MultiGP, the offical releases of the MultiGP Toolkit comes bundled with a closed source module.
+> When running a Global Qualifier, this module will verify the system and give the MultiGP Toolkit the ability to sign off on the pushed race data. 
+> When running a standard event, this module will be dormant and allow code modifications to both the RotorHazard server and the MultiGP Toolkit. 
+> All other actions besides verifiying the system and signing off on race data for Global Qualifiers are open source.
+
 ## Plugin Support
 
 Please reach out in the [RotorHarzard discord server](https://discord.gg/ANKd2pzBKH) for support.
