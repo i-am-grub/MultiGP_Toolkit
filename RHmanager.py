@@ -857,6 +857,9 @@ class RHmanager(UImanager):
 
         heat_id = args['heat_id']
         heat_info = self._rhapi.db.heat_by_id(heat_id)
+        
+        if heat_info is None:
+            return
 
         # Verify pilot only occupy one slot in heat
         slots = self._rhapi.db.slots_by_heat(heat_id)
