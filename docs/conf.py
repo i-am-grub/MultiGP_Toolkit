@@ -19,7 +19,7 @@ with open(os.path.join(topdir, "versions.json"), 'r') as approved_vers:
 rh_versions = []
 tk_versions = []
 
-for entry in APPROVED_VERSIONS:
+for entry in APPROVED_VERSIONS.values():
     if "RotorHazard" in entry:
         rh_versions.append(entry.split(" ")[-1])
     elif "MultiGP Toolkit" in entry:
