@@ -69,16 +69,16 @@ a class that was imported as a Global Qualifier (Controlled or ZippyQ).
 
 - The timer's codebase must not be altered and must be up to date. This includes the primary RotorHazard codebase as well as the MultiGP Toolkit's codebase.
 
-.. seealso::
-
-    :ref:`Version requirements for Global Qualifiers <gq versions>`.
-
 .. note::
 
     The MultiGP Toolkit contains a system to notify the
     race director of an update when there is
     one available for either RotorHazard or
     the MultiGP Toolkit
+
+.. seealso::
+
+    :ref:`Version requirements for Global Qualifiers <gq versions>`.
 
 - A minimum of 3 pilots are required per heat
 - The imported class from MultiGP can not be altered and must be used for the Global Qualifier event (results will not be uploaded otherwise)

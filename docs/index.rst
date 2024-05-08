@@ -45,7 +45,7 @@ The follow table contains the currently approved versions and is expected to cha
     :align: center
 
     * - Software Component
-      - Approved Version
+      - Approved Versions
     * - RotorHazard
       - |approved_rh_versions|
     * - MultiGP Toolkit
