@@ -10,8 +10,20 @@ import json
 topdir = os.path.split(os.path.split(__file__)[0])[0]
 sys.path.insert(0, topdir)
 
-with open(os.path.join(topdir, "manifest.json"), 'r') as manifest:
+with open(os.path.join(topdir, "Multigp_Toolkit/manifest.json"), 'r') as manifest:
     VERSION_INFO = json.load(manifest)["version"]
+
+with open(os.path.join(topdir, "versions.json"), 'r') as approved_vers:
+    APPROVED_VERSIONS = json.load(approved_vers)
+
+rh_versions = []
+tk_versions = []
+
+for entry in APPROVED_VERSIONS:
+    if "RotorHazard" in entry:
+        rh_versions.append(entry.split(" ")[-1])
+    elif "MultiGP Toolkit" in entry:
+        tk_versions.append(entry.split(" ")[-1])
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -24,6 +36,8 @@ release = f"{VERSION_INFO}"
 
 rst_prolog = f"""
 .. |project_version| replace:: {release}
+.. |approved_rh_versions| replace:: {", ".join(rh_versions)}
+.. |approved_tk_versions| replace:: {", ".join(tk_versions)}
 """
 
 # -- General configuration ---------------------------------------------------

@@ -17,12 +17,31 @@ This is a plugin developed with cooperation from MultiGP for the `RotorHazard <h
 
 This plugin comes packaged with a lite version of `FPVScores plugin <https://github.com/FPVScores/FPVScores>`_ allowing you to push your event results without the need to install the full version.
 
-General Requirements
+Requirements
 ---------------------------
-- RotorHazard v4.1+ is required to run this plugin
-   - When running a Global Qualifer, version |project_version| of the MultiGP Toolkit requires `RotorHazard v4.1.0-beta.2 <https://github.com/RotorHazard/RotorHazard/releases/tag/v4.1.0-beta.2>`_ to be used.
+
+General Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 - You will need your MultiGP Chapter's API key
 - An internet connection when pushing data to or pulling data from MultiGP
+- RotorHarzard v4.1-beta.2+
+
+Global Qualifier Version Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- You must use the RotorHarzard user interface for running your event
+   - Use of the Trackside connector is not currently allowed
+
+.. list-table:: Version Requirements
+    :widths: 30 30
+    :header-rows: 0
+    :align: center
+
+    * - Approved RotorHazard Versions
+      - |approved_rh_versions|
+    * - MultiGP Toolkit Versions
+      - |approved_tk_versions|
 
 .. note::
 
