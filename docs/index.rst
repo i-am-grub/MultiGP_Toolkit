@@ -27,25 +27,39 @@ General Requirements
 - An internet connection when pushing data to or pulling data from MultiGP
 - RotorHarzard v4.1-beta.2+
 
-Global Qualifier Version Requirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- You must use the RotorHarzard user interface for running your event
-   - Use of the Trackside connector is not currently allowed
-
-.. list-table:: Version Requirements
-    :widths: 30 30
-    :header-rows: 0
-    :align: center
-
-    * - Approved RotorHazard Versions
-      - |approved_rh_versions|
-    * - MultiGP Toolkit Versions
-      - |approved_tk_versions|
-
 .. note::
 
    An internet connection is **not** required for running the event, unless ZippyQ is being used
+
+Requirements for Global Qualifiers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _gq versions:
+
+Global Qualifier have stricter requirements for what versions of RotorHarzard and the MultiGP Toolkit can be used. The follow table contains the currently approved versions.
+
+.. list-table:: Version Requirements
+    :widths: 30 30
+    :header-rows: 1
+    :align: center
+
+    * - Software Component
+      - Approved Version
+    * - RotorHazard
+      - |approved_rh_versions|
+    * - MultiGP Toolkit
+      - |approved_tk_versions|
+
+.. warning:: 
+   
+   You must use the RotorHarzard user interface when using RotorHarzard and the MultiGP Toolkit for running your Global Qualifier events.
+   
+   Use of timing solutions the connect to the RotorHarzard timer (such as LiveTime and Trackside) are not approved to be used alongside
+   the MultiGP Toolkit for Global Qualifiers
+
+.. seealso::
+
+   :ref:`Additional rules when running Global Qualifier events <gq rules>`.
 
 Support
 ---------------------------
