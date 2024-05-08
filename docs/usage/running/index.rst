@@ -69,9 +69,9 @@ a class that was imported as a Global Qualifier (Controlled or ZippyQ).
 
 - The timer's codebase must not be altered and must be up to date. This includes the primary RotorHazard codebase as well as the MultiGP Toolkit's codebase.
 
-    .. seealso::
+.. seealso::
 
-        :ref:`Version requirements for Global Qualifiers <gq versions>`.
+    :ref:`Version requirements for Global Qualifiers <gq versions>`.
 
 .. note::
 

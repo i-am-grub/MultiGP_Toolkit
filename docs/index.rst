@@ -36,9 +36,10 @@ Requirements for Global Qualifiers
 
 .. _gq versions:
 
-Global Qualifier have stricter requirements for what versions of RotorHarzard and the MultiGP Toolkit can be used. The follow table contains the currently approved versions.
+Global Qualifier have stricter requirements for what versions of RotorHarzard and the MultiGP Toolkit can be used.
+The follow table contains the currently approved versions and is expected to change throughout the developed of RotorHazard.
 
-.. list-table:: Version Requirements
+.. list-table::
     :widths: 30 30
     :header-rows: 1
     :align: center
@@ -54,8 +55,8 @@ Global Qualifier have stricter requirements for what versions of RotorHarzard an
    
    You must use the RotorHarzard user interface when using RotorHarzard and the MultiGP Toolkit for running your Global Qualifier events.
    
-   Use of timing solutions the connect to the RotorHarzard timer (such as LiveTime and Trackside) are not approved to be used alongside
-   the MultiGP Toolkit for Global Qualifiers
+   Use of timing solutions that connect to the RotorHarzard timer (such as LiveTime and Trackside) are not approved to be used alongside
+   the MultiGP Toolkit for Global Qualifiers.
 
 .. seealso::
 
