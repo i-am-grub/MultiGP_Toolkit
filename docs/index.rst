@@ -25,7 +25,7 @@ General Requirements
 
 - You will need your MultiGP Chapter's API key
 - An internet connection when pushing data to or pulling data from MultiGP
-- RotorHarzard v4.1-beta.2+
+- RotorHazard v4.1.0-beta.2+
 
 .. note::
 
@@ -36,7 +36,7 @@ Requirements for Global Qualifiers
 
 .. _gq versions:
 
-Global Qualifier have stricter requirements for what versions of RotorHarzard and the MultiGP Toolkit can be used.
+Global Qualifier have stricter requirements for what versions of RotorHazard and the MultiGP Toolkit can be used.
 The follow table contains the currently approved versions and is expected to change throughout the developed of RotorHazard.
 
 .. list-table::
@@ -53,9 +53,9 @@ The follow table contains the currently approved versions and is expected to cha
 
 .. warning:: 
    
-   You must use the RotorHarzard user interface when using RotorHarzard and the MultiGP Toolkit for running your Global Qualifier events.
+   You must use the RotorHazard user interface when using RotorHazard and the MultiGP Toolkit for running your Global Qualifier events.
    
-   Use of timing solutions that connect to the RotorHarzard timer (such as LiveTime and Trackside) are not approved to be used alongside
+   Use of timing solutions that connect to the RotorHazard timer (such as LiveTime and Trackside) are not approved to be used alongside
    the MultiGP Toolkit for Global Qualifiers.
 
 .. seealso::
@@ -65,11 +65,11 @@ The follow table contains the currently approved versions and is expected to cha
 Support
 ---------------------------
 
-Please reach out in the `RotorHarzard discord server <https://discord.gg/ANKd2pzBKH>`_ for support.
+Please reach out in the `RotorHazard discord server <https://discord.gg/ANKd2pzBKH>`_ for support.
 
 Issues and feature requests can be submitted `here <https://github.com/i-am-grub/MultiGP_Toolkit/issues>`_.
 
-Noteworthy RotorHarzard Best Practices 
+Noteworthy RotorHazard Best Practices 
 ---------------------------
 
 You may notice the performance of certain aspects of the timer's user interface degrade as more race data is collected throughout the event. A few things can be done to combat this issue.

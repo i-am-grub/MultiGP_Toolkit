@@ -60,7 +60,7 @@ the ``Update Scores`` setting for your race.
     This setting has slightly different functionality depending on how the selected class is setup.
     
     - If the selected class has a ranking activated (``From Race Format`` is considered the ``OFF`` switch), the calculated ranking will be pushed to MultiGP.
-    - If the selected class is **not** activated, the results RotorHarzard generates based on the win condition of the race format will be used
+    - If the selected class is **not** activated, the results RotorHazard generates based on the win condition of the race format will be used
     - If this option is set to ``Let MultiGP Calculate Overall Results``, the Toolkit will **not** push ``Overall Results`` to MultiGP
 
     .. image:: rh_ranking.png

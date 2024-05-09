@@ -1,4 +1,18 @@
 {
-    "4c9ee3d2287aa5930948167de6e22978" : "RotorHazard 4.1.0-beta.2",
-    "c8fa589fef1a0992e03a440fa0414b0d" : "MultiGP Toolkit 2.0.1"
+    "RotorHazard" : {
+        "hashes" : [
+            "6b71bcd4a32f9f47f115e7e335b6e0a5"
+        ],
+        "versions" : [
+            "4.1.0-beta.4"
+        ]
+    },
+    "MultiGP Toolkit" : {
+        "hashes" : [
+            "74350efa8a4ca9d0d006df0c1d3d40ea"
+        ],
+        "versions" : [
+            "2.0.2"
+        ]
+    }
 }

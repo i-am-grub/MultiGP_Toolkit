@@ -16,14 +16,8 @@ with open(os.path.join(topdir, "Multigp_Toolkit/manifest.json"), 'r') as manifes
 with open(os.path.join(topdir, "versions.json"), 'r') as approved_vers:
     APPROVED_VERSIONS = json.load(approved_vers)
 
-rh_versions = []
-tk_versions = []
-
-for entry in APPROVED_VERSIONS.values():
-    if "RotorHazard" in entry:
-        rh_versions.append(entry.split(" ")[-1])
-    elif "MultiGP Toolkit" in entry:
-        tk_versions.append(entry.split(" ")[-1])
+rh_versions = APPROVED_VERSIONS["RotorHazard"]["versions"]
+tk_versions = APPROVED_VERSIONS["MultiGP Toolkit"]["versions"]
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
