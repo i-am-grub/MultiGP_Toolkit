@@ -10,7 +10,7 @@ import json
 topdir = os.path.split(os.path.split(__file__)[0])[0]
 sys.path.insert(0, topdir)
 
-with open(os.path.join(topdir, "Multigp_Toolkit/manifest.json"), 'r') as manifest:
+with open(os.path.join(topdir, "MultiGP_Toolkit/manifest.json"), 'r') as manifest:
     VERSION_INFO = json.load(manifest)["version"]
 
 with open(os.path.join(topdir, "versions.json"), 'r') as approved_vers:
