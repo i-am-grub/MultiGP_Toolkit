@@ -5,6 +5,7 @@ import logging
 import requests
 import json
 import gevent
+import Database
 from data_export import DataExporter
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -135,9 +136,14 @@ def assemble_heatnodes_complete(rhapi):
     freqs = json.loads(rhapi.race.frequencyset.frequencies)
 
     for slot in payload:
-        slot.node_frequency_band = freqs['b'][slot.node_index]
-        slot.node_frequency_c = freqs['c'][slot.node_index]
-        slot.node_frequency_f = freqs['f'][slot.node_index]
+        if slot.method == Database.ProgramMethod.NONE:
+            slot.node_frequency_band = ' '
+            slot.node_frequency_c = ' '
+            slot.node_frequency_f = ' '
+        else:
+            slot.node_frequency_band = freqs['b'][slot.node_index]
+            slot.node_frequency_c = freqs['c'][slot.node_index]
+            slot.node_frequency_f = freqs['f'][slot.node_index]
 
     return payload
 

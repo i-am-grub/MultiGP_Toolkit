@@ -114,7 +114,7 @@ class UImanager():
 
         if not self.FPVscores_installed:
             fpv_scores_text = self._rhapi.language.__('FPVScores Event UUID')
-            fpv_scores = UIField('event_uuid', fpv_scores_text, desc="Provided by FPVScores", value='', field_type = UIFieldType.TEXT)
+            fpv_scores = UIField('event_uuid_toolkit', fpv_scores_text, desc="Provided by FPVScores", value='', field_type = UIFieldType.TEXT)
             self._rhapi.fields.register_option(fpv_scores, 'results_controls')
 
         self.results_class_selector()

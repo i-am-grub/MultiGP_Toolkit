@@ -2,6 +2,7 @@ import sys
 import logging
 import json
 import requests
+import subprocess
 from dataclasses import dataclass
 from eventmanager import Evt
 from enum import Enum
@@ -78,10 +79,10 @@ class RHmanager(UImanager):
     #
 
     def clear_uuid(self, _args = None):
-        self._rhapi.db.option_set('event_uuid', '')
+        self._rhapi.db.option_set('event_uuid_toolkit', '')
 
     def reset_event_metadata(self, _args = None):
-        self._rhapi.db.option_set('event_uuid', '')
+        self._rhapi.db.option_set('event_uuid_toolkit', '')
         self._rhapi.db.option_set('mgp_race_id', '')
         self._rhapi.db.option_set('zippyq_races', 0)
         self._rhapi.db.option_set('global_qualifer_event', '0')
@@ -148,7 +149,37 @@ class RHmanager(UImanager):
             logger.info(f"MultiGP API key cannot be verified.")
             return
         
+        self.check_update()
         self.setup_plugin()
+
+    #
+    # Check for Updates
+    #
+
+    def check_update(self):
+        url = "https://raw.githubusercontent.com/i-am-grub/MultiGP_Toolkit/master/versions.json"
+        r = requests.get(url)
+        VERSIONS = json.loads(r.text)
+        latest_version = VERSIONS["MultiGP Toolkit"]["latest"]
+
+        with open("plugins/MultiGP_Toolkit/manifest.json") as manifest:
+            version = json.load(manifest)["version"]
+
+        if version != latest_version:
+            self._rhapi.ui.register_quickbutton('multigp_set', 'update_mgptk', 'Update MultiGP Toolkit', self.update_plugin, args = latest_version)
+
+    def update_plugin(self, version):
+        url = f"https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/v{version}/MultiGP_Toolkit.zip"
+
+        #subprocess.run(args=["rm", "-r", "plugins/MultiGP_Toolkit"])
+        logger.info(subprocess.run(args=["wget", url]))
+        logger.info(subprocess.run(args=["unzip", "MultiGP_Toolkit.zip"]))
+        logger.info(subprocess.run(args=["cp", "MultiGP_Toolkit", "-r", "plugins/"]))
+        logger.info(subprocess.run(args=["rm", "-r", "MultiGP_Toolkit"]))
+        logger.info(subprocess.run(args=["rm", "MultiGP_Toolkit.zip"]))
+
+        message = "Update complete. Restart the server to complete the update."
+        self._rhapi.ui.message_alert(self._rhapi.language.__(message))
 
     #
     # Setup Plugin's Online Tools
@@ -651,7 +682,7 @@ class RHmanager(UImanager):
         # Handle FPVScores
         FPVS_CONDITIONALS = [
             self._rhapi.db.option('push_fpvs') == '1', 
-            miniFPVscores.linkedMGPOrg(self._rhapi) or self._rhapi.db.option('event_uuid')
+            miniFPVscores.linkedMGPOrg(self._rhapi) or self._rhapi.db.option('event_uuid_toolkit')
         ]
 
         if self._rhapi.db.raceclass_attribute_value(class_id, 'gq_class') == "1":
@@ -673,10 +704,10 @@ class RHmanager(UImanager):
                 eventURL = None
             else:
                 eventURL = miniFPVscores.getURLfromFPVS(self._rhapi, uuid)
-                self._rhapi.db.option_set('event_uuid', uuid)
+                self._rhapi.db.option_set('event_uuid_toolkit', uuid)
                 self._rhapi.ui.broadcast_ui('format')
         else:
-            uuid = self._rhapi.db.option('event_uuid')
+            uuid = self._rhapi.db.option('event_uuid_toolkit')
             eventURL = None
 
         # Upload Results
@@ -757,7 +788,7 @@ class RHmanager(UImanager):
         # Handle FPVScores        
         FPVS_CONDITIONALS = [
             self._rhapi.db.option('push_fpvs') == '1', 
-            miniFPVscores.linkedMGPOrg(self._rhapi) or self._rhapi.db.option('event_uuid')
+            miniFPVscores.linkedMGPOrg(self._rhapi) or self._rhapi.db.option('event_uuid_toolkit')
         ]
 
         if gq_active:
@@ -776,10 +807,10 @@ class RHmanager(UImanager):
                 return
             else:
                 eventURL = miniFPVscores.getURLfromFPVS(self._rhapi, uuid)
-                self._rhapi.db.option_set('event_uuid', uuid)
+                self._rhapi.db.option_set('event_uuid_toolkit', uuid)
                 self._rhapi.ui.broadcast_ui('format')
         else:
-            uuid = self._rhapi.db.option('event_uuid')
+            uuid = self._rhapi.db.option('event_uuid_toolkit')
             eventURL = None
 
         # Determine results formating        

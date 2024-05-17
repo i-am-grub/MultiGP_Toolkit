@@ -55,7 +55,7 @@ This is the recommended method for installing this plugin
 
 .. code-block:: bash
 
-    sudo reboot
+    sudo systemctl restart rotorhazard.service
 
 Manual Installation
 -------------------------------------------
