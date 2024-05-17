@@ -100,13 +100,20 @@ class RHmanager(UImanager):
     def generate_pilot_list(self, args = None):
         race_info = self._rhapi.db.race_by_id(args['race_id'])
         heat_info = self._rhapi.db.heat_by_id(race_info.heat_id)
-        
+        class_info = self._rhapi.db.class_by_id(race_info.class_id)
+
         race_pilots = {}
-        for slot in self._rhapi.db.slots_by_heat(heat_info.id):
-            if slot.pilot_id == 0:
-                continue
-            else:
-                race_pilots[slot.pilot_id] = slot.node_index
+
+        gq_class = self._rhapi.db.raceclass_attribute_value(class_info.id, "gq_class", "0")
+        if self._rhapi.db.option('global_qualifer_event') == "1" and gq_class == "0":
+            message = "Warning: Saving non-valid Global Qualifer race results. Use the imported class to generate valid results."
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        else:
+            for slot in self._rhapi.db.slots_by_heat(heat_info.id):
+                if slot.pilot_id == 0:
+                    continue
+                else:
+                    race_pilots[slot.pilot_id] = slot.node_index
 
         self._rhapi.db.race_alter(race_info.id, attributes={'race_pilots' : json.dumps(race_pilots)})
 

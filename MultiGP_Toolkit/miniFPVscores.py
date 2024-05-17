@@ -61,7 +61,7 @@ def runPushMGP(rhapi):
     json_data =  input_data['data']
     r = postFPVS(url, json_data)
     if r and r.status_code == 200:
-        data = json.loads(r.text)
+        data = json.loads(r.text.split("\n")[-1])
         if data["status"] == "error":
             return data["message"], None
         elif data["status"] == 'success':
@@ -75,7 +75,7 @@ def linkedMGPOrg(rhapi):
     json_data = json.dumps({"mgp_api_key": rhapi.db.option('mgp_api_key')})
     r = postFPVS(url, json_data)
     if r and r.status_code == 200:
-        data = json.loads(r.text)
+        data = json.loads(r.text.split("\n")[-1])
         return data["exist"] == "true"
     else:
         return None

@@ -66,19 +66,17 @@ Global Qualifiers
 The follow rules will be enforced by the system for a race belonging to
 a class that was imported as a Global Qualifier (Controlled or ZippyQ).
 
+- An approved version RotorHazard and the MultiGP Toolkit must be used for running Global Qualifiers. This includes the primary RotorHazard codebase as well as the MultiGP Toolkit's codebase.
 
-- The timer's codebase must not be altered and must be up to date. This includes the primary RotorHazard codebase as well as the MultiGP Toolkit's codebase.
+.. seealso::
+
+    :ref:`Software version requirements for Global Qualifiers <gq versions>`.
 
 .. note::
 
     The MultiGP Toolkit contains a system to notify the
-    race director of an update when there is
-    one available for either RotorHazard or
-    the MultiGP Toolkit
-
-.. seealso::
-
-    :ref:`Version requirements for Global Qualifiers <gq versions>`.
+    race director when a mandatory update is available for 
+    either RotorHazard or the MultiGP Toolkit
 
 - A minimum of 3 pilots are required per heat
 - The imported class from MultiGP can not be altered and must be used for the Global Qualifier event (results will not be uploaded otherwise)
