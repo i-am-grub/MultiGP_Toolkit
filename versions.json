@@ -1,18 +1,18 @@
 {
     "RotorHazard" : {
         "hashes" : [
-            "6b71bcd4a32f9f47f115e7e335b6e0a5"
+            "beadd199dcaf7794674fd71a9adf6cd2"
         ],
         "versions" : [
-            "4.1.0-beta.4"
+            "4.1.0-beta.5"
         ]
     },
     "MultiGP Toolkit" : {
         "hashes" : [
-            "64fa6b7842498bc680d96699faac14ff"
+            "e7313a1ca70910de29548a53d13b5873"
         ],
         "versions" : [
-            "2.0.2"
+            "2.0.3"
         ]
     }
 }

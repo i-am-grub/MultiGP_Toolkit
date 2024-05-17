@@ -160,6 +160,8 @@ cython_debug/
 #.idea/
 
 # File for storing MultiGp Provided API key
+systemVerification
 systemVerification.py
 systemVerification/__init__.py
 build.py
+build.bat
