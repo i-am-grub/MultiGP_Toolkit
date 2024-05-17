@@ -100,7 +100,7 @@ class RHmanager(UImanager):
     def generate_pilot_list(self, args = None):
         race_info = self._rhapi.db.race_by_id(args['race_id'])
         heat_info = self._rhapi.db.heat_by_id(race_info.heat_id)
-        class_info = self._rhapi.db.class_by_id(race_info.class_id)
+        class_info = self._rhapi.db.raceclass_by_id(race_info.class_id)
 
         race_pilots = {}
 
