@@ -323,7 +323,7 @@ class RHmanager(UImanager):
         ]
 
         if any(rh_db) or self._rhapi.db.option('mgp_race_id'):
-            message = "Archive Race, Heat, Class, and Pilot data before continuing. Under the Event panel >> Archive/New Event >> Archive Event."
+            message = "Archive Race, Heat, and Class data before continuing. Under the Event panel >> Archive/New Event >> Archive Event."
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
             return
         
@@ -406,18 +406,18 @@ class RHmanager(UImanager):
 
         # Import Class
         if race_data['disableSlotAutoPopulation'] == "0" and 'rounds' in schedule:
+
+            num_of_slots = len(self._rhapi.interface.seats)
+            if len(schedule['rounds'][0]['heats'][0]['entries']) > num_of_slots:
+                message = "Attempted to import race with more slots than avaliable nodes. Please decrease the number of slots used on MultiGP"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+                return
+
             num_rounds = len(schedule['rounds'])
             race_class = self._rhapi.db.raceclass_add(name=rh_race_name, raceformat=format_id, win_condition='',
                                                       description="Imported Controlled class from MultiGP", rounds=num_rounds, heat_advance_type=HeatAdvanceType.NEXT_HEAT)
             db_pilots = self._rhapi.db.pilots
             slot_list = []
-
-            default_profile = self._rhapi.db.frequencysets[0].frequencies
-            num_of_slots = len(json.loads(default_profile)["f"])
-            if len(schedule['rounds'][0]['heats'][0]['entries']) > num_of_slots:
-                message = "Attempted to import race with more slots than avaliable nodes. Please decrease the number of slots used on MultiGP"
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-                return
 
             for hindex, heat in enumerate(schedule['rounds'][0]['heats']):
                 heat_data = self._rhapi.db.heat_add(name=f"Heat {hindex + 1}", raceclass=race_class.id)
@@ -485,8 +485,7 @@ class RHmanager(UImanager):
         db_pilots = self._rhapi.db.pilots
         slot_list = []
         
-        default_profile = self._rhapi.db.frequencysets[0].frequencies
-        num_of_slots = len(json.loads(default_profile)["f"])
+        num_of_slots = len(self._rhapi.interface.seats)
         if len(data['rounds'][0]['heats'][0]['entries']) > num_of_slots:
             message = "Attempted to import race with more slots than avaliable nodes. Please decrease the number of slots used on MultiGP"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
