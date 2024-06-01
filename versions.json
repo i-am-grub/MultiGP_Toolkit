@@ -1,23 +1,21 @@
 {
     "RotorHazard" : {
         "hashes" : [
-            "beadd199dcaf7794674fd71a9adf6cd2",
-            "2cdafaf2dc1534a9add7125abecf92a4"
+            "2cdafaf2dc1534a9add7125abecf92a4",
+            "f6cd21297537f29ebf91563d7762e8f0"
         ],
         "versions" : [
-            "4.1.0-beta.5",
-            "4.1.0-beta.6"
+            "4.1.0-beta.6",
+            "4.1.0"
         ]
     },
     "MultiGP Toolkit" : {
         "hashes" : [
-            "d17da369349d74bc6b9a9cd719026dfb",
-            "d42031fc956dc0d725332bd1c23d8a02"
+            "085bd7750e48352c73d9328d08473824"
         ],
         "versions" : [
-            "2.0.4",
-            "2.0.5"
+            "2.0.6"
         ],
-        "latest" : "2.0.5"
+        "latest" : "2.0.6"
     }
 }

@@ -67,7 +67,7 @@ class RHmanager(UImanager):
         self._rhapi.events.on(Evt.LAPS_SAVE, self.generate_pilot_list, name='generate_pilot_list')
 
     def startup(self, _args):
-        if self._rhapi.db.option('store_pilot_url') ==  "1":
+        if self._rhapi.db.option('store_pilot_url') == "1":
             self._pilot_urls = True
             pilotPhotoUrl = UIField(name = "PilotDetailPhotoURL", label = "Pilot Photo URL", field_type = UIFieldType.TEXT)
             self._rhapi.fields.register_pilot_attribute(pilotPhotoUrl)
