@@ -21,15 +21,15 @@ from .fpvscoresapi import FPVScoresAPI
 
 try:
     if sys.version_info.minor == 13:
-        from .verification import SystemVerification
+        from .verification.py313 import SystemVerification
     elif sys.version_info.minor == 12:
-        from .verification import SystemVerification
+        from .verification.py312 import SystemVerification
     elif sys.version_info.minor == 11:
-        from .verification import SystemVerification
+        from .verification.py311 import SystemVerification
     elif sys.version_info.minor == 10:
-        from .verification import SystemVerification
+        from .verification.py310 import SystemVerification
     elif sys.version_info.minor == 9:
-        from .verification import SystemVerification
+        from .verification.py39 import SystemVerification
     else:
         raise ImportError("Unsupported Python version")
 except ImportError as exc:
@@ -58,7 +58,6 @@ class RaceSyncExporter(_RaceSyncDataManager):
         rhapi: RHAPI,
         multigp: MultiGPAPI,
         verification: SystemVerification,
-        pilot_urls: bool,
     ):
         """
         Class initalization
@@ -66,7 +65,6 @@ class RaceSyncExporter(_RaceSyncDataManager):
         :param rhapi: An instance of RHAPI
         :param multigp: An instance of the MultiGPAPI
         :param verification: An instace of the SystemVerification module
-        :param pilot_urls: Flag determining if the system booted with pilot_urls active
         """
         super().__init__(rhapi)
 
@@ -74,9 +72,6 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """A stored instace of the MultiGPAPI module"""
         self._verification = verification
         """A stored instace of the SystemVerification module"""
-        self._pilot_urls = pilot_urls
-        """Flag determining if the system booted with pilot_urls active"""
-
         self._fpvscores = FPVScoresAPI(rhapi)
         """An instance of FPVScoresAPI"""
 
@@ -234,7 +229,13 @@ class RaceSyncExporter(_RaceSyncDataManager):
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
         Parses class data in the `Generate Heat Groups` format
-        to be compatible with MultiGP predefined heats
+        to be compatible with MultiGP predefined heats.
+
+        Round number is set to the internal group id + 1 and the heat number
+        is set set to the index of the heat within the heat group
+
+        **Race data may be lost if a pilot participates in more than one heat per round.
+        This is due to a limitation with MultiGP limiting pilots to one heat per round.**
 
         :param selected_mgp_race: The selected MultiGP race
         :param event_url: The FPVScores event url
@@ -260,7 +261,13 @@ class RaceSyncExporter(_RaceSyncDataManager):
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
         Parses class data in the `Count Races per Heat` format
-        to be compatible with MultiGP predefined heats
+        to be compatible with MultiGP predefined heats.
+
+        Uses the internal round number and the index of the heat
+        within the raceclass.
+
+        **Race data may be lost if a pilot participates in more than one heat per round.
+        This is due to a limitation with MultiGP limiting pilots to one heat per round.**
 
         :param selected_mgp_race: The selected MultiGP race
         :param event_url: The FPVScores event url
@@ -270,8 +277,8 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
         data = self._bundle_by_heat(races)
         heat_index = 1
-        for races_ in data.values():
-            for race_info in races_:
+        for heat in data.values():
+            for race_info in heat:
                 yield self.generate_formated_race_data(
                     race_info,
                     selected_mgp_race,
@@ -286,7 +293,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
         self, selected_mgp_race: int, event_url: str | None, races: list[SavedRaceMeta]
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
-        Parses class data to be compatible with ZippyQ
+        Parses class data to be compatible with ZippyQ.
+
+        Each race increments the round number and
+        the heat number is always set to 1.
 
         :param selected_mgp_race: The selected MultiGP race
         :param event_url: The FPVScores event url
@@ -331,12 +341,12 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
             elif (
                 self._rhapi.db.raceclass_attribute_value(selected_rh_class, "mgp_mode")
-                == MGPMode.PREDEFINED_HEATS
+                == MGPMode.ZIPPYQ
             ):
-                yield from self._parse_heat_data(selected_mgp_race, event_url, races)
+                yield from self._parse_zippyq_data(selected_mgp_race, event_url, races)
 
             else:
-                yield from self._parse_zippyq_data(selected_mgp_race, event_url, races)
+                yield from self._parse_heat_data(selected_mgp_race, event_url, races)
 
         races: list[SavedRaceMeta] = self._rhapi.db.races_by_raceclass(
             selected_rh_class
@@ -509,7 +519,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 self.clear_uuid()
 
             self._fpvscores.run_full_sync()
-            if self._rhapi.db.option("event_uuid_toolkit") == "":
+            if not self._rhapi.db.option("event_uuid_toolkit"):
                 return False, None
 
             event_url = self._fpvscores.get_event_url()

@@ -26,15 +26,15 @@ from .multigpapi import MultiGPAPI
 
 try:
     if sys.version_info.minor == 13:
-        from .verification import SystemVerification
+        from .verification.py313 import SystemVerification
     elif sys.version_info.minor == 12:
-        from .verification import SystemVerification
+        from .verification.py312 import SystemVerification
     elif sys.version_info.minor == 11:
-        from .verification import SystemVerification
+        from .verification.py311 import SystemVerification
     elif sys.version_info.minor == 10:
-        from .verification import SystemVerification
+        from .verification.py310 import SystemVerification
     elif sys.version_info.minor == 9:
-        from .verification import SystemVerification
+        from .verification.py39 import SystemVerification
     else:
         raise ImportError("Unsupported Python version")
 except ImportError as exc:
@@ -62,7 +62,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         rhapi: RHAPI,
         multigp: MultiGPAPI,
         verification: SystemVerification,
-        pilot_urls: bool,
     ):
         """
         Class initalization
@@ -70,7 +69,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :param rhapi: An instance of RHAPI
         :param multigp: An instance of the MultiGPAPI
         :param verification: An instace of the SystemVerification module
-        :param pilot_urls: Flag determining if the system booted with pilot_urls active
         """
         super().__init__(rhapi)
 
@@ -78,8 +76,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         """A stored instace of the MultiGPAPI module"""
         self._verification = verification
         """A stored instace of the SystemVerification module"""
-        self._pilot_urls = pilot_urls
-        """Flag determining if the system booted with pilot_urls active"""
 
     def pilot_search(self, db_pilots: list[Pilot], mgp_pilot: dict[str, T]) -> int:
         """
@@ -99,10 +95,10 @@ class RaceSyncImporter(_RaceSyncDataManager):
             db_pilot: Pilot = self._rhapi.db.pilot_add(
                 name=mgp_pilot_name, callsign=mgp_pilot["userName"]
             )
-            attrs = {"mgp_pilot_id": mgp_pilot["pilotId"]}
-
-            if self._pilot_urls:
-                attrs["PilotDetailPhotoURL"] = mgp_pilot["profilePictureUrl"]
+            attrs = {
+                "mgp_pilot_id": mgp_pilot["pilotId"],
+                "PilotDetailPhotoURL": mgp_pilot["profilePictureUrl"],
+            }
 
             self._rhapi.db.pilot_alter(db_pilot.id, attributes=attrs)
 
@@ -197,10 +193,12 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :param _args: Args passed from the event call, defaults to {}
         """
         selected_race = self._rhapi.db.option("mgp_race_id")
+
         if not selected_race:
             message = "Select a MultiGP Race to import pilots from"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
+
         db_pilots = self._rhapi.db.pilots
         race_data = self._multigp.pull_race_data(selected_race)
 
@@ -356,10 +354,8 @@ class RaceSyncImporter(_RaceSyncDataManager):
             name=str(race_data["name"]),
             raceformat=format_id,
             win_condition="",
-            description=(
-                "Imported predefined schedule from MultiGP\n\n"
-                "Set the [Round Type] to [Generate heat groups]"
-            ),
+            round_type=1,
+            description=str(race_data["description"]),
             rounds=len(rounds),
             heat_advance_type=HeatAdvanceType.NEXT_HEAT,
         )
@@ -429,10 +425,8 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 name=rh_race_name,
                 raceformat=format_id,
                 win_condition="",
-                description=(
-                    "Imported predefined schedule from MultiGP\n\n"
-                    "Set the [Round Type] to [Generate heat groups]"
-                ),
+                round_type=1,
+                description=str(race_data["description"]),
                 rounds=num_rounds,
                 heat_advance_type=HeatAdvanceType.NEXT_HEAT,
             )
@@ -453,10 +447,8 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 name=rh_race_name,
                 raceformat=format_id,
                 win_condition="",
-                description=(
-                    "Imported ZippyQ schedule from MultiGP\n\n"
-                    "Set the [Round Type] to [Count races per heat]"
-                ),
+                round_type=0,
+                description=str(race_data["description"]),
                 rounds=1,
                 heat_advance_type=HeatAdvanceType.NONE,
             )

@@ -267,7 +267,7 @@ class UImanager:
                 "fpvscores_autoupload",
                 fpv_scores_text,
                 desc="Enable or disable automatic syncing. A network connection is required.",
-                value="0",
+                value=False,
                 field_type=UIFieldType.CHECKBOX,
             )
             self._rhapi.fields.register_option(fpv_scores, "results_controls")

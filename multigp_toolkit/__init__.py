@@ -42,6 +42,14 @@ def register_pilot_attributes(rhapi: RHAPI) -> None:
     )
     rhapi.fields.register_pilot_attribute(mgp_pilot_id)
 
+    pilot_photo_url = UIField(
+        name="PilotDetailPhotoURL",
+        label="Pilot Photo URL",
+        field_type=UIFieldType.TEXT,
+        private=True,
+    )
+    rhapi.fields.register_pilot_attribute(pilot_photo_url)
+
 
 def register_raceclass_attributes(rhapi: RHAPI) -> None:
     """
@@ -176,15 +184,3 @@ def register_global_options(rhapi: RHAPI) -> None:
         private=True,
     )
     rhapi.fields.register_option(apikey_field, "multigp_set")
-
-    store_pilot_url = UIField(
-        name="store_pilot_url",
-        label="Store Pilot URL",
-        field_type=UIFieldType.CHECKBOX,
-        desc=(
-            "Changes are active after a reboot. Stores the pilot's "
-            "MultiGP profile image URL when importing a race."
-        ),
-        private=True,
-    )
-    rhapi.fields.register_option(store_pilot_url, "multigp_set")

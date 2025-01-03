@@ -53,7 +53,7 @@ class _APIManager:
                 request_type,
                 url,
                 data=json_request,
-                timeout=5,
+                timeout=10,
             )
         except requests.exceptions.ConnectionError:
             logger.warning("Unable to connect to MultiGP API")

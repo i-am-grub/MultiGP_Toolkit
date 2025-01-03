@@ -47,7 +47,7 @@ def standard_plugin_not_installed() -> bool:
 
     :return: status of the install
     """
-    return "plugins.fpvscores" in sys.modules
+    return "plugins.fpvscores" not in sys.modules
 
 
 class FPVScoresAPI(_APIManager):
@@ -77,8 +77,6 @@ class FPVScoresAPI(_APIManager):
 
         self._rhapi = rhapi
         """A stored instance of RHAPI"""
-
-        self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, self.register_handlers)
 
         if standard_plugin_not_installed():
             self._register_listeners()
@@ -146,7 +144,7 @@ class FPVScoresAPI(_APIManager):
             self._connected = self.connection_check()
         yield self._connected
 
-        if self._rhapi.db.option("event_uuid_toolkit") != "":
+        if self._rhapi.db.option("event_uuid_toolkit"):
             yield True
         elif self._linked_org is None:
             self._linked_org = self.check_linked_org()
@@ -154,7 +152,7 @@ class FPVScoresAPI(_APIManager):
             if self._linked_org:
                 self.run_full_sync()
 
-            yield self._rhapi.db.option("event_uuid_toolkit") != ""
+            yield bool(self._rhapi.db.option("event_uuid_toolkit"))
         else:
             yield False
 
@@ -177,7 +175,7 @@ class FPVScoresAPI(_APIManager):
 
         @wraps(func)
         def inner(self, *args: P.args, **kwargs: P.kwargs):
-            if all(self._generate_listener_conditions):
+            if all(self._generate_listener_conditions()):
                 func(self, *args, **kwargs)
 
         return inner
@@ -224,7 +222,7 @@ class FPVScoresAPI(_APIManager):
         :param greenlet: The greenlet to wait for
         """
 
-        gevent.wait([greenlet])
+        gevent.wait((greenlet,))
         response: requests.Response = greenlet.value
         self._parse_server_response(response.text)
 
@@ -533,19 +531,22 @@ class FPVScoresAPI(_APIManager):
         greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
         self._process_response(greenlet)
 
-    def run_full_sync(self, _args: dict | None = None) -> tuple[str, str]:
+    def run_full_sync(self, _args: dict | None = None) -> None:
         """
         Syncs the FPVScores event to the current RotorHazard state
 
         :param _args: Default callback arguments
         """
 
-        payload = self._rhapi.io.run_export("JSON_FPVScores_MGP_Upload")
+        export = self._rhapi.io.run_export("JSON_FPVScores_MGP_Upload")
+        payload = export["data"]
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_push"
 
         greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
+        gevent.wait((greenlet,))
+        response: requests.Response = greenlet.value
 
-        self._process_response(greenlet)
+        self._parse_server_response(response.text.split("\n")[-1])
 
     def get_event_url(self) -> str | None:
         """
@@ -554,23 +555,24 @@ class FPVScoresAPI(_APIManager):
         :return: The event url
         """
 
-        if (
-            not self._connected
-            or (uuid := self._rhapi.db.option("event_uuid_toolkit")) == ""
+        if not self._connected or not (
+            uuid := self._rhapi.db.option("event_uuid_toolkit")
         ):
             return None
 
         payload = {"event_uuid": uuid}
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=fpvs_get_event_url"
 
-        greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
-        gevent.wait([greenlet])
+        greenlet = gevent.spawn(
+            self._request, RequestAction.POST, url, json.dumps(payload)
+        )
+        gevent.wait((greenlet,))
 
         response: requests.Response = greenlet.value
 
         if response.status_code == 200 and response.text != "no event found":
             logger.info("FPVScores event URL: %s", response.text)
-            return response.text.split("\n")[-1]
+            return response.text
 
         return None
 
@@ -588,8 +590,10 @@ class FPVScoresAPI(_APIManager):
         payload = {"mgp_api_key": self._rhapi.db.option("mgp_api_key")}
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_api_check"
 
-        greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
-        gevent.wait([greenlet])
+        greenlet = gevent.spawn(
+            self._request, RequestAction.POST, url, json.dumps(payload)
+        )
+        gevent.wait((greenlet,))
 
         response: requests.Response = greenlet.value
 
@@ -599,73 +603,82 @@ class FPVScoresAPI(_APIManager):
 
         return False
 
-    def _assemble_pilots_complete(self) -> list[Pilot]:
-        """
-        Gets the database pilots and adds their MultiGP id
-        to the upload data.
 
-        :return: The list of pilots
-        """
-        payload = self._rhapi.db.pilots
+def _assemble_pilots_complete(rhapi: RHAPI) -> list[Pilot]:
+    """
+    Gets the database pilots and adds their MultiGP id
+    to the upload data.
 
-        pilot: Pilot
-        for pilot in payload:
-            pilot.mgpid = self._rhapi.db.pilot_attribute_value(pilot.id, "mgp_pilot_id")
+    :return: The list of pilots
+    """
+    payload = rhapi.db.pilots
+
+    pilot: Pilot
+    for pilot in payload:
+        pilot.mgpid = rhapi.db.pilot_attribute_value(pilot.id, "mgp_pilot_id")
+
+    return payload
+
+
+def _assemble_heatnodes_complete(rhapi: RHAPI) -> dict:
+    """
+    Assembles heatnode data for FPVScores push
+
+    :param rhapi: An instance of RHAPI
+    :return: The formated payload
+    """
+    payload: list[HeatNode] = rhapi.db.slots
+    profile: Profiles = rhapi.race.frequencyset
+    freqs = json.loads(profile.frequencies)
+
+    num_seats = len(rhapi.interface.seats)
+    for index, slot in enumerate(payload):
+        if (index + 1) > num_seats:
+            break
+
+        if slot.method == ProgramMethod.NONE:
+            slot.node_frequency_band = " "
+            slot.node_frequency_c = " "
+            slot.node_frequency_f = " "
+        else:
+            slot.node_frequency_band = freqs["b"][slot.node_index]
+            slot.node_frequency_c = freqs["c"][slot.node_index]
+            slot.node_frequency_f = freqs["f"][slot.node_index]
+
+    return payload
+
+
+def register_handlers(args: dict | None) -> None:
+    """
+    Register export handlers
+
+    :param args: Default callback arguments
+    """
+
+    def write_to_json(data):
+        payload = json.dumps(data, indent="\t", cls=AlchemyEncoder)
+        return {"data": payload, "encoding": "application/json", "ext": "json"}
+
+    def assemble_fpvscores_upload(rhapi: RHAPI):
+        payload = {}
+        payload["import_settings"] = "upload_FPVScores"
+        payload["Pilot"] = _assemble_pilots_complete(rhapi)
+        payload["Heat"] = rhapi.db.heats
+        payload["HeatNode"] = _assemble_heatnodes_complete(rhapi)
+        payload["RaceClass"] = rhapi.db.raceclasses
+        payload["GlobalSettings"] = rhapi.db.options
+        payload["FPVScores_results"] = rhapi.eventresults.results
 
         return payload
 
-    def _assemble_heatnodes_complete(self):
-        payload: list[HeatNode] = self._rhapi.db.slots
-        profile: Profiles = self._rhapi.race.frequencyset
-        freqs = json.loads(profile.frequencies)
-
-        num_seats = len(self._rhapi.interface.seats)
-        for index, slot in enumerate(payload):
-            if (index + 1) > num_seats:
-                break
-
-            if slot.method == ProgramMethod.NONE:
-                slot.node_frequency_band = " "
-                slot.node_frequency_c = " "
-                slot.node_frequency_f = " "
-            else:
-                slot.node_frequency_band = freqs["b"][slot.node_index]
-                slot.node_frequency_c = freqs["c"][slot.node_index]
-                slot.node_frequency_f = freqs["f"][slot.node_index]
-
-        return payload
-
-    def register_handlers(self, args: dict | None) -> None:
-        """
-        Register export handlers
-
-        :param args: Default callback arguments
-        """
-
-        def write_to_json(data):
-            payload = json.dumps(data, indent="\t", cls=AlchemyEncoder)
-            return {"data": payload, "encoding": "application/json", "ext": "json"}
-
-        def assemble_fpvscores_upload():
-            payload = {}
-            payload["import_settings"] = "upload_FPVScores"
-            payload["Pilot"] = self._assemble_pilots_complete()
-            payload["Heat"] = self._rhapi.db.heats
-            payload["HeatNode"] = self._assemble_heatnodes_complete()
-            payload["RaceClass"] = self._rhapi.db.raceclasses
-            payload["GlobalSettings"] = self._rhapi.db.options
-            payload["FPVScores_results"] = self._rhapi.eventresults.results
-
-            return payload
-
-        if "register_fn" in args:
-            args["register_fn"](
-                DataExporter(
-                    "JSON FPVScores MGP Upload",
-                    write_to_json,
-                    assemble_fpvscores_upload,
-                )
+    if "register_fn" in args:
+        args["register_fn"](
+            DataExporter(
+                "JSON FPVScores MGP Upload",
+                write_to_json,
+                assemble_fpvscores_upload,
             )
+        )
 
 
 class AlchemyEncoder(json.JSONEncoder):

@@ -14,7 +14,6 @@ import requests
 from eventmanager import Evt
 from Database import Pilot, Heat, HeatNode, RaceClass, RaceFormat, SavedRaceMeta
 
-from RHUI import UIField, UIFieldType
 from RHAPI import RHAPI
 
 from .enums import DefaultMGPFormats, MGPMode
@@ -22,18 +21,19 @@ from .multigpapi import MultiGPAPI
 from .uimanager import UImanager
 from .rsimporter import RaceSyncImporter
 from .rsexporter import RaceSyncExporter
+from .fpvscoresapi import register_handlers
 
 try:
     if sys.version_info.minor == 13:
-        from .verification import SystemVerification
+        from .verification.py313 import SystemVerification
     elif sys.version_info.minor == 12:
-        from .verification import SystemVerification
+        from .verification.py312 import SystemVerification
     elif sys.version_info.minor == 11:
-        from .verification import SystemVerification
+        from .verification.py311 import SystemVerification
     elif sys.version_info.minor == 10:
-        from .verification import SystemVerification
+        from .verification.py310 import SystemVerification
     elif sys.version_info.minor == 9:
-        from .verification import SystemVerification
+        from .verification.py39 import SystemVerification
     else:
         raise ImportError("Unsupported Python version")
 except ImportError as exc:
@@ -57,7 +57,6 @@ class RaceSyncCoordinator:
     """
 
     _multigp_cred_set = False
-    _pilot_urls = False
     _multigp = MultiGPAPI()
     _importer: RaceSyncImporter
     _exporter: RaceSyncExporter
@@ -67,7 +66,12 @@ class RaceSyncCoordinator:
         self._rhapi: RHAPI = rhapi
         self._ui = UImanager(rhapi, self._multigp)
 
-        self._fpvscores_installed = "plugins.fpvscores" in sys.modules
+        self._importer = RaceSyncImporter(
+            self._rhapi, self._multigp, self._system_verification
+        )
+        self._exporter = RaceSyncExporter(
+            self._rhapi, self._multigp, self._system_verification
+        )
 
         self._rhapi.events.on(Evt.STARTUP, self.startup, name="startup")
         self._rhapi.events.on(Evt.RACE_STAGE, self.verify_race, name="verify_race")
@@ -87,6 +91,7 @@ class RaceSyncCoordinator:
         self._rhapi.events.on(
             Evt.LAPS_SAVE, self.store_pilot_list, name="store_pilot_list"
         )
+        self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, register_handlers)
 
     def startup(self, _args: dict | None = None):
         """
@@ -94,26 +99,6 @@ class RaceSyncCoordinator:
 
         :param _args: Args passed to the callback function, defaults to None
         """
-
-        if self._rhapi.db.option("store_pilot_url") == "1":
-            pilot_urls = True
-            pilot_photo_url = UIField(
-                name="PilotDetailPhotoURL",
-                label="Pilot Photo URL",
-                field_type=UIFieldType.TEXT,
-                private=False,
-            )
-            self._rhapi.fields.register_pilot_attribute(pilot_photo_url)
-        else:
-            pilot_urls = False
-
-        self._importer = RaceSyncImporter(
-            self._rhapi, self._multigp, self._system_verification, pilot_urls
-        )
-        self._exporter = RaceSyncExporter(
-            self._rhapi, self._multigp, self._system_verification, pilot_urls
-        )
-
         self.verify_creds()
 
     def reset_event_metadata(self, _args: dict | None = None):
