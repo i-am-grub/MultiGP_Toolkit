@@ -9,7 +9,9 @@ from RHAPI import RHAPI
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
 from Database import Pilot, Heat, RaceClass, SavedRaceMeta
 
+from .enums import MGPMode
 from .multigpapi import MultiGPAPI
+from .fpvscoresapi import standard_plugin_not_installed
 
 
 class UImanager:
@@ -235,7 +237,7 @@ class UImanager:
                 "zippyq_return", "ZippyQ Pack Return", "", order=0
             )
 
-    def create_results_export_menu(self, fpvs_installed: bool, callback: Callable):
+    def create_results_export_menu(self, callback: Callable):
         """
         Create the results export menu
 
@@ -258,7 +260,18 @@ class UImanager:
         )
         self._rhapi.fields.register_option(push_fpvs, "results_controls")
 
-        if not fpvs_installed:
+        if standard_plugin_not_installed():
+
+            fpv_scores_text = self._rhapi.language.__("FPVScores Auto Sync")
+            fpv_scores = UIField(
+                "fpvscores_autoupload",
+                fpv_scores_text,
+                desc="Enable or disable automatic syncing. A network connection is required.",
+                value="0",
+                field_type=UIFieldType.CHECKBOX,
+            )
+            self._rhapi.fields.register_option(fpv_scores, "results_controls")
+
             fpv_scores_text = self._rhapi.language.__("FPVScores Event UUID")
             fpv_scores = UIField(
                 "event_uuid_toolkit",
@@ -424,8 +437,8 @@ class UImanager:
         race: SavedRaceMeta
         for race in self._rhapi.db.races:
             if (
-                self._rhapi.db.raceclass_attribute_value(race.class_id, "zippyq_class")
-                == "1"
+                self._rhapi.db.raceclass_attribute_value(race.class_id, "mgp_mode")
+                == MGPMode.ZIPPYQ
             ):
                 class_info: RaceClass = self._rhapi.db.raceclass_by_id(race.class_id)
                 heat_info: Heat = self._rhapi.db.heat_by_id(race.heat_id)
@@ -495,9 +508,9 @@ class UImanager:
             rh_class: RaceClass
             for rh_class in self._rhapi.db.raceclasses:
                 zq_state = self._rhapi.db.raceclass_attribute_value(
-                    rh_class.id, "zippyq_class"
+                    rh_class.id, "mgp_mode"
                 )
-                if zq_state == "1":
+                if zq_state == MGPMode.ZIPPYQ:
                     result_class_list.append(
                         UIFieldSelectOption(value=rh_class.id, label=rh_class.name)
                     )
@@ -519,9 +532,10 @@ class UImanager:
 
             for rh_class in self._rhapi.db.raceclasses:
                 zq_state = self._rhapi.db.raceclass_attribute_value(
-                    rh_class.id, "zippyq_class"
+                    rh_class.id, "mgp_mode"
                 )
-                if zq_state == "1":
+
+                if zq_state == MGPMode.ZIPPYQ:
                     self._rhapi.db.option_set("zq_class_select", rh_class.id)
                     break
             else:

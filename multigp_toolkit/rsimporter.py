@@ -2,14 +2,13 @@
 Import Data from RaceSync
 """
 
+import sys
 import json
 import logging
-from enum import Enum
-from dataclasses import dataclass
 from typing import TypeVar
-from collections.abc import Generator, Callable
+from collections.abc import Generator
 
-from RHRace import WinCondition, StartBehavior
+from RHAPI import RHAPI
 from Database import (
     Pilot,
     Heat,
@@ -21,49 +20,66 @@ from Database import (
     HeatAdvanceType,
 )
 
-from .datamanager import _RaceSyncDataManager, MultiGPMode
+from .enums import MGPMode, MGPFormat, DefaultMGPFormats
+from .abstracts import _RaceSyncDataManager
+from .multigpapi import MultiGPAPI
+
+try:
+    if sys.version_info.minor == 13:
+        from .verification import SystemVerification
+    elif sys.version_info.minor == 12:
+        from .verification import SystemVerification
+    elif sys.version_info.minor == 11:
+        from .verification import SystemVerification
+    elif sys.version_info.minor == 10:
+        from .verification import SystemVerification
+    elif sys.version_info.minor == 9:
+        from .verification import SystemVerification
+    else:
+        raise ImportError("Unsupported Python version")
+except ImportError as exc:
+    raise ImportError(
+        (
+            "System Verification module not found. "
+            "Follow the installation instructions here: "
+            "https://multigp-toolkit.readthedocs.io"
+            "/stable/usage/install/index.html"
+        )
+    ) from exc
 
 T = TypeVar("T")
+"""Generic type variable"""
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass(frozen=True)
-class MGPFormat:
-    """
-    Define the standard variables for an imported race format
-    """
-
-    format_name: str
-    win_condition: WinCondition
-    mgp_gq: bool = False
-    race_time_sec: int = 120
-    unlimited_time: bool = False
-    start_behavior: StartBehavior = StartBehavior.HOLESHOT
-    team_racing_mode: bool = False
-
-
-class DefaultMGPFormats(MGPFormat, Enum):
-    """
-    Default formats for MultiGP
-    """
-
-    AGGREGATE = "MultiGP: Aggregate Laps", WinCondition.MOST_PROGRESS
-    """Most laps in race"""
-    FASTEST = "MultiGP: Fastest Lap", WinCondition.FASTEST_LAP
-    """Fastest lap in race"""
-    CONSECUTIVE = "MultiGP: Fastest Consecutive Laps", WinCondition.FASTEST_CONSECUTIVE
-    """Fastest Consecutive laps in race"""
-    GLOBAL = "MultiGP: Global Qualifier", WinCondition.FASTEST_CONSECUTIVE, True
-    """`CONSECUTIVE` with Global Qualifer features enabled.
-
-    This format needs to be hardcoded until there is a way to lock format changes
-    in the user interface.
-    """
+"""Logger for the module"""
 
 
 class RaceSyncImporter(_RaceSyncDataManager):
     """Actions for importing data from RaceSync"""
+
+    def __init__(
+        self,
+        rhapi: RHAPI,
+        multigp: MultiGPAPI,
+        verification: SystemVerification,
+        pilot_urls: bool,
+    ):
+        """
+        Class initalization
+
+        :param rhapi: An instance of RHAPI
+        :param multigp: An instance of the MultiGPAPI
+        :param verification: An instace of the SystemVerification module
+        :param pilot_urls: Flag determining if the system booted with pilot_urls active
+        """
+        super().__init__(rhapi)
+
+        self._multigp = multigp
+        """A stored instace of the MultiGPAPI module"""
+        self._verification = verification
+        """A stored instace of the SystemVerification module"""
+        self._pilot_urls = pilot_urls
+        """Flag determining if the system booted with pilot_urls active"""
 
     def pilot_search(self, db_pilots: list[Pilot], mgp_pilot: dict[str, T]) -> int:
         """
@@ -225,7 +241,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         if race_data["raceType"] == "2":
 
-            # TODO: Switch from
+            # Switch from
             mgp_format = DefaultMGPFormats.GLOBAL
             # to
             # mgp_format = replace(mgp_format, format_name=GQ_FORMAT_NAME, mgp_gq=True)
@@ -251,7 +267,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         rh_formats = self._rhapi.db.raceformats
         format_id = self.format_search(rh_formats, mgp_format)
 
-        # Adjust points for format
         if race_data["scoringDisabled"] == "0":
             self._rhapi.db.raceformat_alter(
                 format_id,
@@ -355,7 +370,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
             race_class.id,
             attributes={
                 "mgp_raceclass_id": selected_race,
-                "mgp_mode": MultiGPMode.PREDEFINED_HEATS,
+                "mgp_mode": MGPMode.PREDEFINED_HEATS,
                 "gq_class": mgp_format.mgp_gq,
             },
         )
@@ -425,7 +440,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 race_class.id,
                 attributes={
                     "mgp_raceclass_id": selected_race,
-                    "mgp_mode": MultiGPMode.PREDEFINED_HEATS,
+                    "mgp_mode": MGPMode.PREDEFINED_HEATS,
                     "gq_class": mgp_format.mgp_gq,
                 },
             )
@@ -450,10 +465,12 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 race_class.id,
                 attributes={
                     "mgp_raceclass_id": selected_race,
-                    "mgp_mode": MultiGPMode.ZIPPYQ,
+                    "mgp_mode": MGPMode.ZIPPYQ,
                     "gq_class": mgp_format.mgp_gq,
                 },
             )
+
+            self._rhapi.db.option_set("zippyq_races", zippyq_races)
 
     def zippyq(
         self, raceclass_id: int, selected_race: str, round_num: int
@@ -543,7 +560,8 @@ class RaceSyncImporter(_RaceSyncDataManager):
         class_id = int(race_info.class_id)
 
         if (
-            self._rhapi.db.raceclass_attribute_value(class_id, "zippyq_class") != "1"
+            self._rhapi.db.raceclass_attribute_value(class_id, "mgp_mode")
+            != MGPMode.ZIPPYQ
             or self._rhapi.db.option("auto_zippy") != "1"
         ):
             return

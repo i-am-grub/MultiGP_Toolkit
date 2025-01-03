@@ -1,5 +1,5 @@
 """
-System Event Management
+System Event, Data, and User Interface Coordination
 """
 
 import sys
@@ -17,13 +17,11 @@ from Database import Pilot, Heat, HeatNode, RaceClass, RaceFormat, SavedRaceMeta
 from RHUI import UIField, UIFieldType
 from RHAPI import RHAPI
 
+from .enums import DefaultMGPFormats, MGPMode
 from .multigpapi import MultiGPAPI
 from .uimanager import UImanager
-from .rsimporter import RaceSyncImporter, DefaultMGPFormats
+from .rsimporter import RaceSyncImporter
 from .rsexporter import RaceSyncExporter
-
-# from .fpvscoresapi import register_handlers, linkedMGPOrg, runPushMGP, getURLfromFPVS
-
 
 try:
     if sys.version_info.minor == 13:
@@ -72,7 +70,6 @@ class RaceSyncCoordinator:
         self._fpvscores_installed = "plugins.fpvscores" in sys.modules
 
         self._rhapi.events.on(Evt.STARTUP, self.startup, name="startup")
-        # self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, register_handlers)
         self._rhapi.events.on(Evt.RACE_STAGE, self.verify_race, name="verify_race")
         self._rhapi.events.on(Evt.CLASS_ALTER, self.verify_class, name="verify_class")
         self._rhapi.events.on(
@@ -216,7 +213,7 @@ class RaceSyncCoordinator:
         Compares the versions listed in the local and public (repo) manifest files.
         Register a button for updating if there is a mismatch.
         """
-        url = "https://raw.githubusercontent.com/i-am-grub/MultiGP_Toolkit/master/versions.json"
+        url = "https://raw.githubusercontent.com/i-am-grub/multigp_toolkit/master/versions.json"
 
         response = requests.get(url, timeout=5)
 
@@ -224,7 +221,7 @@ class RaceSyncCoordinator:
         latest_version = versions["MultiGP Toolkit"]["latest"]
 
         with open(
-            "plugins/MultiGP_Toolkit/manifest.json", encoding="utf-8"
+            "plugins/multigp_toolkit/manifest.json", encoding="utf-8"
         ) as manifest:
             version = json.load(manifest)["version"]
 
@@ -245,19 +242,19 @@ class RaceSyncCoordinator:
         :param str version: The version of the plugin to update to.
         """
         url = (
-            "https://github.com/i-am-grub/MultiGP_Toolkit"
-            f"/releases/download/v{version}/MultiGP_Toolkit.zip"
+            "https://github.com/i-am-grub/multigp_toolkit"
+            f"/releases/download/v{version}/multigp_toolkit.zip"
         )
 
         logger.info(subprocess.run(args=["wget", url], check=False))
-        logger.info(subprocess.run(args=["unzip", "MultiGP_Toolkit.zip"], check=False))
+        logger.info(subprocess.run(args=["unzip", "multigp_toolkit.zip"], check=False))
         logger.info(
             subprocess.run(
-                args=["cp", "MultiGP_Toolkit", "-r", "plugins/"], check=False
+                args=["cp", "multigp_toolkit", "-r", "plugins/"], check=False
             )
         )
-        logger.info(subprocess.run(args=["rm", "-r", "MultiGP_Toolkit"], check=False))
-        logger.info(subprocess.run(args=["rm", "MultiGP_Toolkit.zip"], check=False))
+        logger.info(subprocess.run(args=["rm", "-r", "multigp_toolkit"], check=False))
+        logger.info(subprocess.run(args=["rm", "multigp_toolkit.zip"], check=False))
 
         message = "Data downloaded. Restart the server to complete the update."
         self._rhapi.ui.message_alert(self._rhapi.language.__(message))
@@ -271,10 +268,10 @@ class RaceSyncCoordinator:
             Evt.LAPS_SAVE, self._importer.auto_zippyq, name="auto_zippyq"
         )
         self._rhapi.events.on(
-            Evt.LAPS_SAVE, self._exporter.auto_slot_score, name="auto_slot_score"
+            Evt.LAPS_SAVE, self._exporter.zippyq_slot_score, name="zippyq_slot_score"
         )
         self._rhapi.events.on(
-            Evt.LAPS_RESAVE, self._exporter.auto_slot_score, name="auto_slot_score"
+            Evt.LAPS_RESAVE, self._exporter.zippyq_slot_score, name="zippyq_slot_score"
         )
 
         self._rhapi.events.on(
@@ -336,10 +333,8 @@ class RaceSyncCoordinator:
         self._ui.create_race_import_menu(self.setup_event)
         self._ui.create_pilot_import_menu(self._importer.import_pilots)
         self._ui.create_zippyq_controls(self._importer.manual_zippyq)
-        self._ui.create_results_export_menu(
-            self._fpvscores_installed, self._exporter.push_results
-        )
-        self._ui.create_gq_export_menu(self._exporter.push_results)
+        self._ui.create_results_export_menu(self._exporter.manual_push_results)
+        self._ui.create_gq_export_menu(self._exporter.manual_push_results)
         self._ui.create_zippyq_return(self.return_pack)
 
         self._ui.update_panels()
@@ -461,7 +456,12 @@ class RaceSyncCoordinator:
         if self._verification_checks(race_data):
             self._import_event(selected_race, race_data)
 
-    def return_pack(self, args=None):
+    def return_pack(self, _args: dict | None = None):
+        """
+        Returns a pilots pack for the race.
+
+        :param _args: Callback args, defaults to None
+        """
         race_id = self._rhapi.db.option("zq_race_select")
         pilot_id = self._rhapi.db.option("zq_pilot_select")
 
@@ -476,116 +476,133 @@ class RaceSyncCoordinator:
                 )
                 self._ui.zq_pilot_selector(args={"option": "zq_race_select"})
 
+    def _race_pilots_checks(self, heat_id: int, gq_active: bool) -> bool:
+        """
+        _summary_
+
+        :param heat_id: _description_
+        :param gq_active: _description_
+        :return: _description_
+        """
+
+        slots: list[HeatNode] = self._rhapi.db.slots_by_heat(heat_id)
+        heat_pilots = []
+        pilot_counter = 0
+
+        for slot_info in slots:
+
+            if slot_info.pilot_id == 0:
+                continue
+
+            if slot_info.pilot_id in heat_pilots:
+                pilot_info: Pilot = self._rhapi.db.pilot_by_id(slot_info.pilot_id)
+                message = (
+                    f"MultiGP Toolkit: {pilot_info.callsign} occupies "
+                    "more than one slot in current heat"
+                )
+                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                return False
+
+            heat_pilots.append(slot_info.pilot_id)
+            pilot_counter += 1
+
+        if pilot_counter == 0:
+            return False
+
+        if gq_active and pilot_counter < 3:
+            message = "GQ Rules: At least 3 pilots are required to start the race"
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+            return False
+
+        return True
+
+    def _race_zippyq_checks(self, heat_info: Heat) -> bool:
+        """
+        _summary_
+
+        :param heat_info: _description_
+        :return: _description_
+        """
+
+        heat_id = heat_info.id
+
+        if self._rhapi.db.heat_max_round(heat_id) > 0:
+            message = "ZippyQ: Round cannot be repeated"
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+            return False
+
+        heat: Heat
+        for heat in reversed(self._rhapi.db.heats_by_class(heat_info.class_id)):
+
+            if heat.id < heat_id and self._rhapi.db.heat_max_round(heat.id) == 0:
+                check_heat: Heat = self._rhapi.db.heat_by_id(heat.id)
+                message = f"ZippyQ: Complete {check_heat.name} before starting {heat_info.name}"
+                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                return False
+
+            if self._rhapi.db.heat_max_round(heat.id) != 0:
+                break
+
+        return True
+
+    def _race_code_integrity_check(self) -> bool:
+        """
+        _summary_
+
+        :return: _description_
+        """
+        if not self._system_verification.get_integrity_check():
+            message = (
+                "Your system's codebase has been modified and "
+                "is not approved to run Global Qualifier races"
+            )
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+            return False
+
+        return True
+
+    def generate_race_conditionals(
+        self, heat_info: Heat
+    ) -> Generator[bool, None, None]:
+        """
+        Generate the conditions to run a race with a MultiGP event
+        imported
+
+        :param heat_info: The heat to verify
+        :yield: Status of checks
+        """
+
+        if gq_active := self._rhapi.db.raceclass_attribute_value(
+            heat_info.class_id, "gq_class" == "1"
+        ):
+            yield self._race_code_integrity_check()
+
+        yield self._race_pilots_checks(heat_info.id, gq_active)
+
+        if (
+            self._rhapi.db.raceclass_attribute_value(heat_info.class_id, "mgp_mode")
+            == MGPMode.ZIPPYQ
+        ):
+            yield self._race_zippyq_checks(heat_info)
+
     def verify_race(self, args: dict | None) -> None:
         """
         Check to make sure all parameters are met to run a race
 
-        :param args: _description_
+        :param args: Callback args
         """
 
         if not self._rhapi.db.option("mgp_race_id"):
             return
 
         heat_id = args["heat_id"]
-        heat_info = self._rhapi.db.heat_by_id(heat_id)
+        heat_info: Heat = self._rhapi.db.heat_by_id(heat_id)
 
         if heat_info is None:
             return
 
-        # Verify pilot only occupy one slot in heat
-        slots = self._rhapi.db.slots_by_heat(heat_id)
-        heat_pilots = []
-        pilot_counter = 0
-        for slot_info in slots:
-            if slot_info.pilot_id == 0:
-                continue
-            elif slot_info.pilot_id in heat_pilots:
-                self._rhapi.race.stop()
-                pilot_info: Pilot = self._rhapi.db.pilot_by_id(slot_info.pilot_id)
-                message = f"MultiGP Toolkit: {pilot_info.callsign} occupies more than one slot in current heat"
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
-            else:
-                heat_pilots.append(slot_info.pilot_id)
-                pilot_counter += 1
-
-        if pilot_counter == 0:
+        if not all(self.generate_race_conditionals(heat_info)):
             self._rhapi.race.stop()
-
-        # Verify rounds for respective formats
-        zq_state = self._rhapi.db.raceclass_attribute_value(
-            heat_info.class_id, "zippyq_class"
-        )
-        num_completed_rounds = len(self._rhapi.db.races_by_heat(heat_id))
-        for heat in self._rhapi.db.heats_by_class(heat_info.class_id):
-            heat_rounds = self._rhapi.db.heat_max_round(heat.id)
-            round_difference = num_completed_rounds - heat_rounds
-
-            # ZippyQ - Repeated Round Check
-            if zq_state == "1" and self._rhapi.db.heat_max_round(heat_id) > 0:
-                self._rhapi.race.stop()
-                message = f"ZippyQ: Round cannot be repeated"
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
-
-            # ZippyQ - Round Order Check
-            elif (
-                zq_state == "1"
-                and heat.id < heat_id
-                and self._rhapi.db.heat_max_round(heat.id) == 0
-            ):
-                self._rhapi.race.stop()
-                check_heat = self._rhapi.db.heat_by_id(heat.id)
-                message = f"ZippyQ: Complete {check_heat.name} before starting {heat_info.name}"
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
-
-            # Controlled - Multi Heat Pilot Check
-            elif zq_state != "1" and heat.id != heat_id:
-                for solt in self._rhapi.db.slots_by_heat(heat.id):
-                    if solt.pilot_id in heat_pilots:
-                        pilot = self._rhapi.db.pilot_by_id(solt.pilot_id)
-                        message = f"MultiGP Toolkit: {pilot.callsign} is in multiple heats within this class. MultiGP will only accept results from their last heat."
-                        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-
-        if (
-            self._rhapi.db.raceclass_attribute_value(heat_info.class_id, "gq_class")
-            != "1"
-        ):
-            return
-
-        heat: Heat
-        for heat in self._rhapi.db.heats_by_class(heat_info.class_id):
-            heat_rounds = self._rhapi.db.heat_max_round(heat.id)
-            round_difference = num_completed_rounds - heat_rounds
-
-            # Controlled - Round Incrementing Check
-            if zq_state != "1" and round_difference > 0:
-                self._rhapi.race.stop()
-                check_heat: Heat = self._rhapi.db.heat_by_id(heat.id)
-                message = (
-                    f"MultiGP Toolkit: Run {check_heat.name} "
-                    f"before starting {heat_info.name}'s next round"
-                )
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
-
-        # GQ - System codebase check
-        if not self._system_verification.get_integrity_check():
-            self._rhapi.race.stop()
-            message = (
-                "Your system's codebase has been modified and "
-                "is not approved to run Global Qualifier races"
-            )
-            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-            return
-
-        # GQ - Minimum pilot check
-        if pilot_counter < 3:
-            self._rhapi.race.stop()
-            message = f"GQ Rules: At least 3 pilots are required to start the race"
-            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-            return
 
     def generate_class_conditionals(
         self, raceclass: RaceClass
