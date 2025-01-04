@@ -29,17 +29,26 @@ class _APIManager:
     _session: requests.Session
     """Session for API requests"""
 
-    def __init__(self, headers: dict[str, str]):
+    def __init__(self, rhapi: RHAPI, headers: dict[str, str] | None = None):
         """
         Class initalization
 
         :param headers: Header to use for API request
         """
+
+        self._rhapi = rhapi
+        """Instace of RHAPI"""
+
         self._session = requests.Session()
+        """Session to use for API requests"""
         self._session.headers = headers
 
     def _request(
-        self, request_type: RequestAction, url: str, json_request: str | None
+        self,
+        request_type: RequestAction,
+        url: str,
+        json_request: dict | None,
+        headers: dict | None = None,
     ) -> requests.Response:
         """
         Make a request to the MultiGP API
@@ -52,11 +61,14 @@ class _APIManager:
             response = self._session.request(
                 request_type,
                 url,
-                data=json_request,
+                headers=headers,
+                json=json_request,
                 timeout=10,
             )
         except requests.exceptions.ConnectionError:
-            logger.warning("Unable to connect to MultiGP API")
+            message = f"Connection with {type(self).__name__} failed"
+            self._rhapi.ui.message_alert(message)
+            logger.warning(message)
             self._connected = False
             raise
 

@@ -90,6 +90,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
         :param event_url: The FPVScores event url
         :yield: Formated race data
         """
+        # pylint: disable=R0913
 
         race_pilots = json.loads(
             self._rhapi.db.race_attribute_value(race_info.id, "race_pilots")

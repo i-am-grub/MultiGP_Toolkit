@@ -3,7 +3,6 @@ MultiGP RaceSync API Access
 """
 
 import logging
-import json
 from typing import TypeVar
 
 import requests
@@ -31,13 +30,26 @@ class MultiGPAPI(_APIManager):
     _api_key = None
     _chapter_id = None
 
-    def __init__(self):
+    def __init__(self, rhapi):
+        """
+        Class initalization
+
+        :param rhapi: An instance of RHAPI
+        """
         headers = {"Content-type": "application/json"}
-        super().__init__(headers)
+        super().__init__(rhapi, headers)
 
     def _request_and_parse(
-        self, request_type: RequestAction, url: str, json_request: str
+        self, request_type: RequestAction, url: str, json_request: dict
     ) -> dict[str, bool] | dict[str, U]:
+        """
+        Request data from the MultiGP API and parse it's output
+
+        :param request_type: The request type
+        :param url: The url to send the request
+        :param json_request: The payload
+        :return: The parsed data
+        """
 
         if self._connected is False:
             return {"status": False}
@@ -47,7 +59,11 @@ class MultiGPAPI(_APIManager):
         except requests.exceptions.ConnectionError:
             return {"status": False}
 
-        return json.loads(response.text)
+        try:
+            return response.json()
+        except AttributeError:
+            logger.error("Error parsing data from MultiGP")
+            return {"status": False}
 
     def set_api_key(self, api_key: str) -> None:
         """
@@ -64,9 +80,9 @@ class MultiGPAPI(_APIManager):
         :return: The name of the Chapter, returns None if chapter not found
         """
         url = f"{BASE_API_URL}/chapter/findChapterFromApiKey"
-        data = {"apiKey": self._api_key}
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.POST, url, json_request)
+        payload = {"apiKey": self._api_key}
+
+        returned_json = self._request_and_parse(RequestAction.POST, url, payload)
 
         if returned_json["status"]:
             self._chapter_id = returned_json["chapterId"]
@@ -84,9 +100,9 @@ class MultiGPAPI(_APIManager):
         """
 
         url = f"{BASE_API_URL}/race/listForChapter?chapterId={self._chapter_id}"
-        data = {"apiKey": self._api_key}
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.POST, url, json_request)
+        payload = {"apiKey": self._api_key}
+
+        returned_json = self._request_and_parse(RequestAction.POST, url, payload)
 
         if returned_json["status"]:
             races = {}
@@ -107,9 +123,9 @@ class MultiGPAPI(_APIManager):
         """
 
         url = f"{BASE_API_URL}/race/view?id={race_id}"
-        data = {"apiKey": self._api_key}
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.POST, url, json_request)
+        payload = {"apiKey": self._api_key}
+
+        returned_json = self._request_and_parse(RequestAction.POST, url, payload)
 
         if returned_json["status"]:
             logger.info("Pulled data for %s", {returned_json["data"]["chapterName"]})
@@ -128,9 +144,9 @@ class MultiGPAPI(_APIManager):
         :return: The race data for the round
         """
         url = f"{BASE_API_URL}/race/getAdditionalRounds?id={race_id}&startFromRound={round_num}"
-        data = {"apiKey": self._api_key}
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.POST, url, json_request)
+        payload = {"apiKey": self._api_key}
+
+        returned_json = self._request_and_parse(RequestAction.POST, url, payload)
 
         if returned_json["status"]:
             return returned_json["data"]
@@ -152,10 +168,9 @@ class MultiGPAPI(_APIManager):
             f"{BASE_API_URL}/race/assignslot/id/"
             f"{race_id}/cycle/{race_round}/heat/{heat}/slot/{slot}"
         )
-        data = {"data": race_data, "apiKey": self._api_key}
+        payload = {"data": race_data, "apiKey": self._api_key}
 
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.PUT, url, json_request)
+        returned_json = self._request_and_parse(RequestAction.PUT, url, payload)
 
         return returned_json["status"]
 
@@ -171,11 +186,11 @@ class MultiGPAPI(_APIManager):
         """
 
         url = f"{BASE_API_URL}/race/captureOverallRaceResult?id={race_id}"
-        data = {
+        payload = {
             "data": {"raceId": race_id, "bracketResults": bracket_results},
             "apiKey": self._api_key,
         }
-        json_request = json.dumps(data)
-        returned_json = self._request_and_parse(RequestAction.PUT, url, json_request)
+
+        returned_json = self._request_and_parse(RequestAction.PUT, url, payload)
 
         return returned_json["status"]

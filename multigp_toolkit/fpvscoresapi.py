@@ -36,6 +36,11 @@ logger = logging.getLogger(__name__)
 BASE_API_URL = "https://api.fpvscores.com"
 FPVS_API_VERSION = "0.1.0"
 FPVS_MGP_API_VERSION = "0.0.3"
+LEGACY_HEADERS = {
+    "Authorization": "rhconnect",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+}
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -68,12 +73,7 @@ class FPVScoresAPI(_APIManager):
 
         :param rhapi: An instance of RHAPI
         """
-        headers = {
-            "Authorization": "rhconnect",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
-        super().__init__(headers)
+        super().__init__(rhapi)
 
         self._rhapi = rhapi
         """A stored instance of RHAPI"""
@@ -373,7 +373,7 @@ class FPVScoresAPI(_APIManager):
 
         payload = {
             "event_uuid": self._rhapi.db.option("event_uuid_toolkit"),
-            "class_id": args["heat_id"],
+            "heat_id": args["heat_id"],
         }
 
         url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=heat_delete"
@@ -416,7 +416,7 @@ class FPVScoresAPI(_APIManager):
 
         payload = []
 
-        if (rankings := self._rhapi.db.raceclass_ranking(raceclass.id)) is None:
+        if not (rankings := self._rhapi.db.raceclass_ranking(raceclass.id)):
             return payload
 
         meta = rankings["meta"]
@@ -425,7 +425,8 @@ class FPVScoresAPI(_APIManager):
         for rank in rankings["ranking"]:
 
             rank_values = rank.copy()
-            del rank_values["total_time_laps"]
+            if "total_time_laps" in rank_values:
+                del rank_values["total_time_laps"]
 
             pilot_data = {
                 "classid": raceclass.id,
@@ -479,32 +480,49 @@ class FPVScoresAPI(_APIManager):
                         "last_lap_raw": result["last_lap_raw"],
                         "average_lap": result["average_lap"],
                         "fastest_lap": result["fastest_lap"],
-                        "fastest_lap_source_round": result.get(
-                            "fastest_lap_source", {}
-                        ).get("round", ""),
-                        "consecutives_source_round": result.get(
-                            "consecutives_source", {}
-                        ).get("round", ""),
                         "total_time_raw": result["total_time_raw"],
                         "total_time_laps_raw": result["total_time_laps_raw"],
                         "average_lap_raw": result["average_lap_raw"],
-                        "fastest_lap_source_heat": result.get(
-                            "fastest_lap_source", {}
-                        ).get("heat", ""),
-                        "fastest_lap_source_displayname": result.get(
-                            "fastest_lap_source", {}
-                        ).get("displayname", ""),
-                        "consecutives_source_heat": result.get(
-                            "consecutives_source", {}
-                        ).get("heat", ""),
-                        "consecutives_source_displayname": result.get(
-                            "consecutives_source", {}
-                        ).get("displayname", ""),
                         "consecutives_lap_start": result.get(
                             "consecutive_lap_start", ""
                         ),
                         "method_label": leaderboard,
                     }
+
+                    if (
+                        fast_source := result.get("fastest_lap_source", {})
+                    ) is not None:
+                        pilot_data["fastest_lap_source_round"] = fast_source.get(
+                            "round", ""
+                        )
+                        pilot_data["fastest_lap_source_heat"] = fast_source.get(
+                            "heat", ""
+                        )
+                        pilot_data["fastest_lap_source_displayname"] = fast_source.get(
+                            "displayname", ""
+                        )
+                    else:
+                        pilot_data["fastest_lap_source_round"] = ""
+                        pilot_data["fastest_lap_source_heat"] = ""
+                        pilot_data["fastest_lap_source_displayname"] = ""
+
+                    if (
+                        con_source := result.get("consecutives_source", {})
+                    ) is not None:
+                        pilot_data["consecutives_source_round"] = con_source.get(
+                            "round", ""
+                        )
+                        pilot_data["consecutives_source_heat"] = con_source.get(
+                            "heat", ""
+                        )
+                        pilot_data["consecutives_source_displayname"] = con_source.get(
+                            "displayname", ""
+                        )
+                    else:
+                        pilot_data["consecutives_source_round"] = ""
+                        pilot_data["consecutives_source_heat"] = ""
+                        pilot_data["consecutives_source_displayname"] = ""
+
                     payload.append(pilot_data)
 
         return payload
@@ -539,10 +557,12 @@ class FPVScoresAPI(_APIManager):
         """
 
         export = self._rhapi.io.run_export("JSON_FPVScores_MGP_Upload")
-        payload = export["data"]
+        payload = json.loads(export["data"])
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_push"
 
-        greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
+        greenlet = gevent.spawn(
+            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
+        )
         gevent.wait((greenlet,))
         response: requests.Response = greenlet.value
 
@@ -564,7 +584,7 @@ class FPVScoresAPI(_APIManager):
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=fpvs_get_event_url"
 
         greenlet = gevent.spawn(
-            self._request, RequestAction.POST, url, json.dumps(payload)
+            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
         )
         gevent.wait((greenlet,))
 
@@ -591,7 +611,7 @@ class FPVScoresAPI(_APIManager):
         url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_api_check"
 
         greenlet = gevent.spawn(
-            self._request, RequestAction.POST, url, json.dumps(payload)
+            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
         )
         gevent.wait((greenlet,))
 

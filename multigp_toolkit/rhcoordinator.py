@@ -57,15 +57,14 @@ class RaceSyncCoordinator:
     """
 
     _multigp_cred_set = False
-    _multigp = MultiGPAPI()
     _importer: RaceSyncImporter
     _exporter: RaceSyncExporter
     _system_verification = SystemVerification()
 
     def __init__(self, rhapi: RHAPI):
         self._rhapi: RHAPI = rhapi
+        self._multigp = MultiGPAPI(self._rhapi)
         self._ui = UImanager(rhapi, self._multigp)
-
         self._importer = RaceSyncImporter(
             self._rhapi, self._multigp, self._system_verification
         )
@@ -179,19 +178,16 @@ class RaceSyncCoordinator:
         if key:
             self._multigp.set_api_key(key)
         else:
+            logger.warning("A MultiGP API key has not been entered into the system")
             return
 
-        chapter_name = self._multigp.pull_chapter()
-
-        if chapter_name:
+        if chapter_name := self._multigp.pull_chapter():
             self._ui.set_chapter_name(chapter_name)
             logger.info("API key for %s has been recognized", chapter_name)
+            self.check_update()
+            self.setup_plugin()
         else:
-            logger.info("MultiGP API key cannot be verified.")
-            return
-
-        self.check_update()
-        self.setup_plugin()
+            logger.warning("MultiGP API key cannot be verified.")
 
     def check_update(self):
         """
