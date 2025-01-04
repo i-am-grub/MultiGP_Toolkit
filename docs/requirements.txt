@@ -1,3 +1,5 @@
-sphinx-material
+sphinx
+sphinx-book-theme
 Sphinx-Substitution-Extensions
 sphinx-copybutton
+sphinx-autoapi

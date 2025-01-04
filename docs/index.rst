@@ -70,7 +70,7 @@ Please reach out in the `RotorHazard discord server <https://discord.gg/ANKd2pzB
 Issues and feature requests can be submitted `here <https://github.com/i-am-grub/MultiGP_Toolkit/issues>`_.
 
 Noteworthy RotorHazard Best Practices 
----------------------------
+---------------------------------------
 
 You may notice the performance of certain aspects of the timer's user interface degrade as more race data is collected throughout the event. A few things can be done to combat this issue.
 
