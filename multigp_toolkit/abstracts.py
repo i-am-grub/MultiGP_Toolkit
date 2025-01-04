@@ -11,9 +11,12 @@ from RHAPI import RHAPI
 
 from .enums import RequestAction
 
-U = TypeVar("U", bound=bool | str | int | dict)
 
 logger = logging.getLogger(__name__)
+"""Module logger"""
+
+U = TypeVar("U", bound=bool | str | int | dict)
+"""Generic used for typing"""
 
 
 class _APIManager:

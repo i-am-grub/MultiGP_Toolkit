@@ -11,9 +11,6 @@ from RHRace import WinCondition, StartBehavior
 class RequestAction(str, Enum):
     """
     Common request methods
-
-    Can be subclassed from StrEnum when python 3.11
-    is the minimum version
     """
 
     GET = "GET"
@@ -36,7 +33,7 @@ class MGPMode(str, Enum):
     PREDEFINED_HEATS = "0"
     """Standard type. Formerly known as CONTROLLED mode"""
     ZIPPYQ = "1"
-    """MultiGP's customing queuing mode"""
+    """MultiGP's custom queueing mode"""
 
 
 @dataclass(frozen=True)

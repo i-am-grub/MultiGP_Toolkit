@@ -392,13 +392,12 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         return True
 
-    def import_class(self, selected_race: int, race_data: dict[str, T]):
+    def import_class(self, selected_race: int, race_data: dict[str, T]) -> None:
         """
         Setup a new raceclass within the RHUI based on the import MultiGP race(s).
 
-        :param selected_race: _description_
-        :param race_data: _description_
-        :return: _description_
+        :param selected_race: The id of the MultiGP race
+        :param race_data: The imported race data
         """
 
         if (format_data := self._generate_race_format(race_data)) is None:

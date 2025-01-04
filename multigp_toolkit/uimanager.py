@@ -22,10 +22,13 @@ class UImanager:
     _rhapi: RHAPI
     _multigp: MultiGPAPI
     _chapter_name: str
+    """The imported chapter name"""
 
     def __init__(self, rhapi: RHAPI, multigp: MultiGPAPI):
         self._rhapi = rhapi
+        """A stored instance of RHAPI"""
         self._multigp = multigp
+        """A stored instance of the MultiGP API manager"""
 
     def update_panels(self, _args: dict | None = None):
         """
@@ -66,7 +69,7 @@ class UImanager:
         """
         Sets the chapter name to use in the user interface
 
-        :param chapter_name: _description_
+        :param chapter_name: The chapter name
         """
         self._chapter_name = chapter_name
 
@@ -374,7 +377,7 @@ class UImanager:
         """
         Generates or updates the selector for pushing race results
 
-        :param args: _description_, defaults to None
+        :param args: Callback args, defaults to None
         """
         result_class_list = [UIFieldSelectOption(value="", label="")]
         rank_class_list = [
@@ -468,7 +471,7 @@ class UImanager:
         Generates or updates the selector for choosing a pilot to remove
         a ZippyQ pack from
 
-        :param args: _description_, defaults to None
+        :param args: Callback args, defaults to None
         """
 
         if args is not None and args["option"] != "zq_race_select":

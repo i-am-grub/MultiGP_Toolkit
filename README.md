@@ -16,7 +16,7 @@ This plugin now comes packaged with a mini version of [FPVScores](https://github
 
 ## General Requirements
 
-- RotorHazard v4.1+ is required to run this plugin
+- RotorHazard v4.2.1+ is required to run this plugin
    - Stricter RotorHazard version requirements are enforced for running Global Qualifers. Please see the current release's documentation for details.
 - You will need your MultiGP Chapter's API key
 - An internet connection when pushing data to or pulling data from MultiGP

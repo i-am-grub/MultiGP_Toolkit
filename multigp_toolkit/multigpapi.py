@@ -11,11 +11,15 @@ from .enums import RequestAction
 from .abstracts import _APIManager
 
 logger = logging.getLogger(__name__)
+"""Module logger"""
 
 T = TypeVar("T", bound=bool | str | int)
+"""Generic for typing"""
 U = TypeVar("U", bound=bool | str | int | dict)
+"""Generic for typing"""
 
 BASE_API_URL = "https://www.multigp.com/mgp/multigpwebservice"
+"""MultiGP API base URL"""
 
 
 class MultiGPAPI(_APIManager):
@@ -27,8 +31,10 @@ class MultiGPAPI(_APIManager):
         https://www.multigp.com/apidocumentation/
     """
 
-    _api_key = None
-    _chapter_id = None
+    _api_key: str | None = None
+    """Chapter API key"""
+    _chapter_id: int | None = None
+    """MultiGP id for the chapter"""
 
     def __init__(self, rhapi):
         """

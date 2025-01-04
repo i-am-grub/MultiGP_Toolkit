@@ -25,7 +25,7 @@ General Requirements
 
 - You will need your MultiGP Chapter's API key
 - An internet connection when pushing data to or pulling data from MultiGP
-- RotorHazard v4.1.0-beta.2+
+- RotorHazard v4.2.1+
 
 .. note::
 
@@ -76,9 +76,6 @@ You may notice the performance of certain aspects of the timer's user interface 
 
 - Limit user access to the timer. Avoid letting pilots login to the raspberry pi to check results.
    - If you have access to an internet connection, consider uploading your race data to MultiGP, FPVScores, or `RHCloudlink <https://rhcloudlink.com/home>`_ for pilots to view
-- Use a higher model raspberry pi in the timer. The raspberry pi 3B is currently recommended up to 100 pilot-races (number of pilots per race * number of races).
-   - Above the 100 pilot-races threshold, a raspberry pi 4B or 5 is advised (the more RAM, the better)
-
 
 Sections
 ---------------------------

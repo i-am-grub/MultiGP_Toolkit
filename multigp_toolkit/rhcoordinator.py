@@ -47,8 +47,10 @@ except ImportError as exc:
     ) from exc
 
 logger = logging.getLogger(__name__)
+"""Module logger"""
 
 T = TypeVar("T")
+"""Generic for typing"""
 
 
 class RaceSyncCoordinator:
@@ -56,21 +58,24 @@ class RaceSyncCoordinator:
     The bridge between the user interface, system events, and dataflow
     """
 
-    _multigp_cred_set = False
-    _importer: RaceSyncImporter
-    _exporter: RaceSyncExporter
     _system_verification = SystemVerification()
+    """Instance of the system verification module"""
 
     def __init__(self, rhapi: RHAPI):
         self._rhapi: RHAPI = rhapi
+        """Instance of RHAPI"""
         self._multigp = MultiGPAPI(self._rhapi)
+        """Instance of the MultiGP API manager"""
         self._ui = UImanager(rhapi, self._multigp)
+        """Instance of the toolkit user interface manager"""
         self._importer = RaceSyncImporter(
             self._rhapi, self._multigp, self._system_verification
         )
+        """Instance of the RaceSync importer"""
         self._exporter = RaceSyncExporter(
             self._rhapi, self._multigp, self._system_verification
         )
+        """Instance of the RaceSync exporter"""
 
         self._rhapi.events.on(Evt.STARTUP, self.startup, name="startup")
         self._rhapi.events.on(Evt.RACE_STAGE, self.verify_race, name="verify_race")
@@ -122,7 +127,7 @@ class RaceSyncCoordinator:
         Callback for setting the frequency profille for the server based on the
         active heat. Allows for switching the profile for different heats.
 
-        :param args: _description_
+        :param args: Callback args
         """
 
         fprofile_id = self._rhapi.db.heat_attribute_value(
@@ -365,8 +370,8 @@ class RaceSyncCoordinator:
         """
         Runs system verification checks based on the imported data
 
-        :param race_data: _description_
-        :return: _description_
+        :param race_data: The data for the race
+        :return: Status of checks passing
         """
         if race_data["raceType"] == "2":
             logger.info("Importing GQ race")
@@ -459,11 +464,12 @@ class RaceSyncCoordinator:
 
     def _race_pilots_checks(self, heat_id: int, gq_active: bool) -> bool:
         """
-        _summary_
+        Checks to verify pilot data is correct for RaceSync and Global
+        Qualifier rules
 
-        :param heat_id: _description_
-        :param gq_active: _description_
-        :return: _description_
+        :param heat_id: ID of the heat
+        :param gq_active: Whether a Global Qualifier is active or not
+        :return: The status of all the checks passing
         """
 
         slots: list[HeatNode] = self._rhapi.db.slots_by_heat(heat_id)
@@ -499,10 +505,10 @@ class RaceSyncCoordinator:
 
     def _race_zippyq_checks(self, heat_info: Heat) -> bool:
         """
-        _summary_
+        ZippyQ race checks
 
-        :param heat_info: _description_
-        :return: _description_
+        :param heat_info: The heat information to check
+        :return: The status of all the checks passing
         """
 
         heat_id = heat_info.id
@@ -528,9 +534,10 @@ class RaceSyncCoordinator:
 
     def _race_code_integrity_check(self) -> bool:
         """
-        _summary_
+        Checks to make sure the system is unmodified when running a
+        Global Qualifier
 
-        :return: _description_
+        :return: The status of the check
         """
         if not self._system_verification.get_integrity_check():
             message = (

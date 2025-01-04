@@ -212,8 +212,8 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """
         Group saved race meta by heat id.
 
-        :param races: _description_
-        :return: _description_
+        :param races: A list of the saved race data
+        :return: An organized group of race data
         """
         groups: dict[int, list] = {}
         for race in races:
@@ -581,7 +581,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """
         Pushes the results of a RotorHazard class to MultiGP
 
-        :param _args: _description_, defaults to None
+        :param _args: Callback args, defaults to None
         """
 
         gq_active = self._rhapi.db.option("global_qualifer_event") == "1"

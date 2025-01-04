@@ -32,18 +32,25 @@ from .enums import RequestAction
 from .abstracts import _APIManager
 
 logger = logging.getLogger(__name__)
+"""Module logger"""
 
 BASE_API_URL = "https://api.fpvscores.com"
+"""FPVScores API base URL"""
 FPVS_API_VERSION = "0.1.0"
+"""FPVScores Sync API version"""
 FPVS_MGP_API_VERSION = "0.0.3"
+"""FPVScores MultiGP Tooklit API version"""
 LEGACY_HEADERS = {
     "Authorization": "rhconnect",
     "Accept": "application/json",
     "Content-Type": "application/json",
 }
+"""Headers for FPVScores MultiGP requests"""
 
 P = ParamSpec("P")
+"""Generic for typing"""
 R = TypeVar("R")
+"""Generic for typing"""
 
 
 def standard_plugin_not_installed() -> bool:
