@@ -260,17 +260,19 @@ class UImanager:
         )
         self._rhapi.fields.register_option(push_fpvs, "results_controls")
 
+        fpv_scores_auto_text = self._rhapi.language.__("FPVScores Auto Sync")
+        fpv_scores_auto = UIField(
+            "fpvscores_autoupload_mgp",
+            fpv_scores_auto_text,
+            desc="Enable or disable automatic syncing. A network connection is required.",
+            value=False,
+            field_type=UIFieldType.CHECKBOX,
+            private=not standard_plugin_not_installed(),
+        )
+
         if standard_plugin_not_installed():
 
-            fpv_scores_text = self._rhapi.language.__("FPVScores Auto Sync")
-            fpv_scores = UIField(
-                "fpvscores_autoupload",
-                fpv_scores_text,
-                desc="Enable or disable automatic syncing. A network connection is required.",
-                value=False,
-                field_type=UIFieldType.CHECKBOX,
-            )
-            self._rhapi.fields.register_option(fpv_scores, "results_controls")
+            self._rhapi.fields.register_option(fpv_scores_auto, "results_controls")
 
             fpv_scores_text = self._rhapi.language.__("FPVScores Event UUID")
             fpv_scores = UIField(
@@ -281,6 +283,11 @@ class UImanager:
                 field_type=UIFieldType.TEXT,
             )
             self._rhapi.fields.register_option(fpv_scores, "results_controls")
+
+        else:
+            self._rhapi.fields.register_option(fpv_scores_auto)
+
+        self._rhapi.db.option_set("fpvscores_autoupload_mgp", "0")
 
         self.results_class_selector()
 

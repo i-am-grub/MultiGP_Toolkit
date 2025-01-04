@@ -162,7 +162,7 @@ class FPVScoresAPI(_APIManager):
 
         :yield: Check statuses
         """
-        yield self._rhapi.db.option("fpvscores_autoupload") == "1"
+        yield self._rhapi.db.option("fpvscores_autoupload_mgp") == "1"
         yield from self.generate_fpvsconditions()
 
     def _check_listener_conditions(  # type: ignore
@@ -400,6 +400,9 @@ class FPVScoresAPI(_APIManager):
             "phonetic": pilot.phonetic,
             "color": pilot.color,
             "event_name": args["_eventName"],
+            "mgp_id": self._rhapi.db.pilot_attribute_value(
+                pilot.id, "mgp_pilot_id", ""
+            ),
         }
 
         url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=pilot_update"
