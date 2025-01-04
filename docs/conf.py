@@ -23,7 +23,7 @@ tk_versions = APPROVED_VERSIONS["MultiGP Toolkit"]["versions"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "MultiGP Toolkit"
-copyright = "2024-2025, Bryce Gruber"
+copyright = "2024, Bryce Gruber"
 author = "Bryce Gruber"
 version = VERSION_INFO.split("-")[0]
 release = f"{VERSION_INFO}"
