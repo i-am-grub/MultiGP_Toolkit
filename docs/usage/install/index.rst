@@ -27,7 +27,7 @@ This is the recommended method for installing this plugin
 .. code-block:: bash
     :substitutions:
 
-    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/v|project_version|/multiGP_toolkit.zip
+    wget https://github.com/i-am-grub/MultiGP_Toolkit/releases/download/v|project_version|/multigp_toolkit.zip
 
 4. Unzip the download
 
@@ -35,21 +35,17 @@ This is the recommended method for installing this plugin
 
     unzip multigp_toolkit.zip
     
-5. Copy the files over to the ``~/RotorHazard/src/server/plugins`` folder
+5. Move the files over to the ``~/RotorHazard/src/server/plugins`` folder
 
 .. code-block:: bash
 
-    cp -r multigp_toolkit RotorHazard/src/server/plugins/
+    mv multigp_toolkit RotorHazard/src/server/plugins/
 
 6. Delete the downloaded files
 
 .. code-block:: bash
 
-    rm -r multigp_toolkit
-
-.. code-block:: bash
-
-    rm multiGP_toolkit.zip
+    rm multigp_toolkit.zip
 
 7. Restart the server
 
