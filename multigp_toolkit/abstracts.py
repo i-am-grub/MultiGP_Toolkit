@@ -71,7 +71,7 @@ class _APIManager:
                 json=json_request,
                 timeout=10,
             )
-            logger.info(
+            logger.debug(
                 "%s response time: %s seconds",
                 self.__class__.__name__,
                 time.time() - req_send,
