@@ -25,7 +25,6 @@ from Database import (
     HeatNode,
     Profiles,
     SavedRaceMeta,
-    ProgramMethod,
 )
 
 from .enums import RequestAction
@@ -38,8 +37,6 @@ BASE_API_URL = "https://api.fpvscores.com"
 """FPVScores API base URL"""
 FPVS_API_VERSION = "0.1.0"
 """FPVScores Sync API version"""
-FPVS_MGP_API_VERSION = "0.0.3"
-"""FPVScores MultiGP Tooklit API version"""
 LEGACY_HEADERS = {
     "Authorization": "rhconnect",
     "Accept": "application/json",
@@ -134,12 +131,20 @@ class FPVScoresAPI(_APIManager):
 
         :return: The connection status
         """
-        try:
-            self._request(RequestAction.GET, BASE_API_URL, None)
-        except requests.ConnectionError:
-            return False
 
-        return True
+        if self._connected is None:
+            try:
+                self._request(RequestAction.GET, BASE_API_URL, None)
+            except requests.ConnectionError:
+                self._connected = False
+            else:
+                self._connected = True
+
+        if self._connected is False:
+            self._rhapi.db.option_set("push_fpvs", "0")
+            self._rhapi.db.option_set("fpvscores_autoupload_mgp", "0")
+
+        return self._connected
 
     def generate_fpvsconditions(self) -> Generator[bool, None, None]:
         """
@@ -147,9 +152,7 @@ class FPVScoresAPI(_APIManager):
 
         :yield: Check statuses
         """
-        if self._connected is None:
-            self._connected = self.connection_check()
-        yield self._connected
+        yield self.connection_check()
 
         if self._rhapi.db.option("event_uuid_toolkit"):
             yield True
@@ -198,7 +201,7 @@ class FPVScoresAPI(_APIManager):
             parsed_data = json.loads(data)
         except json.JSONDecodeError:
             message = "FPVScores: Failed to parse server response."
-            logger.error(message)
+            logger.error("%s Response: %s", message, data)
             self._rhapi.ui.message_notify(message)
             return
 
@@ -566,17 +569,19 @@ class FPVScoresAPI(_APIManager):
         :param _args: Default callback arguments
         """
 
+        if not self.connection_check():
+            message = "Unable to connect to FPVScores"
+            self._rhapi.ui.message_notify(message)
+            return
+
         export = self._rhapi.io.run_export("JSON_FPVScores_MGP_Upload")
         payload = json.loads(export["data"])
-        url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_push"
+        url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=full_manual_import"
 
         greenlet = gevent.spawn(
             self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
         )
-        gevent.wait((greenlet,))
-        response: requests.Response = greenlet.value
-
-        self._parse_server_response(response.text.split("\n")[-1])
+        self._process_response(greenlet)
 
     def get_event_url(self) -> str | None:
         """
@@ -591,7 +596,7 @@ class FPVScoresAPI(_APIManager):
             return None
 
         payload = {"event_uuid": uuid}
-        url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=fpvs_get_event_url"
+        url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=fpvs_get_event_url"
 
         greenlet = gevent.spawn(
             self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
@@ -618,7 +623,7 @@ class FPVScoresAPI(_APIManager):
             return False
 
         payload = {"mgp_api_key": self._rhapi.db.option("mgp_api_key")}
-        url = f"{BASE_API_URL}/rh/{FPVS_MGP_API_VERSION}/?action=mgp_api_check"
+        url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=mgp_api_check"
 
         greenlet = gevent.spawn(
             self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
@@ -661,19 +666,27 @@ def _assemble_heatnodes_complete(rhapi: RHAPI) -> dict:
     profile: Profiles = rhapi.race.frequencyset
     freqs = json.loads(profile.frequencies)
 
-    num_seats = len(rhapi.interface.seats)
-    for index, slot in enumerate(payload):
-        if (index + 1) > num_seats:
-            break
-
-        if slot.method == ProgramMethod.NONE:
+    for slot in payload:
+        if slot.node_index is not None and isinstance(slot.node_index, int):
+            slot.node_frequency_band = (
+                freqs["b"][slot.node_index]
+                if len(freqs["b"]) > slot.node_index
+                else " "
+            )
+            slot.node_frequency_c = (
+                freqs["c"][slot.node_index]
+                if len(freqs["c"]) > slot.node_index
+                else " "
+            )
+            slot.node_frequency_f = (
+                freqs["f"][slot.node_index]
+                if len(freqs["f"]) > slot.node_index
+                else " "
+            )
+        else:
             slot.node_frequency_band = " "
             slot.node_frequency_c = " "
             slot.node_frequency_f = " "
-        else:
-            slot.node_frequency_band = freqs["b"][slot.node_index]
-            slot.node_frequency_c = freqs["c"][slot.node_index]
-            slot.node_frequency_f = freqs["f"][slot.node_index]
 
     return payload
 

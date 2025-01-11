@@ -50,9 +50,6 @@ logger = logging.getLogger(__name__)
 class RaceSyncExporter(_RaceSyncDataManager):
     """Actions for exporting data to RaceSync"""
 
-    _connection_pool = gevent.pool.Pool(10)
-    """A gevent connection pool"""
-
     def __init__(
         self,
         rhapi: RHAPI,
@@ -123,7 +120,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 continue
 
             if result is not None:
-                race_data["score"] = result["points"]
+
+                if "points" in result:
+                    race_data["score"] = result["points"]
+
                 race_data["totalLaps"] = result["laps"]
                 race_data["totalTime"] = round(result["total_time_raw"] * 0.001, 3)
                 race_data["fastestLapTime"] = round(
@@ -142,7 +142,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 race_data["totalLaps"] = 0
 
             if event_url is not None:
-                race_data["liveTimeevent_url"] = event_url
+                race_data["event_url"] = event_url
 
             yield (selected_race, round_num, heat_num, slot_num, race_data)
 
@@ -159,7 +159,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
             for generator in iterable:
                 yield from generator
 
-        statuses = self._connection_pool.map(
+        statuses = gevent.pool.Pool(10).map(
             self._multigp.push_slot_and_score, combined_generators(collection)
         )
 
@@ -519,6 +519,9 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 self._rhapi.db.option_set("push_fpvs", "1")
                 self.clear_uuid()
 
+            message = "Starting to push results to FPVScores..."
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+
             self._fpvscores.run_full_sync()
             if not self._rhapi.db.option("event_uuid_toolkit"):
                 return False, None
@@ -603,7 +606,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
         if status is False:
             return
 
-        message = "Starting to push results to MultiGP... This may take some time..."
+        message = "Starting to push results to MultiGP..."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
         if self.raceclass_results_push(event_url):

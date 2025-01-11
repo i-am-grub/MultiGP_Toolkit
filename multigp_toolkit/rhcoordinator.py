@@ -211,7 +211,7 @@ class RaceSyncCoordinator:
         ) as manifest:
             version = json.load(manifest)["version"]
 
-        if version != latest_version:
+        if version != latest_version and sys.platform == "linux":
             self._rhapi.ui.register_quickbutton(
                 "multigp_set",
                 "update_mgptk",
@@ -234,15 +234,17 @@ class RaceSyncCoordinator:
 
         logger.info(subprocess.run(args=["wget", url], check=False))
         logger.info(subprocess.run(args=["unzip", "multigp_toolkit.zip"], check=False))
+
         logger.info(
-            subprocess.run(
-                args=["cp", "multigp_toolkit", "-r", "plugins/"], check=False
-            )
+            subprocess.run(args=["rm", "-r", "plugins/multigp_toolkit"], check=False)
         )
-        logger.info(subprocess.run(args=["rm", "-r", "multigp_toolkit"], check=False))
+
+        logger.info(
+            subprocess.run(args=["mv", "multigp_toolkit", "plugins/"], check=False)
+        )
         logger.info(subprocess.run(args=["rm", "multigp_toolkit.zip"], check=False))
 
-        message = "Data downloaded. Restart the server to complete the update."
+        message = "Update installed. Restart the server to complete the update."
         self._rhapi.ui.message_alert(self._rhapi.language.__(message))
 
     def setup_plugin(self) -> None:
@@ -394,7 +396,7 @@ class RaceSyncCoordinator:
 
         self._rhapi.db.option_set("mgp_race_id", selected_race)
         self._rhapi.db.option_set("eventName", race_data["name"])
-        self._rhapi.db.option_set("eventDescription", race_data["description"])
+        self._rhapi.db.option_set("eventDescription", race_data["content"])
 
         mgp_event_races = []
 
