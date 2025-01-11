@@ -13,4 +13,4 @@ build:
   commands:
     - pip install poetry
     - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
-    - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry run sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
+    - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
