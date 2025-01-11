@@ -290,8 +290,6 @@ class UImanager:
         else:
             self._rhapi.fields.register_option(fpv_scores_auto)
 
-        self._rhapi.db.option_set("fpvscores_autoupload_mgp", "0")
-
         self.results_class_selector()
 
         self._rhapi.ui.register_quickbutton(

@@ -2,6 +2,7 @@
 Data manager abstraction
 """
 
+import time
 import logging
 from typing import TypeVar
 
@@ -60,13 +61,20 @@ class _APIManager:
         :param json_request: JSON payload as a string
         :return: Data recieved from the request
         """
+
         try:
+            req_send = time.time()
             response = self._session.request(
                 request_type,
                 url,
                 headers=headers,
                 json=json_request,
                 timeout=10,
+            )
+            logger.info(
+                "%s response time: %s seconds",
+                self.__class__.__name__,
+                time.time() - req_send,
             )
         except requests.exceptions.ConnectionError:
             message = f"Connection with {type(self).__name__} failed"

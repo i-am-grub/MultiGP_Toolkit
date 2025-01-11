@@ -355,7 +355,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
             raceformat=format_id,
             win_condition="",
             round_type=1,
-            description=str(race_data["description"]),
+            description=str(race_data["content"]),
             rounds=len(rounds),
             heat_advance_type=HeatAdvanceType.NEXT_HEAT,
         )
@@ -425,7 +425,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 raceformat=format_id,
                 win_condition="",
                 round_type=1,
-                description=str(race_data["description"]),
+                description=str(race_data["content"]),
                 rounds=num_rounds,
                 heat_advance_type=HeatAdvanceType.NEXT_HEAT,
             )
@@ -447,7 +447,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
                 raceformat=format_id,
                 win_condition="",
                 round_type=0,
-                description=str(race_data["description"]),
+                description=str(race_data["content"]),
                 rounds=1,
                 heat_advance_type=HeatAdvanceType.NONE,
             )

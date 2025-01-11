@@ -394,7 +394,7 @@ class RaceSyncCoordinator:
 
         self._rhapi.db.option_set("mgp_race_id", selected_race)
         self._rhapi.db.option_set("eventName", race_data["name"])
-        self._rhapi.db.option_set("eventDescription", race_data["description"])
+        self._rhapi.db.option_set("eventDescription", race_data["content"])
 
         mgp_event_races = []
 
