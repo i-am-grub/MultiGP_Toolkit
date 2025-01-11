@@ -7,10 +7,19 @@ version: 2
 
 # Set the OS, Python version and other tools you might need
 build:
-  os: "ubuntu-22.04"
+  os: ubuntu-22.04
   tools:
-    python: "3.13"
-  commands:
-    - pip install poetry==1.8.4
-    - VIRTUAL_ENV=poetry install --with docs
-    - VIRTUAL_ENV=poetry run sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
+    python: "3.12"
+
+# Build documentation in the "docs/" directory with Sphinx
+sphinx:
+  configuration: docs/conf.py
+
+# Optionally build your docs in additional formats such as PDF and ePub
+formats:
+   - pdf
+   - epub
+
+python:
+  install:
+    - requirements: docs/requirements.txt
