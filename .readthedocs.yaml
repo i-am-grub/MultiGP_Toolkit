@@ -12,5 +12,5 @@ build:
     python: "3.13"
   commands:
     - pip install poetry
-    - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
-    - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry run sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
+    - VIRTUAL_ENV=poetry install --with docs
+    - VIRTUAL_ENV=poetry run sphinx-build -b html docs $READTHEDOCS_OUTPUT/html
