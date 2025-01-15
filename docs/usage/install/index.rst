@@ -20,7 +20,7 @@ This is the recommended method for installing this plugin
 
 .. code-block:: bash
 
-    sudo rm -r RotorHazard/src/server/plugins/MultiGP_Toolkit
+    sudo rm -r RotorHazard/src/server/plugins/multigp_toolkit
 
 3. Download the latest release's ``zip file`` from `GitHub <https://github.com/i-am-grub/MultiGP_Toolkit/releases>`_
 
