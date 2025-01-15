@@ -3,7 +3,7 @@ MultiGP RaceSync API Access
 """
 
 import logging
-from typing import TypeVar
+from typing import TypeVar, Union
 
 import requests
 
@@ -13,9 +13,9 @@ from .abstracts import _APIManager
 logger = logging.getLogger(__name__)
 """Module logger"""
 
-T = TypeVar("T", bound=bool | str | int)
+T = TypeVar("T", bound=Union[bool, str, int])
 """Generic for typing"""
-U = TypeVar("U", bound=bool | str | int | dict)
+U = TypeVar("U", bound=Union[bool, str, int, dict])
 """Generic for typing"""
 
 BASE_API_URL = "https://www.multigp.com/mgp/multigpwebservice"
@@ -31,9 +31,9 @@ class MultiGPAPI(_APIManager):
         https://www.multigp.com/apidocumentation/
     """
 
-    _api_key: str | None = None
+    _api_key: Union[str, None] = None
     """Chapter API key"""
-    _chapter_id: int | None = None
+    _chapter_id: Union[int, None] = None
     """MultiGP id for the chapter"""
 
     def __init__(self, rhapi):
@@ -47,7 +47,7 @@ class MultiGPAPI(_APIManager):
 
     def _request_and_parse(
         self, request_type: RequestAction, url: str, json_request: dict
-    ) -> dict[str, bool] | dict[str, U]:
+    ) -> Union[dict[str, bool], dict[str, U]]:
         """
         Request data from the MultiGP API and parse it's output
 
@@ -79,7 +79,7 @@ class MultiGPAPI(_APIManager):
         """
         self._api_key = api_key
 
-    def pull_chapter(self) -> str | None:
+    def pull_chapter(self) -> Union[str, None]:
         """
         Find the chapter for the set RaceSync API key.
 
@@ -97,7 +97,7 @@ class MultiGPAPI(_APIManager):
 
         return None
 
-    def pull_races(self) -> dict[int, str] | None:
+    def pull_races(self) -> Union[dict[int, str], None]:
         """
         Pull the avaliable races for the chapter.
 
@@ -120,7 +120,7 @@ class MultiGPAPI(_APIManager):
 
         return None
 
-    def pull_race_data(self, race_id: str) -> dict[str, U] | None:
+    def pull_race_data(self, race_id: str) -> Union[dict[str, U], None]:
         """
         retrieve the race data for a specific race.
 
@@ -141,7 +141,7 @@ class MultiGPAPI(_APIManager):
 
     def pull_additional_rounds(
         self, race_id: str, round_num: int
-    ) -> dict[str, U] | None:
+    ) -> Union[dict[str, U], None]:
         """
         Downloads round informtions. Typcially used for ZippyQ.
 

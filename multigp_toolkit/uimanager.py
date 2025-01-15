@@ -4,6 +4,7 @@ User Interface Management
 
 import json
 from collections.abc import Callable
+from typing import Union
 
 from RHAPI import RHAPI
 from RHUI import UIField, UIFieldType, UIFieldSelectOption
@@ -30,7 +31,7 @@ class UImanager:
         self._multigp = multigp
         """A stored instance of the MultiGP API manager"""
 
-    def update_panels(self, _args: dict | None = None):
+    def update_panels(self, _args: Union[dict, None] = None):
         """
         Updates the shown panels based on the current system configuration
 
@@ -344,7 +345,7 @@ class UImanager:
                 "gqresults_controls", "MultiGP Results Controls", "", order=0
             )
 
-    def mgp_event_selector(self, args: dict | None = None):
+    def mgp_event_selector(self, args: Union[dict, None] = None):
         """
         Generates or updates the selector for MultiGP event importing
 
@@ -371,7 +372,7 @@ class UImanager:
         if args is not None and "refreshed" in args:
             self._rhapi.ui.broadcast_ui("format")
 
-    def results_class_selector(self, args: dict | None = None):
+    def results_class_selector(self, args: Union[dict, None] = None):
         """
         Generates or updates the selector for pushing race results
 
@@ -433,7 +434,7 @@ class UImanager:
             )
             self._rhapi.fields.register_option(ranking_selector, "")
 
-    def zq_race_selector(self, _args: dict | None = None):
+    def zq_race_selector(self, _args: Union[dict, None] = None):
         """
         Generates or updates the selector for choosing a race to remove
         a ZippyQ pack from
@@ -464,7 +465,7 @@ class UImanager:
         self._rhapi.db.option_set("zq_race_select", "")
         self._rhapi.fields.register_option(race_selector, "zippyq_return")
 
-    def zq_pilot_selector(self, args: dict | None = None):
+    def zq_pilot_selector(self, args: Union[dict, None] = None):
         """
         Generates or updates the selector for choosing a pilot to remove
         a ZippyQ pack from
@@ -502,7 +503,7 @@ class UImanager:
         if args is not None and args["option"] == "zq_race_select":
             self._rhapi.ui.broadcast_ui("marshal")
 
-    def zq_class_selector(self, _args: dict | None = None):
+    def zq_class_selector(self, _args: Union[dict, None] = None):
         """
         Generates or updates the selector for selecting the ZippyQ
         class from a multi-class event

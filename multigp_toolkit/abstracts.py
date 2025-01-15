@@ -4,7 +4,7 @@ Data manager abstraction
 
 import time
 import logging
-from typing import TypeVar
+from typing import TypeVar, Union
 
 import requests
 
@@ -16,7 +16,7 @@ from .enums import RequestAction
 logger = logging.getLogger(__name__)
 """Module logger"""
 
-U = TypeVar("U", bound=bool | str | int | dict)
+U = TypeVar("U", bound=Union[bool, str, int, dict])
 """Generic used for typing"""
 
 
@@ -27,13 +27,13 @@ class _APIManager:
 
     # pylint: disable=R0903
 
-    _connected: bool | None = None
+    _connected: Union[bool, None] = None
     """Whether the system is able to connect to the API"""
 
     _session: requests.Session
     """Session for API requests"""
 
-    def __init__(self, rhapi: RHAPI, headers: dict[str, str] | None = None):
+    def __init__(self, rhapi: RHAPI, headers: Union[dict[str, str], None] = None):
         """
         Class initalization
 
@@ -51,8 +51,8 @@ class _APIManager:
         self,
         request_type: RequestAction,
         url: str,
-        json_request: dict | None,
-        headers: dict | None = None,
+        json_request: Union[dict, None],
+        headers: Union[dict, None] = None,
     ) -> requests.Response:
         """
         Make a request to the MultiGP API
@@ -105,7 +105,7 @@ class _RaceSyncDataManager:
         self._rhapi = rhapi
         """A stored instace of the RHAPI module"""
 
-    def get_mgp_pilot_id(self, pilot_id: int) -> None:
+    def get_mgp_pilot_id(self, pilot_id: int) -> Union[str, None]:
         """
         Gets the MultiGP id for a pilot
 

@@ -5,7 +5,7 @@ Import Data from RaceSync
 import sys
 import json
 import logging
-from typing import TypeVar
+from typing import TypeVar, Union
 from collections.abc import Generator, Iterable
 
 import gevent
@@ -78,7 +78,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
         selected_race: int,
         round_num: int,
         heat_num: int,
-        event_url: str | None,
+        event_url: Union[str, None],
     ):
         """
         Generates a slot and score package for each pilot for the provided race
@@ -226,7 +226,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
         return groups
 
     def _parse_heat_group_data(
-        self, selected_mgp_race: int, event_url: str | None, races: list[SavedRaceMeta]
+        self,
+        selected_mgp_race: int,
+        event_url: Union[str, None],
+        races: list[SavedRaceMeta],
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
         Parses class data in the `Generate Heat Groups` format
@@ -258,7 +261,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 heat_index += 1
 
     def _parse_heat_data(
-        self, selected_mgp_race: int, event_url: str | None, races: list[SavedRaceMeta]
+        self,
+        selected_mgp_race: int,
+        event_url: Union[str, None],
+        races: list[SavedRaceMeta],
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
         Parses class data in the `Count Races per Heat` format
@@ -291,7 +297,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
             heat_index += 1
 
     def _parse_zippyq_data(
-        self, selected_mgp_race: int, event_url: str | None, races: list[SavedRaceMeta]
+        self,
+        selected_mgp_race: int,
+        event_url: Union[str, None],
+        races: list[SavedRaceMeta],
     ) -> Generator[Generator[tuple, None, None], None, None]:
         """
         Parses class data to be compatible with ZippyQ.
@@ -454,7 +463,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
         return True
 
-    def raceclass_results_push(self, event_url: str | None = None) -> bool:
+    def raceclass_results_push(self, event_url: Union[str, None] = None) -> bool:
         """
         Trigger a results push to all imported MultiGP races
         """
@@ -534,7 +543,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
         return True, event_url
 
-    def zippyq_slot_score(self, args: dict | None = None) -> None:
+    def zippyq_slot_score(self, args: Union[dict, None] = None) -> None:
         """
         Push results of a saved ZippyQ race to MultiGP
 
@@ -580,7 +589,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
             message = "ZippyQ data successfully pushed to MultiGP."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    def manual_push_results(self, _args: dict | None = None) -> None:
+    def manual_push_results(self, _args: Union[dict, None] = None) -> None:
         """
         Pushes the results of a RotorHazard class to MultiGP
 

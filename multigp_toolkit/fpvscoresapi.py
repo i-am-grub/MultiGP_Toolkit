@@ -6,8 +6,18 @@ import sys
 import logging
 import json
 from functools import wraps
-from typing import TypeVar, ParamSpec, Concatenate, Self
 from collections.abc import Generator, Callable
+from typing import TypeVar, Union
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec, Concatenate
+else:
+    from typing_extensions import ParamSpec, Concatenate
 
 import gevent
 import requests
@@ -68,7 +78,7 @@ class FPVScoresAPI(_APIManager):
         https://github.com/FPVScores/FPVScores-Sync/tree/main
     """
 
-    _linked_org: bool | None = None
+    _linked_org: Union[bool, None] = None
     """Whether the current MultiGP chapter is linked to FPVScores or not"""
 
     def __init__(self, rhapi: RHAPI):
@@ -249,7 +259,7 @@ class FPVScoresAPI(_APIManager):
         self._process_response(greenlet)
 
     @_check_listener_conditions
-    def add_raceclass_listener(self, args: dict | None) -> None:
+    def add_raceclass_listener(self, args: Union[dict, None]) -> None:
         """
         Sync the individual race class creation data to FPVScores
 
@@ -268,7 +278,7 @@ class FPVScoresAPI(_APIManager):
         self._class_listener_request(payload)
 
     @_check_listener_conditions
-    def alter_raceclass_listener(self, args: dict | None) -> None:
+    def alter_raceclass_listener(self, args: Union[dict, None]) -> None:
         """
         Sync the individual race class modification data to FPVScores
 
@@ -306,7 +316,7 @@ class FPVScoresAPI(_APIManager):
         return racechannels
 
     @_check_listener_conditions
-    def class_delete(self, args: dict | None) -> None:
+    def class_delete(self, args: Union[dict, None]) -> None:
         """
         Deletes a single race class from FPVScores.
 
@@ -323,7 +333,7 @@ class FPVScoresAPI(_APIManager):
         self._process_response(greenlet)
 
     @_check_listener_conditions
-    def heat_listener(self, args: dict | None) -> None:
+    def heat_listener(self, args: Union[dict, None]) -> None:
         """
         Sync the individual heat data to FPVScores
 
@@ -331,7 +341,7 @@ class FPVScoresAPI(_APIManager):
         """
 
         heat: Heat = self._rhapi.db.heat_by_id(args["heat_id"])
-        heat_data: dict[str, str | list] = {
+        heat_data: dict[str, Union[str, list]] = {
             "class_id": f"{heat.class_id}",
             "class_name": "unsupported",
             "class_descr": "unsupported",
@@ -374,7 +384,7 @@ class FPVScoresAPI(_APIManager):
         self._process_response(greenlet)
 
     @_check_listener_conditions
-    def heat_delete(self, args: dict | None):
+    def heat_delete(self, args: Union[dict, None]):
         """
         Deletes a single heat from FPVScores.
 
@@ -391,7 +401,7 @@ class FPVScoresAPI(_APIManager):
         self._process_response(greenlet)
 
     @_check_listener_conditions
-    def pilot_listener(self, args: dict | None) -> None:
+    def pilot_listener(self, args: Union[dict, None]) -> None:
         """
         Sync the individual pilot data to FPVScores
 
@@ -472,7 +482,7 @@ class FPVScoresAPI(_APIManager):
 
         for leaderboard in ("by_consecutives", "by_race_time", "by_fastest_lap"):
             if leaderboard in fullresults:
-                result: dict[str, str | int | float | dict]
+                result: dict[str, Union[str, int, float, dict]]
                 for result in fullresults[leaderboard]:
                     pilot_data = {
                         "classid": raceclass.id,
@@ -541,7 +551,7 @@ class FPVScoresAPI(_APIManager):
         return payload
 
     @_check_listener_conditions
-    def results_listener(self, args: dict | None) -> None:
+    def results_listener(self, args: Union[dict, None]) -> None:
         """
         Sync the individual class results to FPVScores
 
@@ -562,7 +572,7 @@ class FPVScoresAPI(_APIManager):
         greenlet = gevent.spawn(self._request, RequestAction.POST, url, payload)
         self._process_response(greenlet)
 
-    def run_full_sync(self, _args: dict | None = None) -> None:
+    def run_full_sync(self, _args: Union[dict, None] = None) -> None:
         """
         Syncs the FPVScores event to the current RotorHazard state
 
@@ -583,7 +593,7 @@ class FPVScoresAPI(_APIManager):
         )
         self._process_response(greenlet)
 
-    def get_event_url(self) -> str | None:
+    def get_event_url(self) -> Union[str, None]:
         """
         Get the FPVScores event url for the active race
 
@@ -691,7 +701,7 @@ def _assemble_heatnodes_complete(rhapi: RHAPI) -> dict:
     return payload
 
 
-def register_handlers(args: dict | None) -> None:
+def register_handlers(args: Union[dict, None]) -> None:
     """
     Register export handlers
 

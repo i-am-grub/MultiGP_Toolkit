@@ -5,7 +5,7 @@ Import Data from RaceSync
 import sys
 import json
 import logging
-from typing import TypeVar
+from typing import TypeVar, Union
 from collections.abc import Generator
 
 from RHAPI import RHAPI
@@ -186,7 +186,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         return int(profile.id)
 
-    def import_pilots(self, _args: dict | None = None) -> None:
+    def import_pilots(self, _args: Union[dict, None] = None) -> None:
         """
         Imports pilots from the race selected in the RHUI.
 
@@ -209,7 +209,9 @@ class RaceSyncImporter(_RaceSyncDataManager):
         message = "Pilots imported"
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    def _generate_format_from_data(self, race_data: dict[str, T]) -> MGPFormat | None:
+    def _generate_format_from_data(
+        self, race_data: dict[str, T]
+    ) -> Union[MGPFormat, None]:
         """
         Generates the format from the race data
 
@@ -249,7 +251,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
     def _generate_race_format(
         self, race_data: dict[str, T]
-    ) -> tuple[int, MGPFormat] | None:
+    ) -> Union[tuple[int, MGPFormat], None]:
         """
         Parse the race data from RaceSync. Use it to find a format
         in the RH database. If format not found, add a new format.
@@ -277,7 +279,10 @@ class RaceSyncImporter(_RaceSyncDataManager):
         return format_id, mgp_format
 
     def _setup_raceclass_heats(
-        self, raceclass_id: RaceClass, heat_data: list, heat_name: str | None = None
+        self,
+        raceclass_id: RaceClass,
+        heat_data: list,
+        heat_name: Union[str, None] = None,
     ) -> Heat:
         """
         Setup heats for imported raceclass
@@ -465,7 +470,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
     def zippyq(
         self, raceclass_id: int, selected_race: str, round_num: int
-    ) -> Heat | None:
+    ) -> Union[Heat, None]:
         """
         Imports a single ZippyQ round
 
@@ -475,7 +480,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :return: The import ZippyQ round as a Heat or None if failed
         to import.
         """
-        data: dict[str, list] | None = self._multigp.pull_additional_rounds(
+        data: Union[dict[str, list], None] = self._multigp.pull_additional_rounds(
             selected_race, round_num
         )
         if data is None:
@@ -504,7 +509,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         return heat_data
 
-    def manual_zippyq(self, _args: dict | None = None) -> None:
+    def manual_zippyq(self, _args: Union[dict, None] = None) -> None:
         """
         Used to manually trigger a ZippyQ import from the RHUI
 

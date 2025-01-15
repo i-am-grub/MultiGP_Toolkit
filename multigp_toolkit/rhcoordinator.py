@@ -6,7 +6,7 @@ import sys
 import logging
 import json
 import subprocess
-from typing import TypeVar, Any
+from typing import TypeVar, Union, Any
 from collections.abc import Generator
 
 import requests
@@ -97,7 +97,7 @@ class RaceSyncCoordinator:
         )
         self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, register_handlers)
 
-    def startup(self, _args: dict | None = None):
+    def startup(self, _args: Union[dict, None] = None):
         """
         Callback to setup specific features of the plugin on startup
 
@@ -105,7 +105,7 @@ class RaceSyncCoordinator:
         """
         self.verify_creds()
 
-    def reset_event_metadata(self, _args: dict | None = None):
+    def reset_event_metadata(self, _args: Union[dict, None] = None):
         """
         Callback to reset all parameters used by the toolkit. Typically called when
         the current event in the system has been deleted or archived
@@ -122,7 +122,7 @@ class RaceSyncCoordinator:
         self._rhapi.db.option_set("ranks_select", "")
         self._ui.update_panels()
 
-    def set_frequency_profile(self, args: dict | None = None):
+    def set_frequency_profile(self, args: Union[dict, None] = None):
         """
         Callback for setting the frequency profille for the server based on the
         active heat. Allows for switching the profile for different heats.
@@ -137,7 +137,7 @@ class RaceSyncCoordinator:
             self._rhapi.race.frequencyset = fprofile_id
             self._rhapi.ui.broadcast_frequencies()
 
-    def store_pilot_list(self, args: dict | None = None):
+    def store_pilot_list(self, args: Union[dict, None] = None):
         """
         Stores a list of pilots that participated in the race as an attribute.
         This list marks what pilots should have their data pushed. Removing a
@@ -419,7 +419,7 @@ class RaceSyncCoordinator:
         message = "MultiGP event imported."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    def setup_event(self, _args: dict | None = None) -> None:
+    def setup_event(self, _args: Union[dict, None] = None) -> None:
         """
         Sets up the event from the race selected in the RHUI.
 
@@ -444,7 +444,7 @@ class RaceSyncCoordinator:
         if self._verification_checks(race_data):
             self._import_event(selected_race, race_data)
 
-    def return_pack(self, _args: dict | None = None):
+    def return_pack(self, _args: Union[dict, None] = None):
         """
         Returns a pilots pack for the race.
 
@@ -575,7 +575,7 @@ class RaceSyncCoordinator:
         ):
             yield self._race_zippyq_checks(heat_info)
 
-    def verify_race(self, args: dict | None) -> None:
+    def verify_race(self, args: Union[dict, None]) -> None:
         """
         Check to make sure all parameters are met to run a race
 
@@ -638,7 +638,7 @@ class RaceSyncCoordinator:
             self._rhapi.ui.broadcast_raceclasses()
             self._rhapi.ui.broadcast_raceformats()
 
-    def verify_classes(self, _args: dict | None = None) -> None:
+    def verify_classes(self, _args: Union[dict, None] = None) -> None:
         """
         Verifies all raceclasses in the database meet the RaceSync requirements
 
