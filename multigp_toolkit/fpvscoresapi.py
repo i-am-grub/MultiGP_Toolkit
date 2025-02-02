@@ -80,6 +80,8 @@ class FPVScoresAPI(_APIManager):
 
     _linked_org: Union[bool, None] = None
     """Whether the current MultiGP chapter is linked to FPVScores or not"""
+    sync_ran: bool = False
+    """Status if a full sync was ran or not"""
 
     def __init__(self, rhapi: RHAPI):
         """
@@ -162,6 +164,8 @@ class FPVScoresAPI(_APIManager):
 
         :yield: Check statuses
         """
+        self.sync_ran = False
+
         yield self.connection_check()
 
         if self._rhapi.db.option("event_uuid_toolkit"):
@@ -171,6 +175,7 @@ class FPVScoresAPI(_APIManager):
 
             if self._linked_org:
                 self.run_full_sync()
+                self.sync_ran = True
 
             yield bool(self._rhapi.db.option("event_uuid_toolkit"))
         else:
@@ -584,12 +589,15 @@ class FPVScoresAPI(_APIManager):
             self._rhapi.ui.message_notify(message)
             return
 
+        message = "Running a full push to FPVScores. This may take a minute or two..."
+        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+
         export = self._rhapi.io.run_export("JSON_FPVScores_MGP_Upload")
         payload = json.loads(export["data"])
         url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=full_manual_import"
 
         greenlet = gevent.spawn(
-            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS
+            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS, 120
         )
         self._process_response(greenlet)
 
@@ -754,19 +762,23 @@ class AlchemyEncoder(json.JSONEncoder):
 
             mapped_instance = inspect(o)
             fields = {}
-            for field in mapped_instance.attrs.keys():
 
-                value = getattr(o, field)
-                try:
-                    json.dumps(value)
-                except TypeError:
-                    fields[field] = None
-                else:
-                    fields[field] = value
+            for field in dir(o):
 
-            for custom_field in custom_vars:
-                if hasattr(o, custom_field):
-                    fields[custom_field] = getattr(o, custom_field, None)
+                if field in [*mapped_instance.attrs.keys(), *custom_vars]:
+                    data = o.__getattribute__(field)
+
+                    if field != "query" and field != "query_class":
+                        try:
+                            json.dumps(data)
+                            if field == "frequencies":
+                                fields[field] = json.loads(data)
+                            elif field == "enter_ats" or field == "exit_ats":
+                                fields[field] = json.loads(data)
+                            else:
+                                fields[field] = data
+                        except TypeError:
+                            fields[field] = None
 
             return fields
 

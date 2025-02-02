@@ -5,7 +5,11 @@ System Event, Data, and User Interface Coordination
 import sys
 import logging
 import json
-import subprocess
+import zipfile
+import os
+import io
+import shutil
+from pathlib import Path
 from typing import TypeVar, Union, Any
 from collections.abc import Generator
 
@@ -203,7 +207,7 @@ class RaceSyncCoordinator:
 
         response = requests.get(url, timeout=5)
 
-        versions = json.loads(response.text)
+        versions = json.loads(response.content)
         latest_version = versions["MultiGP Toolkit"]["latest"]
 
         with open(
@@ -211,7 +215,7 @@ class RaceSyncCoordinator:
         ) as manifest:
             version = json.load(manifest)["version"]
 
-        if version != latest_version and sys.platform == "linux":
+        if version != latest_version:
             self._rhapi.ui.register_quickbutton(
                 "multigp_set",
                 "update_mgptk",
@@ -232,17 +236,12 @@ class RaceSyncCoordinator:
             f"/releases/download/v{version}/multigp_toolkit.zip"
         )
 
-        logger.info(subprocess.run(args=["wget", url], check=False))
-        logger.info(subprocess.run(args=["unzip", "multigp_toolkit.zip"], check=False))
+        response = requests.get(url, timeout=5)
 
-        logger.info(
-            subprocess.run(args=["rm", "-r", "plugins/multigp_toolkit"], check=False)
-        )
-
-        logger.info(
-            subprocess.run(args=["mv", "multigp_toolkit", "plugins/"], check=False)
-        )
-        logger.info(subprocess.run(args=["rm", "multigp_toolkit.zip"], check=False))
+        domain = "multigp_toolkit"
+        plugin_dir = Path("plugins").joinpath(domain)
+        self._reset_plugin_dir(plugin_dir)
+        self._install_plugin_data(domain, response.content)
 
         message = "Update installed. Restart the server to complete the update."
         self._rhapi.ui.message_alert(self._rhapi.language.__(message))
@@ -692,3 +691,43 @@ class RaceSyncCoordinator:
                 team_racing_mode=gq_format.team_racing_mode,
             )
             self._rhapi.ui.broadcast_raceformats()
+
+    def _reset_plugin_dir(self, plugin_dir: Path) -> None:
+        """
+        Generate a clean directory to install the plugin into.
+
+        Currently a borrowed funtion from RH future plugin updater
+
+        :param plugin_dir: The plugin directory to setup
+        """
+        if plugin_dir.exists():
+            shutil.rmtree(plugin_dir)
+
+        os.mkdir(plugin_dir)
+
+    def _install_plugin_data(self, domain: str, download: bytes):
+        """
+        Installs downloaded plugin data to the domain's folder
+
+        Currently a borrowed funtion from RH future plugin updater
+
+        :param domain: The plugin's domain
+        :param download: The downloaded content
+        """
+        plugin_dir = Path("plugins").joinpath(domain)
+        identifier = f"custom_plugins/{domain}/"
+
+        with zipfile.ZipFile(io.BytesIO(download), "r") as zip_data:
+            for file in zip_data.filelist:
+                fname = file.filename
+
+                if fname.find(identifier) != -1 and not fname.endswith(identifier):
+                    save_stem = file.filename.split(identifier)[-1]
+                    save_name = plugin_dir.joinpath(save_stem)
+
+                    directory = os.path.dirname(save_name)
+                    if directory:
+                        os.makedirs(directory, exist_ok=True)
+
+                    with open(save_name, "wb") as file_:
+                        file_.write(zip_data.read(file))

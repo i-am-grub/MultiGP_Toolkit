@@ -528,10 +528,9 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 self._rhapi.db.option_set("push_fpvs", "1")
                 self.clear_uuid()
 
-            message = "Starting to push results to FPVScores..."
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            if not self._fpvscores.sync_ran:
+                self._fpvscores.run_full_sync()
 
-            self._fpvscores.run_full_sync()
             if not self._rhapi.db.option("event_uuid_toolkit"):
                 return False, None
 

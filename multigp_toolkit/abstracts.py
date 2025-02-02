@@ -53,6 +53,7 @@ class _APIManager:
         url: str,
         json_request: Union[dict, None],
         headers: Union[dict, None] = None,
+        timeout: int = 5,
     ) -> requests.Response:
         """
         Make a request to the MultiGP API
@@ -69,7 +70,7 @@ class _APIManager:
                 url,
                 headers=headers,
                 json=json_request,
-                timeout=10,
+                timeout=timeout,
             )
             logger.debug(
                 "%s response time: %s seconds",

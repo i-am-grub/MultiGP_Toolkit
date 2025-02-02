@@ -6,8 +6,11 @@
     "info_uri" : "https://multigp-toolkit.readthedocs.io/",
     "license" : "MIT",
     "license_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit/blob/master/LICENSE",
-    "version" : "3.1.0",
+    "version" : "3.1.1",
     "required_rhapi_version" : "1.2",
-    "update_uri" : null,
-    "text_domain" : null
+    "domain": "multigp_toolkit",
+    "codeowners": ["@i-am-grub"],
+    "documentation": "https://multigp-toolkit.readthedocs.io/",
+    "zip_release": true,
+    "zip_filename": "multigp_toolkit.zip"
 }

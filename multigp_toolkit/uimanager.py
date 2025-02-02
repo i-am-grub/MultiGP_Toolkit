@@ -22,7 +22,7 @@ class UImanager:
 
     _rhapi: RHAPI
     _multigp: MultiGPAPI
-    _chapter_name: str
+    _chapter_name: Union[str, None] = None
     """The imported chapter name"""
 
     def __init__(self, rhapi: RHAPI, multigp: MultiGPAPI):
