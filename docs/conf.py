@@ -10,7 +10,9 @@ import json
 topdir = os.path.split(os.path.split(__file__)[0])[0]
 sys.path.insert(0, topdir)
 
-with open(os.path.join(topdir, "multigp_toolkit/manifest.json"), "r") as manifest:
+with open(
+    os.path.join(topdir, "custom_plugins/multigp_toolkit/manifest.json"), "r"
+) as manifest:
     VERSION_INFO = json.load(manifest)["version"]
 
 with open(os.path.join(topdir, "versions.json"), "r") as approved_vers:
@@ -65,7 +67,7 @@ html_title = "MultiGP Toolkit"
 
 autoapi_template_dir = "_templates/autoapi"
 
-autoapi_dirs = ["../multigp_toolkit"]
+autoapi_dirs = ["../custom_plugins/multigp_toolkit"]
 
 autoapi_options = [
     "members",
