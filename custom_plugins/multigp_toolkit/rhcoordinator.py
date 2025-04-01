@@ -443,7 +443,7 @@ class RaceSyncCoordinator:
         if self._verification_checks(race_data):
             self._import_event(selected_race, race_data)
 
-    def return_pack(self, _args: Union[dict, None] = None):
+    def return_pack(self, _args: Union[dict, None] = None) -> None:
         """
         Returns a pilots pack for the race.
 
@@ -452,16 +452,27 @@ class RaceSyncCoordinator:
         race_id = self._rhapi.db.option("zq_race_select")
         pilot_id = self._rhapi.db.option("zq_pilot_select")
 
-        if race_id and pilot_id:
-            race_pilots = json.loads(
-                self._rhapi.db.race_attribute_value(race_id, "race_pilots")
+        if not race_id or not pilot_id:
+            return
+        
+        race: SavedRaceMeta = self._rhapi.db.race_by_id(race_id)
+        slots: list[HeatNode] = self._rhapi.db.slots_by_heat(race.heat_id)
+
+        for slot in slots:
+            if slot.pilot_id == int(pilot_id):
+                self._rhapi.db.slot_alter(slot.id, pilot=0)
+
+        race_pilots = json.loads(
+            self._rhapi.db.race_attribute_value(race_id, "race_pilots")
+        )
+
+        if pilot_id in race_pilots:
+            del race_pilots[pilot_id]
+            self._rhapi.db.race_alter(
+                race_id, attributes={"race_pilots": json.dumps(race_pilots)}
             )
-            if pilot_id in race_pilots:
-                del race_pilots[pilot_id]
-                self._rhapi.db.race_alter(
-                    race_id, attributes={"race_pilots": json.dumps(race_pilots)}
-                )
-                self._ui.zq_pilot_selector(args={"option": "zq_race_select"})
+
+        self._ui.zq_pilot_selector(args={"option": "zq_race_select"})
 
     def _race_pilots_checks(self, heat_id: int, gq_active: bool) -> bool:
         """

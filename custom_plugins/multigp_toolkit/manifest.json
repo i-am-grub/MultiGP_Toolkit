@@ -1,16 +1,15 @@
 {
+    "domain": "multigp_toolkit",
     "name": "MultiGP Toolkit",
     "author" : "Bryce \"GRUBBY\" Gruber",
     "author_uri" : "https://github.com/i-am-grub",
     "description" : "MultiGP RaceSync connector for RotorHazard",
-    "info_uri" : "https://multigp-toolkit.readthedocs.io/",
+    "documentation_uri": "https://multigp-toolkit.readthedocs.io/",
     "license" : "MIT",
     "license_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit/blob/master/LICENSE",
-    "version" : "3.1.1",
+    "version" : "3.2.0",
     "required_rhapi_version" : "1.2",
-    "domain": "multigp_toolkit",
-    "codeowners": ["@i-am-grub"],
-    "documentation": "https://multigp-toolkit.readthedocs.io/",
-    "zip_release": true,
+    "category": ["Race Management"],
     "zip_filename": "multigp_toolkit.zip"
+    
 }

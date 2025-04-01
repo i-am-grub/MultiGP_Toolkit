@@ -142,7 +142,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 race_data["totalLaps"] = 0
 
             if event_url is not None:
-                race_data["event_url"] = event_url
+                race_data["liveTimeEventUrl"] = event_url
 
             yield (selected_race, round_num, heat_num, slot_num, race_data)
 
@@ -495,7 +495,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
                 ):
                     return True
 
-            return False
+        return False
 
     def _gq_push_checks(self) -> bool:
         """
