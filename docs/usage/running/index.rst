@@ -4,6 +4,55 @@ Running Races
 This section is for assisting Race Directors with running
 their races with the MultiGP Toolkit installed on a RotorHazard system
 
+Recommended Class Settings
+-------------------------------------------
+
+Each of the MultiGP schedules that you can use have their own set of
+recommended settings to help make running you race smoother.
+
+Controlled Races
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: controlled_settings.webp
+    :width: 500
+    :alt: ZippyQ Class Settings
+    :align: center
+
+The recommended settings for running a race with predefined heats includes the following:
+
+A. Set ``Round Type`` to ``Generate heat groups``
+    - This will allow the race director to edit their
+    heats between rounds
+B. Set ``MultiGP Race Format`` to ``PREDEFINED_HEATS``
+    - This activates the features of the plugin specifically designed for predefined
+    heats as well as tell the toolkit how to format the results when uploading
+    to MultiGP
+
+ZippyQ Races
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: zippy_settings.webp
+    :width: 500
+    :alt: ZippyQ Class Settings
+    :align: center
+
+The recommended settings for running a ZippyQ race includes the following:
+
+A. Set ``Round Type`` to ``Count races per heat``
+    - This will allow the system automatically create a new heat under the class
+    without needing to interact with indivitual rounds within the class
+B. Set ``Rounds`` to ``1``
+    - This will prevent the system from trying to repeat a ZippyQ round
+C. Set ``Advance Heat`` to ``Never``
+    - A majority of the time, the next race is not imported by the time RotorHazard
+    is ready to move to the next heat. If you want to have the system automatically
+    import the next round and switch to it once imported, see the hints under
+    :ref:`Import ZippyQ Rounds <zippy controls>`.
+D. Set ``MultiGP Race Format`` to ``ZIPPYQ``
+    - This activates the features of the plugin specifically designed for ZippyQ
+    as well as tell the toolkit how to format the results when uploading
+    to MultiGP
+
 Enforced Rules
 -------------------------------------------
 
@@ -19,35 +68,7 @@ the plugin installed. This **INCLUDES** any races under classes and heats
 that were manually created.
     
 - A pilot is only allowed to occupy one slot per heat
-
-Controlled Races
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The follow rules may be enforced by the system for any race ran with
-the plugin installed **INCLUDING** any races under classes and heats
-that were manually created, but **EXCLUDING** any classes that were creating
-by importing a ZippyQ race.
-    
-- Each heat within a class must advance to the max round currently in the class before any class currently at the highest round can advance.
-    
-.. admonition:: Example
-
-    Heat 1 has completed 3 rounds, Heat 2 has completed
-    2 rounds, and Heat 3 has completed 2 rounds. 
-    
-    Heat 1 cannot run a 4th round until Heat 2 **and** Heat 3 have
-    completed 3 rounds.
-
-- Each pilot will only be able to participate in one heat per class
-
-.. note::
-
-    This rule is not enforced due to situations where a minimum
-    of pilots per heat is enforced. Instead, a notification will be
-    produced by the system warning about how a pilot's MultiGP result 
-    for a given round (on MultiGP's side) will be obtained by the last heat 
-    they participate in that round (on RotorHazard's side).
-
+- There should be at least one pilot in the heat
 
 ZippyQ Races
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

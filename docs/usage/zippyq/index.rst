@@ -14,6 +14,8 @@ Using MultiGP's ZippyQ System
 Import ZippyQ Rounds
 ------------------------------
 
+.. _zippy controls:
+
 .. important::
 
         All instructions under this subsection will be performed under the ``Format`` page
@@ -109,9 +111,5 @@ The toolkit supports the functionality to give a pilot their pack back after a r
 
 .. note::
 
-    This action will not remove the results from the RotorHazard system; it will only prevent
-    the future upload of the selected results. To remove the results from the RotorHazard system,
-    manually remove the laps from the race for the pilot.
-
-    Only removing the laps from RotorHazard system without returning the pack will result in the
-    pilot having the result of ``0 Laps`` for the race instead of being removed.
+    This action will not remove the results from the RotorHazard system, but it will 
+    disassociate the result from the pilot.
