@@ -27,6 +27,7 @@ from Database import (
 )
 
 from RHAPI import RHAPI
+from RHRace import Crossing
 
 from .enums import DefaultMGPFormats, MGPMode
 from .multigpapi import MultiGPAPI
@@ -718,17 +719,14 @@ class RaceSyncCoordinator:
         """
         Verifies the source for the lap when GQ are active
 
-        :param args: _
-        :raises RuntimeError: _description_
+        :param args: Input args for the callback
         """
-        lap_data: Union[LapSource, None] = args.get("lap", None)
 
-        if lap_data is None:
-            raise RuntimeError("Lap data can not be None")
+        lap_data: Crossing = args["lap"]
 
         if (
             self._rhapi.db.option("global_qualifer_event") == "1"
-            and lap_data == LapSource.API
+            and lap_data.source == LapSource.API
         ):
             self._rhapi.race.stop()
             message = (
