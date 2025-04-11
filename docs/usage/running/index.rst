@@ -102,6 +102,7 @@ a class that was imported as a Global Qualifier (Controlled or ZippyQ).
 - A minimum of 3 pilots are required per heat
 - The imported class from MultiGP can not be altered and must be used for the Global Qualifier event (results will not be uploaded otherwise)
 - The format assigned to the imported class from MultiGP cannot be altered with exception to the settings that manage the start/stop behavior of the timer
+- Other plugins can not be used to register laps
 
 ReRunning Races
 -------------------------------------------

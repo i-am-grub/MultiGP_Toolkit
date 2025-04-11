@@ -16,9 +16,18 @@ from collections.abc import Generator
 import requests
 
 from eventmanager import Evt
-from Database import Pilot, Heat, HeatNode, RaceClass, RaceFormat, SavedRaceMeta
+from Database import (
+    Pilot,
+    Heat,
+    HeatNode,
+    RaceClass,
+    RaceFormat,
+    SavedRaceMeta,
+    LapSource,
+)
 
 from RHAPI import RHAPI
+from RHRace import Crossing
 
 from .enums import DefaultMGPFormats, MGPMode
 from .multigpapi import MultiGPAPI
@@ -98,6 +107,9 @@ class RaceSyncCoordinator:
         )
         self._rhapi.events.on(
             Evt.LAPS_SAVE, self.store_pilot_list, name="store_pilot_list"
+        )
+        self._rhapi.events.on(
+            Evt.RACE_LAP_RECORDED, self.verify_gq_lap, name="verify_gq_lap"
         )
         self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, register_handlers)
 
@@ -703,6 +715,26 @@ class RaceSyncCoordinator:
             )
             self._rhapi.ui.broadcast_raceformats()
 
+    def verify_gq_lap(self, args: dict) -> None:
+        """
+        Verifies the source for the lap when GQ are active
+
+        :param args: Input args for the callback
+        """
+
+        lap_data: Crossing = args["lap"]
+
+        if (
+            self._rhapi.db.option("global_qualifer_event") == "1"
+            and lap_data.source == LapSource.API
+        ):
+            self._rhapi.race.stop()
+            message = (
+                "Lap detection through additional plugins "
+                "is not allowed for Global Qualifers"
+            )
+            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+
     def _reset_plugin_dir(self, plugin_dir: Path) -> None:
         """
         Generate a clean directory to install the plugin into.
@@ -742,3 +774,4 @@ class RaceSyncCoordinator:
 
                     with open(save_name, "wb") as file_:
                         file_.write(zip_data.read(file))
+            
