@@ -14,6 +14,8 @@ Using MultiGP's ZippyQ System
 Import ZippyQ Rounds
 ------------------------------
 
+.. _zippy controls:
+
 .. important::
 
         All instructions under this subsection will be performed under the ``Format`` page
