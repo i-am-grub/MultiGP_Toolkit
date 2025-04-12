@@ -7,8 +7,8 @@ from typing import TypeVar, Union
 
 import requests
 
-from .enums import RequestAction
 from .abstracts import _APIManager
+from .enums import RequestAction
 
 logger = logging.getLogger(__name__)
 """Module logger"""
@@ -67,7 +67,7 @@ class MultiGPAPI(_APIManager):
 
         try:
             return response.json()
-        except AttributeError:
+        except (AttributeError, requests.JSONDecodeError):
             logger.error("Error parsing data from MultiGP")
             return {"status": False}
 
