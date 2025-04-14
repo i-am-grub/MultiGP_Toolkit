@@ -2,39 +2,37 @@
 System Event, Data, and User Interface Coordination
 """
 
-import sys
-import logging
-import json
-import zipfile
-import os
 import io
+import json
+import logging
+import os
 import shutil
-from pathlib import Path
-from typing import TypeVar, Union, Any
+import sys
+import zipfile
 from collections.abc import Generator
+from pathlib import Path
+from typing import Any, TypeVar, Union
 
 import requests
-
-from eventmanager import Evt
 from Database import (
-    Pilot,
     Heat,
     HeatNode,
+    LapSource,
+    Pilot,
     RaceClass,
     RaceFormat,
     SavedRaceMeta,
-    LapSource,
 )
-
+from eventmanager import Evt
 from RHAPI import RHAPI
 from RHRace import Crossing
 
 from .enums import DefaultMGPFormats, MGPMode
-from .multigpapi import MultiGPAPI
-from .uimanager import UImanager
-from .rsimporter import RaceSyncImporter
-from .rsexporter import RaceSyncExporter
 from .fpvscoresapi import register_handlers
+from .multigpapi import MultiGPAPI
+from .rsexporter import RaceSyncExporter
+from .rsimporter import RaceSyncImporter
+from .uimanager import UImanager
 
 try:
     if sys.version_info.minor == 13:
@@ -408,6 +406,11 @@ class RaceSyncCoordinator:
         self._rhapi.db.option_set("mgp_race_id", selected_race)
         self._rhapi.db.option_set("eventName", race_data["name"])
         self._rhapi.db.option_set("eventDescription", race_data["content"])
+
+        if race_data["raceType"] == "2":
+            self._rhapi.db.option_set("global_qualifer_event", "1")
+        else:
+            self._rhapi.db.option_set("global_qualifer_event", "0")
 
         mgp_event_races = []
 
