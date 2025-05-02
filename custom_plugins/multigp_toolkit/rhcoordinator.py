@@ -2,13 +2,10 @@
 System Event, Data, and User Interface Coordination
 """
 
-import io
 import json
 import logging
 import os
-import shutil
 import sys
-import zipfile
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any, TypeVar, Union
@@ -203,58 +200,9 @@ class RaceSyncCoordinator:
         if chapter_name := self._multigp.pull_chapter():
             self._ui.set_chapter_name(chapter_name)
             logger.info("API key for %s has been recognized", chapter_name)
-            self.check_update()
             self.setup_plugin()
         else:
             logger.warning("MultiGP API key cannot be verified.")
-
-    def check_update(self):
-        """
-        Compares the versions listed in the local and public (repo) manifest files.
-        Register a button for updating if there is a mismatch.
-        """
-        url = "https://raw.githubusercontent.com/i-am-grub/multigp_toolkit/master/versions.json"
-
-        response = requests.get(url, timeout=5)
-
-        versions = json.loads(response.content)
-        latest_version = versions["MultiGP Toolkit"]["latest"]
-
-        with open(
-            "plugins/multigp_toolkit/manifest.json", encoding="utf-8"
-        ) as manifest:
-            version = json.load(manifest)["version"]
-
-        if version != latest_version:
-            self._rhapi.ui.register_quickbutton(
-                "multigp_set",
-                "update_mgptk",
-                "Update MultiGP Toolkit",
-                self.update_plugin,
-                args=latest_version,
-            )
-
-    def update_plugin(self, version: str) -> None:
-        """
-        Spawn subprocesses to update the plugin to a specific version.
-        Send an alert through the UI when completed.
-
-        :param str version: The version of the plugin to update to.
-        """
-        url = (
-            "https://github.com/i-am-grub/multigp_toolkit"
-            f"/releases/download/v{version}/multigp_toolkit.zip"
-        )
-
-        response = requests.get(url, timeout=5)
-
-        domain = "multigp_toolkit"
-        plugin_dir = Path("plugins").joinpath(domain)
-        self._reset_plugin_dir(plugin_dir)
-        self._install_plugin_data(domain, response.content)
-
-        message = "Update installed. Restart the server to complete the update."
-        self._rhapi.ui.message_alert(self._rhapi.language.__(message))
 
     def setup_plugin(self) -> None:
         """
@@ -349,7 +297,7 @@ class RaceSyncCoordinator:
         yield self._rhapi.db.raceclasses
         yield self._rhapi.db.option("mgp_race_id")
 
-    def _download_race_data(self, selected_race: int) -> dict:
+    def _download_race_data(self, selected_race: str) -> dict:
         """
         Dowloads data for a specific race
 
@@ -357,23 +305,37 @@ class RaceSyncCoordinator:
         :return: The dowloaded data
         """
 
-        race_data = self._multigp.pull_race_data(selected_race)
+        race_data:dict[str, Any] | None = self._multigp.pull_race_data(selected_race)
+        
+        if race_data is None:
+            raise RuntimeError("Race data not provided from MultiGP")
 
         if self._rhapi.db.option("auto_logo") == "1":
+            
             url: str = race_data["chapterImageFileName"]
             file_name = url.split("/")[-1]
-            save_location = "static/user/" + file_name
+            
+            rhapi_verion = (self._rhapi.API_VERSION_MAJOR, self._rhapi.API_VERSION_MINOR)
+            if rhapi_verion >= (1, 3):
+                data_dir = Path(self._rhapi.server.data_dir)
+                save_dir = data_dir.joinpath("shared")
+                os.makedirs(save_dir, exist_ok=True)
+                save_location = save_dir.joinpath(file_name)
+            else:
+                save_location = Path(f"static/user/{file_name}")
 
             try:
                 response = requests.get(url, timeout=5)
             except requests.exceptions.MissingSchema:
                 logger.warning("Chapter logo unavaliable to download")
                 return race_data
+            except requests.Timeout:
+                logger.warning("Timed out when attempting to download logo")
+            else:
+                with open(save_location, mode="wb") as file:
+                    file.write(response.content)
 
-            with open(save_location, mode="wb") as file:
-                file.write(response.content)
-
-            self._rhapi.config.set_item("UI", "timerLogo", file_name)
+                self._rhapi.config.set_item("UI", "timerLogo", file_name)
 
         return race_data
 
@@ -550,7 +512,7 @@ class RaceSyncCoordinator:
 
             if heat.id < heat_id and self._rhapi.db.heat_max_round(heat.id) == 0:
                 check_heat: Heat = self._rhapi.db.heat_by_id(heat.id)
-                message = f"ZippyQ: Complete {check_heat.name} before starting {heat_info.name}"
+                message = f"ZippyQ: Complete {check_heat.display_name} before starting {heat_info.display_name}"
                 self._rhapi.ui.message_alert(self._rhapi.language.__(message))
                 return False
 
@@ -737,44 +699,4 @@ class RaceSyncCoordinator:
                 "is not allowed for Global Qualifers"
             )
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-
-    def _reset_plugin_dir(self, plugin_dir: Path) -> None:
-        """
-        Generate a clean directory to install the plugin into.
-
-        Currently a borrowed funtion from RH future plugin updater
-
-        :param plugin_dir: The plugin directory to setup
-        """
-        if plugin_dir.exists():
-            shutil.rmtree(plugin_dir)
-
-        os.mkdir(plugin_dir)
-
-    def _install_plugin_data(self, domain: str, download: bytes):
-        """
-        Installs downloaded plugin data to the domain's folder
-
-        Currently a borrowed funtion from RH future plugin updater
-
-        :param domain: The plugin's domain
-        :param download: The downloaded content
-        """
-        plugin_dir = Path("plugins").joinpath(domain)
-        identifier = f"custom_plugins/{domain}/"
-
-        with zipfile.ZipFile(io.BytesIO(download), "r") as zip_data:
-            for file in zip_data.filelist:
-                fname = file.filename
-
-                if fname.find(identifier) != -1 and not fname.endswith(identifier):
-                    save_stem = file.filename.split(identifier)[-1]
-                    save_name = plugin_dir.joinpath(save_stem)
-
-                    directory = os.path.dirname(save_name)
-                    if directory:
-                        os.makedirs(directory, exist_ok=True)
-
-                    with open(save_name, "wb") as file_:
-                        file_.write(zip_data.read(file))
             

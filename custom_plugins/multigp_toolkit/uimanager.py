@@ -6,13 +6,13 @@ import json
 from collections.abc import Callable
 from typing import Union
 
+from Database import Heat, Pilot, RaceClass, SavedRaceMeta
 from RHAPI import RHAPI
-from RHUI import UIField, UIFieldType, UIFieldSelectOption
-from Database import Pilot, Heat, RaceClass, SavedRaceMeta
+from RHUI import UIField, UIFieldSelectOption, UIFieldType
 
 from .enums import MGPMode
-from .multigpapi import MultiGPAPI
 from .fpvscoresapi import standard_plugin_not_installed
+from .multigpapi import MultiGPAPI
 
 
 class UImanager:
@@ -386,7 +386,7 @@ class UImanager:
         event_class: RaceClass
         for event_class in self._rhapi.db.raceclasses:
             race_class = UIFieldSelectOption(
-                value=event_class.id, label=event_class.name
+                value=event_class.id, label=event_class.display_name
             )
             result_class_list.append(race_class)
             rank_class_list.append(race_class)
@@ -452,7 +452,7 @@ class UImanager:
                 class_info: RaceClass = self._rhapi.db.raceclass_by_id(race.class_id)
                 heat_info: Heat = self._rhapi.db.heat_by_id(race.heat_id)
                 race_info = UIFieldSelectOption(
-                    value=race.id, label=f"{class_info.name} - {heat_info.name}"
+                    value=race.id, label=f"{class_info.display_name} - {heat_info.display_name}"
                 )
                 race_list.append(race_info)
 
@@ -521,7 +521,7 @@ class UImanager:
                 )
                 if zq_state == MGPMode.ZIPPYQ:
                     result_class_list.append(
-                        UIFieldSelectOption(value=rh_class.id, label=rh_class.name)
+                        UIFieldSelectOption(value=rh_class.id, label=rh_class.display_name)
                     )
 
             zq_class_select = UIField(
