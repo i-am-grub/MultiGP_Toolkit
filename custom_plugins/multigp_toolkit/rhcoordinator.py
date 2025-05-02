@@ -123,6 +123,8 @@ class RaceSyncCoordinator:
 
         :param _args: Args passed to the callback function, defaults to None
         """
+        self._rhapi.db.option_set("push_fpvs", "0")
+        self._rhapi.db.option_set("fpvscores_autoupload_mgp", "0")
         self._rhapi.db.option_set("event_uuid_toolkit", "")
         self._rhapi.db.option_set("mgp_race_id", "")
         self._rhapi.db.option_set("zippyq_races", 0)
@@ -305,17 +307,20 @@ class RaceSyncCoordinator:
         :return: The dowloaded data
         """
 
-        race_data:dict[str, Any] | None = self._multigp.pull_race_data(selected_race)
-        
+        race_data: dict[str, Any] | None = self._multigp.pull_race_data(selected_race)
+
         if race_data is None:
             raise RuntimeError("Race data not provided from MultiGP")
 
         if self._rhapi.db.option("auto_logo") == "1":
-            
+
             url: str = race_data["chapterImageFileName"]
             file_name = url.split("/")[-1]
-            
-            rhapi_verion = (self._rhapi.API_VERSION_MAJOR, self._rhapi.API_VERSION_MINOR)
+
+            rhapi_verion = (
+                self._rhapi.API_VERSION_MAJOR,
+                self._rhapi.API_VERSION_MINOR,
+            )
             if rhapi_verion >= (1, 3):
                 data_dir = Path(self._rhapi.server.data_dir)
                 save_dir = data_dir.joinpath("shared")
@@ -431,7 +436,7 @@ class RaceSyncCoordinator:
 
         if not race_id or not pilot_id:
             return
-        
+
         race: SavedRaceMeta = self._rhapi.db.race_by_id(race_id)
         slots: list[HeatNode] = self._rhapi.db.slots_by_heat(race.heat_id)
 
@@ -699,4 +704,3 @@ class RaceSyncCoordinator:
                 "is not allowed for Global Qualifers"
             )
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-            

@@ -2,11 +2,11 @@
 FPVScores Connections
 """
 
-import sys
-import logging
 import json
+import logging
+import sys
+from collections.abc import Callable, Generator
 from functools import wraps
-from collections.abc import Generator, Callable
 from typing import TypeVar, Union
 
 if sys.version_info >= (3, 11):
@@ -15,30 +15,29 @@ else:
     from typing_extensions import Self
 
 if sys.version_info >= (3, 10):
-    from typing import ParamSpec, Concatenate
+    from typing import Concatenate, ParamSpec
 else:
-    from typing_extensions import ParamSpec, Concatenate
+    from typing_extensions import Concatenate, ParamSpec
 
 import gevent
 import requests
+from data_export import DataExporter
+from Database import (
+    Heat,
+    HeatNode,
+    Pilot,
+    Profiles,
+    RaceClass,
+    SavedRaceMeta,
+)
+from eventmanager import Evt
+from RHAPI import RHAPI
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from typing_extensions import override
 
-from eventmanager import Evt
-from RHAPI import RHAPI
-from data_export import DataExporter
-from Database import (
-    Pilot,
-    RaceClass,
-    Heat,
-    HeatNode,
-    Profiles,
-    SavedRaceMeta,
-)
-
-from .enums import RequestAction
 from .abstracts import _APIManager
+from .enums import RequestAction
 
 logger = logging.getLogger(__name__)
 """Module logger"""
@@ -191,7 +190,7 @@ class FPVScoresAPI(_APIManager):
         yield from self.generate_fpvsconditions()
 
     def _check_listener_conditions(  # type: ignore
-        func: Callable[Concatenate[Self, P], R]
+        func: Callable[Concatenate[Self, P], R],
     ) -> Callable[Concatenate[Self, P], R]:
         """
         Decorator to run a series of checks before running event callback
@@ -597,7 +596,7 @@ class FPVScoresAPI(_APIManager):
         url = f"{BASE_API_URL}/rh/{FPVS_API_VERSION}/?action=full_manual_import"
 
         greenlet = gevent.spawn(
-            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS, 120
+            self._request, RequestAction.POST, url, payload, LEGACY_HEADERS, 600
         )
         self._process_response(greenlet)
 

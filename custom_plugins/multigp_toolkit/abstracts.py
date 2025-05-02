@@ -2,16 +2,14 @@
 Data manager abstraction
 """
 
-import time
 import logging
+import time
 from typing import TypeVar, Union
 
 import requests
-
 from RHAPI import RHAPI
 
 from .enums import RequestAction
-
 
 logger = logging.getLogger(__name__)
 """Module logger"""
@@ -56,7 +54,7 @@ class _APIManager:
         timeout: int = 5,
     ) -> requests.Response:
         """
-        Make a request to the MultiGP API
+        Make a request to the class's API
 
         :param url: URL endpoint for the request
         :param json_request: JSON payload as a string

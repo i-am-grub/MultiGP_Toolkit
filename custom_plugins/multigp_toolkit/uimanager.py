@@ -336,14 +336,36 @@ class UImanager:
         :param show: Shows the Global Qualifier export menu if `True`, hides the menu if
         set to `False`, defaults to True
         """
+        fpv_scores_auto_text = self._rhapi.language.__("FPVScores Auto Sync")
+
         if show:
             self._rhapi.ui.register_panel(
                 "gqresults_controls", "MultiGP Results Controls", "format", order=0
             )
+
+            fpv_scores_auto = UIField(
+                "fpvscores_autoupload_mgp",
+                fpv_scores_auto_text,
+                desc="Enable or disable automatic syncing. A network connection is required.",
+                value=False,
+                field_type=UIFieldType.CHECKBOX,
+                private=False,
+            )
+            self._rhapi.fields.register_option(fpv_scores_auto, "gqresults_controls")
         else:
             self._rhapi.ui.register_panel(
                 "gqresults_controls", "MultiGP Results Controls", "", order=0
             )
+
+            fpv_scores_auto = UIField(
+                "fpvscores_autoupload_mgp",
+                fpv_scores_auto_text,
+                desc="Enable or disable automatic syncing. A network connection is required.",
+                value=False,
+                field_type=UIFieldType.CHECKBOX,
+                private=not standard_plugin_not_installed(),
+            )
+            self._rhapi.fields.register_option(fpv_scores_auto, "results_controls")
 
     def mgp_event_selector(self, args: Union[dict, None] = None):
         """
@@ -354,11 +376,12 @@ class UImanager:
         mgp_races = self._multigp.pull_races()
         race_list = [UIFieldSelectOption(value=None, label="")]
 
-        for race_id, name in mgp_races.items():
-            race_selection = UIFieldSelectOption(
-                value=race_id, label=f"({race_id}) {name}"
-            )
-            race_list.append(race_selection)
+        if mgp_races is not None:
+            for race_id, name in mgp_races.items():
+                race_selection = UIFieldSelectOption(
+                    value=race_id, label=f"({race_id}) {name}"
+                )
+                race_list.append(race_selection)
 
         race_selector = UIField(
             "sel_mgp_race_id",
@@ -452,7 +475,8 @@ class UImanager:
                 class_info: RaceClass = self._rhapi.db.raceclass_by_id(race.class_id)
                 heat_info: Heat = self._rhapi.db.heat_by_id(race.heat_id)
                 race_info = UIFieldSelectOption(
-                    value=race.id, label=f"{class_info.display_name} - {heat_info.display_name}"
+                    value=race.id,
+                    label=f"{class_info.display_name} - {heat_info.display_name}",
                 )
                 race_list.append(race_info)
 
@@ -521,7 +545,9 @@ class UImanager:
                 )
                 if zq_state == MGPMode.ZIPPYQ:
                     result_class_list.append(
-                        UIFieldSelectOption(value=rh_class.id, label=rh_class.display_name)
+                        UIFieldSelectOption(
+                            value=rh_class.id, label=rh_class.display_name
+                        )
                     )
 
             zq_class_select = UIField(

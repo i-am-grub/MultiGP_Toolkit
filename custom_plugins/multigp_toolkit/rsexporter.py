@@ -2,22 +2,22 @@
 Import Data from RaceSync
 """
 
-import sys
 import json
 import logging
-from typing import TypeVar, Union
+import sys
 from collections.abc import Generator, Iterable
+from typing import Any, TypeVar, Union
 
 import gevent
+import gevent.lock
 import gevent.pool
-
+from Database import Heat, Pilot, RaceClass, SavedRaceMeta
 from RHAPI import RHAPI
-from Database import Pilot, Heat, RaceClass, SavedRaceMeta
 
-from .enums import MGPMode
 from .abstracts import _RaceSyncDataManager
-from .multigpapi import MultiGPAPI
+from .enums import MGPMode
 from .fpvscoresapi import FPVScoresAPI
+from .multigpapi import MultiGPAPI
 
 try:
     if sys.version_info.minor == 13:
@@ -71,6 +71,8 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """A stored instace of the SystemVerification module"""
         self._fpvscores = FPVScoresAPI(rhapi)
         """An instance of FPVScoresAPI"""
+        self.active_sync = gevent.lock.BoundedSemaphore()
+        """Variable for checking if a results sync is active"""
 
     def generate_formated_race_data(
         self,
@@ -104,7 +106,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
             slot_num = race_pilots[pilot_id] + 1
 
-            race_data = {}
+            race_data: dict[str, Any] = {}
 
             mgp_pilot_id = self.get_mgp_pilot_id(pilot_id)
             if mgp_pilot_id:
@@ -328,7 +330,10 @@ class RaceSyncExporter(_RaceSyncDataManager):
             )
 
     def raceclass_slot_score(
-        self, selected_mgp_race: int, selected_rh_class: int, event_url: str
+        self,
+        selected_mgp_race: int,
+        selected_rh_class: int,
+        event_url: Union[str, None],
     ):
         """
         Pushes race results for a selected RotorHazard class to a specific
@@ -397,7 +402,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
         return rankings
 
     def push_bracketed_rankings(
-        self, selected_mgp_race: int, selected_rh_class: int
+        self, selected_mgp_race: str, selected_rh_class: int
     ) -> bool:
         """
         Pushes the overall rankings of the selected RotorHazard race class
@@ -515,7 +520,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
         return True
 
-    def _run_fpvscores_sync(self, gq_active: bool) -> tuple[bool, str]:
+    def _run_fpvscores_sync(self, gq_active: bool) -> tuple[bool, Union[str, None]]:
         """
         Manage the data push to FPVScores
 
@@ -542,7 +547,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
         return True, event_url
 
-    def zippyq_slot_score(self, args: Union[dict, None] = None) -> None:
+    def zippyq_slot_score(self, args: dict[str, int]) -> None:
         """
         Push results of a saved ZippyQ race to MultiGP
 
@@ -588,7 +593,23 @@ class RaceSyncExporter(_RaceSyncDataManager):
             message = "ZippyQ data successfully pushed to MultiGP."
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-    def manual_push_results(self, _args: Union[dict, None] = None) -> None:
+    def manual_push_results(self, args: Union[dict, None] = None) -> None:
+        """
+        Wrapper for _manual_push_results. Prevents multiple pushes from being active
+        at once
+
+        :param _args: Callback args, defaults to None
+        """
+
+        if self.active_sync.locked():
+            message = "Already working on pushing results. Please wait..."
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            return
+
+        with self.active_sync:
+            self._manual_push_results(args)
+
+    def _manual_push_results(self, _args: Union[dict, None] = None) -> None:
         """
         Pushes the results of a RotorHazard class to MultiGP
 
