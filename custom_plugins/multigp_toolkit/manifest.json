@@ -7,7 +7,7 @@
     "documentation_uri": "https://multigp-toolkit.readthedocs.io/",
     "license" : "MIT",
     "license_uri" : "https://github.com/i-am-grub/MultiGP_Toolkit/blob/master/LICENSE",
-    "version" : "3.2.2",
+    "version" : "3.3.0",
     "required_rhapi_version" : "1.2",
     "category": ["Race Management"],
     "zip_filename": "multigp_toolkit.zip"
