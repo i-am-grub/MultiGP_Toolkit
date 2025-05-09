@@ -23,6 +23,7 @@ from Database import (
 from eventmanager import Evt
 from RHAPI import RHAPI
 from RHRace import Crossing
+from RHUI import UIField, UIFieldType
 
 from .enums import DefaultMGPFormats, MGPMode
 from .fpvscoresapi import register_handlers
@@ -114,7 +115,38 @@ class RaceSyncCoordinator:
 
         :param _args: Args passed to the callback function, defaults to None
         """
+        self.register_aux_plugin_attrs()
         self.verify_creds()
+
+    def register_aux_plugin_attrs(self):
+        """
+        Registers attributes used by other plugins. These attributes are only
+        visible if the associated plugin is installed
+        """
+
+        hide_pilot_photos = hide_velocidrone = True
+
+        for mod in sys.modules:
+            if mod.startswith("plugins.rh_pilot_photos"):
+                hide_pilot_photos = False
+            elif mod.startswith("plugins.velocidrone_controls"):
+                hide_velocidrone = False
+
+        pilot_photo_url = UIField(
+            name="PilotDetailPhotoURL",
+            label="Pilot Photo URL",
+            field_type=UIFieldType.TEXT,
+            private=hide_pilot_photos,
+        )
+        self._rhapi.fields.register_pilot_attribute(pilot_photo_url)
+
+        velo_uid = UIField(
+            name="velo_uid",
+            label="Velocidrone UID",
+            field_type=UIFieldType.TEXT,
+            private=hide_velocidrone,
+        )
+        self._rhapi.fields.register_pilot_attribute(velo_uid)
 
     def reset_event_metadata(self, _args: Union[dict, None] = None):
         """
@@ -127,6 +159,8 @@ class RaceSyncCoordinator:
         self._rhapi.db.option_set("fpvscores_autoupload_mgp", "0")
         self._rhapi.db.option_set("event_uuid_toolkit", "")
         self._rhapi.db.option_set("mgp_race_id", "")
+        self._rhapi.db.option_set("auto_zippy", "0")
+        self._rhapi.db.option_set("active_import", "0")
         self._rhapi.db.option_set("zippyq_races", 0)
         self._rhapi.db.option_set("global_qualifer_event", "0")
         self._ui.clear_multi_class_selector()
@@ -307,7 +341,9 @@ class RaceSyncCoordinator:
         :return: The dowloaded data
         """
 
-        race_data: dict[str, Any] | None = self._multigp.pull_race_data(selected_race)
+        race_data: Union[dict[str, Any], None] = self._multigp.pull_race_data(
+            selected_race
+        )
 
         if race_data is None:
             raise RuntimeError("Race data not provided from MultiGP")
@@ -433,6 +469,7 @@ class RaceSyncCoordinator:
         """
         race_id = self._rhapi.db.option("zq_race_select")
         pilot_id = self._rhapi.db.option("zq_pilot_select")
+        pilot_info: Pilot = self._rhapi.db.pilot_by_id(pilot_id)
 
         if not race_id or not pilot_id:
             return
@@ -455,6 +492,9 @@ class RaceSyncCoordinator:
             )
 
         self._ui.zq_pilot_selector(args={"option": "zq_race_select"})
+
+        message = f"Pack returned to {pilot_info.display_callsign}"
+        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
     def _race_pilots_checks(self, heat_id: int, gq_active: bool) -> bool:
         """
@@ -507,11 +547,6 @@ class RaceSyncCoordinator:
 
         heat_id = heat_info.id
 
-        if self._rhapi.db.heat_max_round(heat_id) > 0:
-            message = "ZippyQ: Round cannot be repeated"
-            self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-            return False
-
         heat: Heat
         for heat in reversed(self._rhapi.db.heats_by_class(heat_info.class_id)):
 
@@ -560,6 +595,15 @@ class RaceSyncCoordinator:
             yield self._race_code_integrity_check()
 
         yield self._race_pilots_checks(heat_info.id, gq_active)
+
+        if (
+            self._rhapi.db.raceclass_attribute_value(heat_info.class_id, "mgp_mode")
+            != MGPMode.PREDEFINED_HEATS
+        ):
+            if self._rhapi.db.heat_max_round(heat_info.id) > 0:
+                message = "MultiGP Race Type: Round cannot be repeated"
+                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                yield False
 
         if (
             self._rhapi.db.raceclass_attribute_value(heat_info.class_id, "mgp_mode")

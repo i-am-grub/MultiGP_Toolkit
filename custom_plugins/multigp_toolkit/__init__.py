@@ -4,11 +4,11 @@ MultiGP Toolkit: RaceSync Connector for RotorHazard
 
 import logging
 
-from RHUI import UIField, UIFieldType, UIFieldSelectOption
 from RHAPI import RHAPI
+from RHUI import UIField, UIFieldSelectOption, UIFieldType
 
-from .rhcoordinator import RaceSyncCoordinator
 from .enums import MGPMode
+from .rhcoordinator import RaceSyncCoordinator
 
 logger = logging.getLogger(__name__)
 
@@ -42,14 +42,6 @@ def register_pilot_attributes(rhapi: RHAPI) -> None:
     )
     rhapi.fields.register_pilot_attribute(mgp_pilot_id)
 
-    pilot_photo_url = UIField(
-        name="PilotDetailPhotoURL",
-        label="Pilot Photo URL",
-        field_type=UIFieldType.TEXT,
-        private=True,
-    )
-    rhapi.fields.register_pilot_attribute(pilot_photo_url)
-
 
 def register_raceclass_attributes(rhapi: RHAPI) -> None:
     """
@@ -72,7 +64,7 @@ def register_raceclass_attributes(rhapi: RHAPI) -> None:
 
     mgp_mode = UIField(
         name="mgp_mode",
-        label="MultiGP Race Format",
+        label="MultiGP Race Type",
         field_type=UIFieldType.SELECT,
         options=mode_options,
         value=0,
@@ -95,6 +87,14 @@ def register_heat_attributes(rhapi: RHAPI) -> None:
     heat_profile_id = UIField(
         name="heat_profile_id",
         label="Heat Profile",
+        field_type=UIFieldType.BASIC_INT,
+        private=True,
+    )
+    rhapi.fields.register_raceformat_attribute(heat_profile_id)
+
+    heat_profile_id = UIField(
+        name="zippyq_round_num",
+        label="ZippyQ round Number",
         field_type=UIFieldType.BASIC_INT,
         private=True,
     )

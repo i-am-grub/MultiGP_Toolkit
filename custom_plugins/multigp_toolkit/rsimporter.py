@@ -2,26 +2,26 @@
 Import Data from RaceSync
 """
 
-import sys
 import json
 import logging
-from typing import TypeVar, Union
+import sys
 from collections.abc import Generator
+from typing import TypeVar, Union
 
-from RHAPI import RHAPI
 from Database import (
-    Pilot,
     Heat,
+    HeatAdvanceType,
     HeatNode,
+    Pilot,
+    Profiles,
     RaceClass,
     RaceFormat,
-    Profiles,
     SavedRaceMeta,
-    HeatAdvanceType,
 )
+from gevent.lock import BoundedSemaphore
+from RHAPI import RHAPI
 
-from .enums import MGPMode, MGPFormat, DefaultMGPFormats
-from .abstracts import _RaceSyncDataManager
+from .enums import DefaultMGPFormats, MGPFormat, MGPMode
 from .multigpapi import MultiGPAPI
 
 try:
@@ -54,7 +54,7 @@ logger = logging.getLogger(__name__)
 """Logger for the module"""
 
 
-class RaceSyncImporter(_RaceSyncDataManager):
+class RaceSyncImporter:
     """Actions for importing data from RaceSync"""
 
     def __init__(
@@ -70,39 +70,62 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :param multigp: An instance of the MultiGPAPI
         :param verification: An instace of the SystemVerification module
         """
-        super().__init__(rhapi)
-
+        self._rhapi = rhapi
+        """A stored instace of the RHAPI module"""
         self._multigp = multigp
         """A stored instace of the MultiGPAPI module"""
         self._verification = verification
         """A stored instace of the SystemVerification module"""
+        self._zippq_lock = BoundedSemaphore()
+        """Lock for ensuring zippyq pulls"""
 
-    def pilot_search(self, db_pilots: list[Pilot], mgp_pilot: dict[str, T]) -> int:
+    def pilot_search(
+        self, mgp_pilot: dict[str, T], *, update_attrs: bool = False
+    ) -> int:
         """
         Attempt to match a MultiGP pilot with a RH pilot from a provided list.
         Create a new pilot if a match is not found.
 
         :param db_pilots: The list of RH pilots to use for matching
         :param mgp_pilot: The MultiGP pilot to attempt to match
+        :param update_attrs: Update the pilot attributes even when seaching for pilot
         :return: The id of the RH pilot that was either matched or created
         """
-        for db_pilot in db_pilots:
-            if mgp_pilot["pilotId"] == self.get_mgp_pilot_id(int(db_pilot.id)):
-                break
+        if ids := self._rhapi.db.pilot_ids_by_attribute(
+            "mgp_pilot_id", mgp_pilot["pilotId"]
+        ):
+            pilot_id = ids[0]
+
+            if not update_attrs:
+                return pilot_id
 
         else:
             mgp_pilot_name = f'{mgp_pilot["firstName"]} {mgp_pilot["lastName"]}'
             db_pilot: Pilot = self._rhapi.db.pilot_add(
                 name=mgp_pilot_name, callsign=mgp_pilot["userName"]
             )
-            attrs = {
-                "mgp_pilot_id": mgp_pilot["pilotId"],
-                "PilotDetailPhotoURL": mgp_pilot["profilePictureUrl"],
-            }
 
-            self._rhapi.db.pilot_alter(db_pilot.id, attributes=attrs)
+            pilot_id = db_pilot.id
 
-        return int(db_pilot.id)
+        attrs = {"mgp_pilot_id": mgp_pilot["pilotId"]}
+
+        if "profilePictureUrl" in mgp_pilot:
+            attrs.update(
+                {
+                    "PilotDetailPhotoURL": mgp_pilot["profilePictureUrl"],
+                }
+            )
+
+        if "velocidroneUid" in mgp_pilot:
+            attrs.update(
+                {
+                    "velo_uid": mgp_pilot["velocidroneUid"],
+                }
+            )
+
+        self._rhapi.db.pilot_alter(pilot_id, attributes=attrs)
+
+        return int(pilot_id)
 
     def _generate_gq_format_checks(
         self, race_format: RaceFormat, mgp_format: MGPFormat
@@ -199,11 +222,15 @@ class RaceSyncImporter(_RaceSyncDataManager):
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return
 
-        db_pilots = self._rhapi.db.pilots
         race_data = self._multigp.pull_race_data(selected_race)
 
+        if race_data is None:
+            message = "Bad race data"
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            return
+
         for mgp_pilot in race_data["entries"]:
-            self.pilot_search(db_pilots, mgp_pilot)
+            self.pilot_search(mgp_pilot, update_attrs=True)
 
         self._rhapi.ui.broadcast_pilots()
         message = "Pilots imported"
@@ -292,7 +319,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :return: The last heat generated from the schedule
         """
 
-        db_pilots = self._rhapi.db.pilots
         slot_list = []
 
         for hindex, heat in enumerate(heat_data):
@@ -308,7 +334,7 @@ class RaceSyncImporter(_RaceSyncDataManager):
             for pindex, mgp_pilot in enumerate(heat["entries"]):
                 count += 1
                 if "pilotId" in mgp_pilot:
-                    db_pilot_id = self.pilot_search(db_pilots, mgp_pilot)
+                    db_pilot_id = self.pilot_search(mgp_pilot)
                     slot_list.append(
                         {"slot_id": rh_slots[pindex].id, "pilot": db_pilot_id}
                     )
@@ -404,7 +430,6 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :param selected_race: The id of the MultiGP race
         :param race_data: The imported race data
         """
-
         if (format_data := self._generate_race_format(race_data)) is None:
             message = "Unrecognized MultiGP Format. Stopping Import"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
@@ -412,6 +437,9 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         format_id, mgp_format = format_data
         rh_race_name = str(race_data["name"])
+
+        for mgp_pilot in race_data["entries"]:
+            self.pilot_search(mgp_pilot, update_attrs=True)
 
         if (
             race_data["disableSlotAutoPopulation"] == "0"
@@ -480,18 +508,39 @@ class RaceSyncImporter(_RaceSyncDataManager):
         :return: The import ZippyQ round as a Heat or None if failed
         to import.
         """
-        data: Union[dict[str, list], None] = self._multigp.pull_additional_rounds(
-            selected_race, round_num
-        )
-        if data is None:
-            message = "No data found when attempting to import ZippyQ round"
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-            return None
 
-        try:
-            heat_name = data["rounds"][0]["name"]
-        except IndexError:
-            message = "Additional ZippyQ rounds not found"
+        entries_found = False
+        data: Union[dict[str, list]]
+
+        for index in range(5):
+
+            data_: Union[dict[str, list], None] = self._multigp.pull_additional_rounds(
+                selected_race, round_num + index
+            )
+
+            if data_ is None:
+                message = "No data found when attempting to import ZippyQ round"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+                return None
+
+            if not data_["rounds"]:
+                message = "Additional ZippyQ rounds not found"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+                return None
+
+            if slots := data_["rounds"][0]["heats"][0]["entries"]:
+                for slot in slots:
+                    if "pilotId" in slot:
+                        entries_found = True
+                        data = data_
+                        break
+
+            if entries_found:
+                round_num = round_num + index
+                break
+
+        else:
+            message = "Stopping ZippyQ round search"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return None
 
@@ -499,7 +548,13 @@ class RaceSyncImporter(_RaceSyncDataManager):
             return None
 
         heat_data = self._setup_raceclass_heats(
-            raceclass_id, data["rounds"][0]["heats"], heat_name
+            raceclass_id, data["rounds"][0]["heats"], data["rounds"][0]["name"]
+        )
+
+        attrs = {"zippyq_round_num": round_num}
+        translation = self._rhapi.language.__("Round")
+        self._rhapi.db.heat_alter(
+            heat_data.id, name=f"{translation} {round_num}", attributes=attrs
         )
 
         self._rhapi.ui.broadcast_pilots()
@@ -515,35 +570,50 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         :param _args: Args passed from the event call, defaults to {}
         """
-
-        class_id = self._rhapi.db.option("zq_class_select")
-
-        if not class_id:
-            message = "ZippyQ class not found"
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-            return
-
-        selected_race = self._rhapi.db.raceclass_attribute_value(
-            class_id, "mgp_raceclass_id"
-        )
-
-        class_races = self._rhapi.db.races_by_raceclass(class_id)
-        races_length = len(class_races)
-
-        class_heats = self._rhapi.db.heats_by_class(class_id)
-        heats_length = len(class_heats)
-
-        if races_length != heats_length:
-            message = "ZippyQ: Complete all races before importing next round"
+        if self._zippq_lock.locked():
+            message = "ZippyQ: Import already in progress"
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
             return
 
-        heat_data = self.zippyq(class_id, selected_race, races_length + 1)
-        if heat_data is None:
-            return
+        with self._zippq_lock:
 
-        if self._rhapi.db.option("active_import") == "1":
-            self._rhapi.race.heat = heat_data.id
+            class_id = self._rhapi.db.option("zq_class_select")
+
+            if not class_id:
+                message = "ZippyQ class not found"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+                return
+
+            selected_race = self._rhapi.db.raceclass_attribute_value(
+                class_id, "mgp_raceclass_id"
+            )
+
+            class_races = self._rhapi.db.races_by_raceclass(class_id)
+            races_length = len(class_races)
+
+            class_heats: list[Heat] = self._rhapi.db.heats_by_class(class_id)
+            heats_length = len(class_heats)
+
+            if races_length != heats_length:
+                message = "ZippyQ: Complete all races before importing next round"
+                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                return
+
+            if class_heats:
+                last_round_num = int(
+                    self._rhapi.db.heat_attribute_value(
+                        class_heats[-1].id, "zippyq_round_num"
+                    )
+                )
+            else:
+                last_round_num = 0
+
+            heat_data = self.zippyq(class_id, selected_race, last_round_num + 1)
+            if heat_data is None:
+                return
+
+            if self._rhapi.db.option("active_import") == "1":
+                self._rhapi.race.heat = heat_data.id
 
     def auto_zippyq(self, args: dict) -> None:
         """
@@ -552,28 +622,39 @@ class RaceSyncImporter(_RaceSyncDataManager):
 
         :param args: Args passed from the event call, defaults to {}
         """
-        race_info: SavedRaceMeta = self._rhapi.db.race_by_id(args["race_id"])
-        class_id = int(race_info.class_id)
-
-        if (
-            self._rhapi.db.raceclass_attribute_value(class_id, "mgp_mode")
-            != MGPMode.ZIPPYQ
-            or self._rhapi.db.option("auto_zippy") != "1"
-        ):
+        if self._zippq_lock.locked():
             return
 
-        message = "Automatically downloading next ZippyQ round..."
-        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+        with self._zippq_lock:
 
-        next_round = len(self._rhapi.db.heats_by_class(class_id)) + 1
+            race_info: SavedRaceMeta = self._rhapi.db.race_by_id(args["race_id"])
+            class_id = int(race_info.class_id)
 
-        selected_race = self._rhapi.db.raceclass_attribute_value(
-            class_id, "mgp_raceclass_id"
-        )
+            if (
+                self._rhapi.db.raceclass_attribute_value(class_id, "mgp_mode")
+                != MGPMode.ZIPPYQ
+                or self._rhapi.db.option("auto_zippy") != "1"
+            ):
+                return
 
-        heat_data = self.zippyq(class_id, selected_race, next_round)
-        if heat_data is None:
-            return
+            message = "Automatically downloading next ZippyQ round..."
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-        if self._rhapi.db.option("active_import") == "1":
-            self._rhapi.race.heat = heat_data.id
+            class_heats = self._rhapi.db.heats_by_class(class_id)
+
+            last_round_num = int(
+                self._rhapi.db.heat_attribute_value(
+                    class_heats[-1].id, "zippyq_round_num"
+                )
+            )
+
+            selected_race = self._rhapi.db.raceclass_attribute_value(
+                class_id, "mgp_raceclass_id"
+            )
+
+            heat_data = self.zippyq(class_id, selected_race, last_round_num + 1)
+            if heat_data is None:
+                return
+
+            if self._rhapi.db.option("active_import") == "1":
+                self._rhapi.race.heat = heat_data.id

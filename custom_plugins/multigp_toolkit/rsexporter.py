@@ -14,7 +14,6 @@ import gevent.pool
 from Database import Heat, Pilot, RaceClass, SavedRaceMeta
 from RHAPI import RHAPI
 
-from .abstracts import _RaceSyncDataManager
 from .enums import MGPMode
 from .fpvscoresapi import FPVScoresAPI
 from .multigpapi import MultiGPAPI
@@ -47,7 +46,7 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
-class RaceSyncExporter(_RaceSyncDataManager):
+class RaceSyncExporter:
     """Actions for exporting data to RaceSync"""
 
     def __init__(
@@ -63,8 +62,8 @@ class RaceSyncExporter(_RaceSyncDataManager):
         :param multigp: An instance of the MultiGPAPI
         :param verification: An instace of the SystemVerification module
         """
-        super().__init__(rhapi)
-
+        self._rhapi = rhapi
+        """A stored instace of the RHAPI module"""
         self._multigp = multigp
         """A stored instace of the MultiGPAPI module"""
         self._verification = verification
@@ -73,6 +72,19 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """An instance of FPVScoresAPI"""
         self.active_sync = gevent.lock.BoundedSemaphore()
         """Variable for checking if a results sync is active"""
+
+    def get_mgp_pilot_id(self, pilot_id: int) -> Union[str, None]:
+        """
+        Gets the MultiGP id for a pilot
+
+        :param pilot_id: The database id for the pilot
+        :return: The
+        """
+        entry: str = self._rhapi.db.pilot_attribute_value(pilot_id, "mgp_pilot_id")
+        if entry:
+            return entry.strip()
+
+        return None
 
     def generate_formated_race_data(
         self,
@@ -307,6 +319,39 @@ class RaceSyncExporter(_RaceSyncDataManager):
         """
         Parses class data to be compatible with ZippyQ.
 
+        The zippyq round number is read from the heat metadata
+
+        :param selected_mgp_race: The selected MultiGP race
+        :param event_url: The FPVScores event url
+        :param races: The race data
+        :yield: The formated data
+        """
+
+        for race_info in races:
+            round_num = int(
+                self._rhapi.db.heat_attribute_value(
+                    race_info.heat_id, "zippyq_round_num"
+                )
+            )
+
+            if round_num:
+                yield self.generate_formated_race_data(
+                    race_info,
+                    selected_mgp_race,
+                    round_num,
+                    1,
+                    event_url,
+                )
+
+    def _parse_incremental_round_data(
+        self,
+        selected_mgp_race: int,
+        event_url: Union[str, None],
+        races: list[SavedRaceMeta],
+    ) -> Generator[Generator[tuple, None, None], None, None]:
+        """
+        Parses class data to be compatible with brackets or ladders.
+
         Each race increments the round number and
         the heat number is always set to 1.
 
@@ -320,11 +365,11 @@ class RaceSyncExporter(_RaceSyncDataManager):
             return race_info.id
 
         races.sort(key=id_from_race)
-        for index, race_info in enumerate(races):
+        for index, race_info in enumerate(races, start=1):
             yield self.generate_formated_race_data(
                 race_info,
                 selected_mgp_race,
-                index + 1,
+                index,
                 1,
                 event_url,
             )
@@ -349,16 +394,24 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
             raceclass: RaceClass = self._rhapi.db.raceclass_by_id(selected_rh_class)
 
-            if raceclass.round_type == 1:
-                yield from self._parse_heat_group_data(
-                    selected_mgp_race, event_url, races
-                )
-
-            elif (
+            if (
                 self._rhapi.db.raceclass_attribute_value(selected_rh_class, "mgp_mode")
                 == MGPMode.ZIPPYQ
             ):
                 yield from self._parse_zippyq_data(selected_mgp_race, event_url, races)
+
+            elif (
+                self._rhapi.db.raceclass_attribute_value(selected_rh_class, "mgp_mode")
+                == MGPMode.BRACKET
+            ):
+                yield from self._parse_incremental_round_data(
+                    selected_mgp_race, event_url, races
+                )
+
+            elif raceclass.round_type == 1:
+                yield from self._parse_heat_group_data(
+                    selected_mgp_race, event_url, races
+                )
 
             else:
                 yield from self._parse_heat_data(selected_mgp_race, event_url, races)
@@ -531,7 +584,7 @@ class RaceSyncExporter(_RaceSyncDataManager):
 
             if gq_active:
                 self._rhapi.db.option_set("push_fpvs", "1")
-                self.clear_uuid()
+                self._rhapi.db.option_set("event_uuid_toolkit", "")
 
             if not self._fpvscores.sync_ran:
                 self._fpvscores.run_full_sync()
@@ -557,9 +610,14 @@ class RaceSyncExporter(_RaceSyncDataManager):
         race_info: SavedRaceMeta = self._rhapi.db.race_by_id(args["race_id"])
         class_id = race_info.class_id
 
+        round_num = round_num = int(
+            self._rhapi.db.heat_attribute_value(race_info.heat_id, "zippyq_round_num")
+        )
+
         if (
             self._rhapi.db.raceclass_attribute_value(class_id, "mgp_mode")
             != MGPMode.ZIPPYQ
+            or not round_num
         ):
             return
 
@@ -570,7 +628,6 @@ class RaceSyncExporter(_RaceSyncDataManager):
         message = "Automatically uploading ZippyQ data to MultiGP..."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
-        heat_info: Heat = self._rhapi.db.heat_by_id(race_info.heat_id)
         selected_race = self._rhapi.db.raceclass_attribute_value(
             class_id, "mgp_raceclass_id"
         )
@@ -580,7 +637,6 @@ class RaceSyncExporter(_RaceSyncDataManager):
         for heat in self._rhapi.db.heats_by_class(class_id):
             heat_ids.append(heat.id)
 
-        round_num = heat_ids.index(heat_info.id) + 1
         event_url = self._fpvscores.get_event_url()
 
         if self.slot_score(

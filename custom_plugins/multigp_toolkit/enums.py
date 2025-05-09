@@ -2,10 +2,10 @@
 Custom Enums
 """
 
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
 
-from RHRace import WinCondition, StartBehavior
+from RHRace import StartBehavior, WinCondition
 
 
 class RequestAction(str, Enum):
@@ -34,6 +34,8 @@ class MGPMode(str, Enum):
     """Standard type. Formerly known as CONTROLLED mode"""
     ZIPPYQ = "1"
     """MultiGP's custom queueing mode"""
+    BRACKET = "2"
+    """Setting for custom bracket results. Expects 1 round per heat"""
 
 
 @dataclass(frozen=True)
