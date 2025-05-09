@@ -12,12 +12,12 @@
     "MultiGP Toolkit" : {
         "hashes" : [
             "4a6e71775a73b80ade403c3b26379bbf",
-            "bad25bc3fdee7818ef8b04b883b9ce0c"
+            "39b48e211b89e3220317cd01438e6671"
         ],
         "versions" : [
             "3.2.2",
-            "3.3.0"
+            "3.4.0"
         ],
-        "latest" : "3.3.0"
+        "latest" : "3.4.0"
     }
 }
