@@ -584,10 +584,10 @@ class RaceSyncExporter:
 
             if gq_active:
                 self._rhapi.db.option_set("push_fpvs", "1")
-                self._rhapi.db.option_set("event_uuid_toolkit", "")
 
-            if not self._fpvscores.sync_ran:
-                self._fpvscores.run_full_sync()
+            with self._fpvscores.sync_guard:
+                if not self._fpvscores.sync_ran:
+                    self._fpvscores.run_full_sync()
 
             if not self._rhapi.db.option("event_uuid_toolkit"):
                 return False, None

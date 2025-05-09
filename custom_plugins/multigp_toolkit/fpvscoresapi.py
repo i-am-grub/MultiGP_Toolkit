@@ -31,6 +31,7 @@ from Database import (
     SavedRaceMeta,
 )
 from eventmanager import Evt
+from gevent.lock import BoundedSemaphore
 from RHAPI import RHAPI
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -92,6 +93,7 @@ class FPVScoresAPI(_APIManager):
 
         self._rhapi = rhapi
         """A stored instance of RHAPI"""
+        self.sync_guard = BoundedSemaphore()
 
         if standard_plugin_not_installed():
             self._register_listeners()
@@ -165,20 +167,22 @@ class FPVScoresAPI(_APIManager):
         """
         self.sync_ran = False
 
-        yield self.connection_check()
+        with self.sync_guard:
 
-        if self._rhapi.db.option("event_uuid_toolkit"):
-            yield True
-        elif self._linked_org is None:
-            self._linked_org = self.check_linked_org()
+            yield self.connection_check()
 
-            if self._linked_org:
-                self.run_full_sync()
-                self.sync_ran = True
+            if self._rhapi.db.option("event_uuid_toolkit"):
+                yield True
+            elif self._linked_org is None:
+                self._linked_org = self.check_linked_org()
 
-            yield bool(self._rhapi.db.option("event_uuid_toolkit"))
-        else:
-            yield False
+                if self._linked_org:
+                    self.run_full_sync()
+                    self.sync_ran = True
+
+                yield bool(self._rhapi.db.option("event_uuid_toolkit"))
+            else:
+                yield False
 
     def _generate_listener_conditions(self) -> Generator[bool, None, None]:
         """

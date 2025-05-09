@@ -509,40 +509,29 @@ class RaceSyncImporter:
         to import.
         """
 
-        entries_found = False
-        data: Union[dict[str, list]]
+        data: Union[dict[str, list], None] = self._multigp.pull_additional_rounds(
+            selected_race, round_num
+        )
 
-        for index in range(5):
-
-            data_: Union[dict[str, list], None] = self._multigp.pull_additional_rounds(
-                selected_race, round_num + index
-            )
-
-            if data_ is None:
-                message = "No data found when attempting to import ZippyQ round"
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-                return None
-
-            if not data_["rounds"]:
-                message = "Additional ZippyQ rounds not found"
-                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-                return None
-
-            if slots := data_["rounds"][0]["heats"][0]["entries"]:
-                for slot in slots:
-                    if "pilotId" in slot:
-                        entries_found = True
-                        data = data_
-                        break
-
-            if entries_found:
-                round_num = round_num + index
-                break
-
-        else:
-            message = "Stopping ZippyQ round search"
+        if data is None:
+            message = "Data not found when attempting to import ZippyQ round"
             self._rhapi.ui.message_notify(self._rhapi.language.__(message))
             return None
+
+        if not data["rounds"]:
+            message = "Additional ZippyQ rounds not found"
+            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+            return None
+
+        current_round = int(data["rounds"][0]["currentRound"])
+        if current_round != round_num:
+            data = self._multigp.pull_additional_rounds(selected_race, current_round)
+            round_num = current_round
+
+            if data is None:
+                message = "Data not found when attempting to import ZippyQ round"
+                self._rhapi.ui.message_notify(self._rhapi.language.__(message))
+                return None
 
         if not self._run_seat_check(data):
             return None
