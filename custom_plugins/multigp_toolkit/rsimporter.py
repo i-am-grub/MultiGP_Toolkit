@@ -4,7 +4,6 @@ Import Data from RaceSync
 
 import json
 import logging
-import sys
 from collections.abc import Generator
 from typing import TypeVar, Union
 
@@ -24,29 +23,6 @@ from RHAPI import RHAPI
 from .enums import DefaultMGPFormats, MGPFormat, MGPMode
 from .multigpapi import MultiGPAPI
 
-try:
-    if sys.version_info.minor == 13:
-        from .verification.py313 import SystemVerification
-    elif sys.version_info.minor == 12:
-        from .verification.py312 import SystemVerification
-    elif sys.version_info.minor == 11:
-        from .verification.py311 import SystemVerification
-    elif sys.version_info.minor == 10:
-        from .verification.py310 import SystemVerification
-    elif sys.version_info.minor == 9:
-        from .verification.py39 import SystemVerification
-    else:
-        raise ImportError("Unsupported Python version")
-except ImportError as exc:
-    raise ImportError(
-        (
-            "System Verification module not found. "
-            "Follow the installation instructions here: "
-            "https://multigp-toolkit.readthedocs.io"
-            "/stable/usage/install/index.html"
-        )
-    ) from exc
-
 T = TypeVar("T")
 """Generic type variable"""
 
@@ -61,7 +37,6 @@ class RaceSyncImporter:
         self,
         rhapi: RHAPI,
         multigp: MultiGPAPI,
-        verification: SystemVerification,
     ):
         """
         Class initalization
@@ -74,8 +49,6 @@ class RaceSyncImporter:
         """A stored instace of the RHAPI module"""
         self._multigp = multigp
         """A stored instace of the MultiGPAPI module"""
-        self._verification = verification
-        """A stored instace of the SystemVerification module"""
         self._zippq_lock = BoundedSemaphore()
         """Lock for ensuring zippyq pulls"""
 
@@ -540,7 +513,7 @@ class RaceSyncImporter:
             raceclass_id, data["rounds"][0]["heats"], data["rounds"][0]["name"]
         )
 
-        attrs = {"zippyq_round_num": round_num}
+        attrs = {"zippyq_round_num": round_num, "downloaded_zippyq": "1"}
         translation = self._rhapi.language.__("Round")
         self._rhapi.db.heat_alter(
             heat_data.id, name=f"{translation} {round_num}", attributes=attrs
@@ -548,7 +521,7 @@ class RaceSyncImporter:
 
         self._rhapi.ui.broadcast_pilots()
         self._rhapi.ui.broadcast_heats()
-        message = "ZippyQ round imported."
+        message = f"ZippyQ Round {round_num} imported."
         self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
         return heat_data
@@ -578,15 +551,6 @@ class RaceSyncImporter:
             )
 
             class_heats: list[Heat] = self._rhapi.db.heats_by_class(class_id)
-            if class_heats:
-                last_heat = class_heats[-1]
-                metas: list[SavedRaceMeta] = self._rhapi.db.races_by_heat(last_heat.id)
-
-                if not metas:
-                    message = "ZippyQ: Complete all races before importing next round"
-                    self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                    return
-
             if class_heats:
                 last_round_num = int(
                     self._rhapi.db.heat_attribute_value(

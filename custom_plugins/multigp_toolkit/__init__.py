@@ -90,15 +90,25 @@ def register_heat_attributes(rhapi: RHAPI) -> None:
         field_type=UIFieldType.BASIC_INT,
         private=True,
     )
-    rhapi.fields.register_raceformat_attribute(heat_profile_id)
+    rhapi.fields.register_heat_attribute(heat_profile_id)
 
-    heat_profile_id = UIField(
+    zippyq_round_num = UIField(
         name="zippyq_round_num",
         label="ZippyQ round Number",
         field_type=UIFieldType.BASIC_INT,
         private=True,
+        value=0,
     )
-    rhapi.fields.register_raceformat_attribute(heat_profile_id)
+    rhapi.fields.register_heat_attribute(zippyq_round_num)
+
+    downloaded_zippyq = UIField(
+        name="downloaded_zippyq",
+        label="Downloaded ZippyQ Round",
+        field_type=UIFieldType.CHECKBOX,
+        private=True,
+        value="0",
+    )
+    rhapi.fields.register_heat_attribute(downloaded_zippyq)
 
 
 def register_format_attributes(rhapi: RHAPI) -> None:

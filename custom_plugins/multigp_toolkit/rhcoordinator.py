@@ -77,9 +77,7 @@ class RaceSyncCoordinator:
         """Instance of the MultiGP API manager"""
         self._ui = UImanager(rhapi, self._multigp)
         """Instance of the toolkit user interface manager"""
-        self._importer = RaceSyncImporter(
-            self._rhapi, self._multigp, self._system_verification
-        )
+        self._importer = RaceSyncImporter(self._rhapi, self._multigp)
         """Instance of the RaceSync importer"""
         self._exporter = RaceSyncExporter(
             self._rhapi, self._multigp, self._system_verification
@@ -108,6 +106,13 @@ class RaceSyncCoordinator:
             Evt.RACE_LAP_RECORDED, self.verify_gq_lap, name="verify_gq_lap"
         )
         self._rhapi.events.on(Evt.DATA_EXPORT_INITIALIZE, register_handlers)
+
+        self._rhapi.events.on(
+            Evt.HEAT_ADD, self.assign_zippyq_round, name="assign_zippyq_round_add"
+        )
+        self._rhapi.events.on(
+            Evt.HEAT_DUPLICATE, self.assign_zippyq_round, name="assign_zippyq_round_dup"
+        )
 
     def startup(self, _args: Union[dict, None] = None):
         """
@@ -199,9 +204,13 @@ class RaceSyncCoordinator:
 
         race_pilots = {}
 
-        gq_class = self._rhapi.db.raceclass_attribute_value(
-            class_info.id, "gq_class", "0"
-        )
+        if class_info is not None:
+            gq_class = self._rhapi.db.raceclass_attribute_value(
+                class_info.id, "gq_class", "0"
+            )
+        else:
+            gq_class = "0"
+
         if gq_class == "0" and self._rhapi.db.option("global_qualifer_event") == "1":
             message = (
                 "Warning: Saving non-valid Global Qualifer race results. "
@@ -460,6 +469,50 @@ class RaceSyncCoordinator:
 
         if self._verification_checks(race_data):
             self._import_event(selected_race, race_data)
+
+    def assign_zippyq_round(self, args: dict) -> None:
+        """
+        Assignes a zippyq round as a heat attribute
+
+        :param args: Callback args, defaults to None
+        """
+        heat_id: int = args["heat_id"]
+        heat: Heat = self._rhapi.db.heat_by_id(heat_id)
+        heats: list[Heat] = self._rhapi.db.heats_by_class(heat.class_id)
+
+        if self._rhapi.db.heat_attribute_value(heat_id, "downloaded_zippyq") == "1":
+            return
+
+        mode = self._rhapi.db.raceclass_attribute_value(heat.class_id, "mgp_mode")
+
+        for heat_ in reversed(heats):
+            if heat_.id == heat_id:
+                continue
+
+            previous_round = int(
+                self._rhapi.db.heat_attribute_value(heat_.id, "zippyq_round_num")
+            )
+            current_round = previous_round + 1
+            heat_attrs = {"zippyq_round_num": current_round}
+
+            if mode == MGPMode.ZIPPYQ:
+                phrase = self._rhapi.language.__("Round")
+                self._rhapi.db.heat_alter(
+                    heat_id, name=f"{phrase} {current_round}", attributes=heat_attrs
+                )
+            else:
+                self._rhapi.db.heat_alter(heat_id, attributes=heat_attrs)
+
+            break
+        else:
+            heat_attrs = {"zippyq_round_num": 1}
+            if mode == MGPMode.ZIPPYQ:
+                phrase = self._rhapi.language.__("Round")
+                self._rhapi.db.heat_alter(
+                    heat_id, name=f"{phrase} 1", attributes=heat_attrs
+                )
+            else:
+                self._rhapi.db.heat_alter(heat_id, attributes=heat_attrs)
 
     def return_pack(self, _args: Union[dict, None] = None) -> None:
         """
