@@ -577,16 +577,15 @@ class RaceSyncImporter:
                 class_id, "mgp_raceclass_id"
             )
 
-            class_races = self._rhapi.db.races_by_raceclass(class_id)
-            races_length = len(class_races)
-
             class_heats: list[Heat] = self._rhapi.db.heats_by_class(class_id)
-            heats_length = len(class_heats)
+            if class_heats:
+                last_heat = class_heats[-1]
+                metas: list[SavedRaceMeta] = self._rhapi.db.races_by_heat(last_heat.id)
 
-            if races_length != heats_length:
-                message = "ZippyQ: Complete all races before importing next round"
-                self._rhapi.ui.message_alert(self._rhapi.language.__(message))
-                return
+                if not metas:
+                    message = "ZippyQ: Complete all races before importing next round"
+                    self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+                    return
 
             if class_heats:
                 last_round_num = int(
