@@ -53,6 +53,20 @@ D. Set ``MultiGP Race Format`` to ``ZIPPYQ``
     as well as tell the toolkit how to format the results when uploading
     to MultiGP
 
+Bracketed Races
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The recommended settings for running a Bracketed races includes the following:
+
+A. Set ``Round Type`` to ``Count races per heat``
+    - This will allow the system automatically create a new heat under the class
+    without needing to interact with indivitual rounds within the class
+B. Set ``Rounds`` to ``1``
+    - This will prevent the system from trying to repeat a ZippyQ round
+C. Set ``MultiGP Race Format`` to ``BRACKET``
+    - This activates the features of the plugin specifically designed for bracketed
+    results when uploading to MultiGP
+
 Enforced Rules
 -------------------------------------------
 
