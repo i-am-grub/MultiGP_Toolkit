@@ -168,7 +168,6 @@ class FPVScoresAPI(_APIManager):
         self.sync_ran = False
 
         with self.sync_guard:
-
             yield self.connection_check()
 
             if self._rhapi.db.option("event_uuid_toolkit"):
@@ -363,7 +362,6 @@ class FPVScoresAPI(_APIManager):
 
         slots: list[HeatNode] = self._rhapi.db.slots_by_heat(heat.id)
         for slot in slots:
-
             if slot.node_index is None:
                 continue
 
@@ -454,7 +452,6 @@ class FPVScoresAPI(_APIManager):
 
         rank: dict
         for rank in rankings["ranking"]:
-
             rank_values = rank.copy()
             if "total_time_laps" in rank_values:
                 del rank_values["total_time_laps"]
@@ -752,7 +749,6 @@ class AlchemyEncoder(json.JSONEncoder):
 
     @override
     def default(self, o: object):
-
         custom_vars = (
             "node_frequency_band",
             "node_frequency_c",
@@ -762,12 +758,10 @@ class AlchemyEncoder(json.JSONEncoder):
         )
 
         if isinstance(o.__class__, DeclarativeMeta):
-
             mapped_instance = inspect(o)
             fields = {}
 
             for field in dir(o):
-
                 if field in [*mapped_instance.attrs.keys(), *custom_vars]:
                     data = o.__getattribute__(field)
 

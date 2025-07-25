@@ -40,6 +40,10 @@ except ImportError as exc:
             "/stable/usage/install/index.html"
         )
     ) from exc
+except ValueError as exc:
+    raise ImportError(
+        "Issue when importing modules. Try reinstalling this plugin."
+    ) from exc
 
 T = TypeVar("T")
 
@@ -109,7 +113,6 @@ class RaceSyncExporter:
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
 
         for pilot_id in race_pilots:
-
             for result in results:
                 if result["pilot_id"] == int(pilot_id):
                     break
@@ -134,7 +137,6 @@ class RaceSyncExporter:
                 continue
 
             if result is not None:
-
                 if "points" in result:
                     race_data["score"] = result["points"]
 
@@ -391,7 +393,6 @@ class RaceSyncExporter:
         """
 
         def generate_score_data(races: list[SavedRaceMeta]):
-
             raceclass: RaceClass = self._rhapi.db.raceclass_by_id(selected_rh_class)
 
             if (
@@ -439,11 +440,14 @@ class RaceSyncExporter:
         for pilot in data:
             pilot_id = int(pilot["pilot_id"])
 
-            if multigp_id := int(
-                self._rhapi.db.pilot_attribute_value(pilot_id, "mgp_pilot_id")
+            if multigp_id := self._rhapi.db.pilot_attribute_value(
+                pilot_id, "mgp_pilot_id"
             ):
                 class_position = pilot["position"]
-                result_dict = {"orderNumber": class_position, "pilotId": multigp_id}
+                result_dict = {
+                    "orderNumber": class_position,
+                    "pilotId": int(multigp_id),
+                }
                 rankings.append(result_dict)
 
             else:
@@ -482,7 +486,6 @@ class RaceSyncExporter:
             return False
 
         if rankings or (results_list and win_condition):
-
             rankings_ = self._rankings_from_leaderboard_data(data)
 
             if self._multigp.push_overall_race_results(selected_mgp_race, rankings_):
@@ -581,7 +584,6 @@ class RaceSyncExporter:
         :return: The status and event url
         """
         if gq_active or all(self._generate_fpvscores_conditions()):
-
             if gq_active:
                 self._rhapi.db.option_set("push_fpvs", "1")
 

@@ -73,7 +73,7 @@ class RaceSyncImporter:
                 return pilot_id
 
         else:
-            mgp_pilot_name = f'{mgp_pilot["firstName"]} {mgp_pilot["lastName"]}'
+            mgp_pilot_name = f"{mgp_pilot['firstName']} {mgp_pilot['lastName']}"
             db_pilot: Pilot = self._rhapi.db.pilot_add(
                 name=mgp_pilot_name, callsign=mgp_pilot["userName"]
             )
@@ -112,9 +112,10 @@ class RaceSyncImporter:
         """
         yield mgp_format.mgp_gq
         yield race_format.name == mgp_format.format_name
-        yield self._rhapi.db.raceformat_attribute_value(
-            race_format.id, "gq_format"
-        ) == "1"
+        yield (
+            self._rhapi.db.raceformat_attribute_value(race_format.id, "gq_format")
+            == "1"
+        )
 
     def format_search(self, db_formats: list[RaceFormat], mgp_format: MGPFormat) -> int:
         """
@@ -127,7 +128,6 @@ class RaceSyncImporter:
         """
 
         for rh_format in db_formats:
-
             if all(self._generate_gq_format_checks(rh_format, mgp_format)) or (
                 rh_format.name == mgp_format.format_name and not mgp_format.mgp_gq
             ):
@@ -240,7 +240,6 @@ class RaceSyncImporter:
             return None
 
         if race_data["raceType"] == "2":
-
             # Switch from
             mgp_format = DefaultMGPFormats.GLOBAL
             # to
@@ -418,7 +417,6 @@ class RaceSyncImporter:
             race_data["disableSlotAutoPopulation"] == "0"
             and "rounds" in race_data["schedule"]
         ):
-
             if not self._run_seat_check(race_data["schedule"]):
                 return
 
@@ -538,7 +536,6 @@ class RaceSyncImporter:
             return
 
         with self._zippq_lock:
-
             class_id = self._rhapi.db.option("zq_class_select")
 
             if not class_id:
@@ -578,7 +575,6 @@ class RaceSyncImporter:
             return
 
         with self._zippq_lock:
-
             race_info: SavedRaceMeta = self._rhapi.db.race_by_id(args["race_id"])
             class_id = int(race_info.class_id)
 

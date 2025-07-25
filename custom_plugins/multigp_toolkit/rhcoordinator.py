@@ -54,6 +54,10 @@ except ImportError as exc:
             "/stable/usage/install/index.html"
         )
     ) from exc
+except ValueError as exc:
+    raise ImportError(
+        "Issue when importing modules. Try reinstalling this plugin."
+    ) from exc
 
 logger = logging.getLogger(__name__)
 """Module logger"""
@@ -358,7 +362,6 @@ class RaceSyncCoordinator:
             raise RuntimeError("Race data not provided from MultiGP")
 
         if self._rhapi.db.option("auto_logo") == "1":
-
             url: str = race_data["chapterImageFileName"]
             file_name = url.split("/")[-1]
 
@@ -564,7 +567,6 @@ class RaceSyncCoordinator:
         pilot_counter = 0
 
         for slot_info in slots:
-
             if slot_info.pilot_id == 0:
                 continue
 
@@ -602,7 +604,6 @@ class RaceSyncCoordinator:
 
         heat: Heat
         for heat in reversed(self._rhapi.db.heats_by_class(heat_info.class_id)):
-
             if heat.id < heat_id and self._rhapi.db.heat_max_round(heat.id) == 0:
                 check_heat: Heat = self._rhapi.db.heat_by_id(heat.id)
                 message = f"ZippyQ: Complete {check_heat.display_name} before starting {heat_info.display_name}"
@@ -694,9 +695,10 @@ class RaceSyncCoordinator:
         """
         yield raceclass.name == DefaultMGPFormats.GLOBAL.format_name
         yield raceclass.win_condition == ""
-        yield self._rhapi.db.raceformat_attribute_value(
-            raceclass.format_id, "gq_format"
-        ) == "1"
+        yield (
+            self._rhapi.db.raceformat_attribute_value(raceclass.format_id, "gq_format")
+            == "1"
+        )
 
     def verify_class(self, args: dict) -> None:
         """

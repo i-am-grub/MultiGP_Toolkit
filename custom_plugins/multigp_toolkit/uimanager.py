@@ -275,7 +275,6 @@ class UImanager:
         )
 
         if standard_plugin_not_installed():
-
             self._rhapi.fields.register_option(fpv_scores_auto, "results_controls")
 
             fpv_scores_text = self._rhapi.language.__("FPVScores Event UUID")
@@ -419,7 +418,7 @@ class UImanager:
         for index, race in enumerate(event_races):
             results_selector = UIField(
                 f"results_select_{index}",
-                f'Race Data: ({race["mgpid"]}) {race["name"]}',
+                f"Race Data: ({race['mgpid']}) {race['name']}",
                 desc="Class holding the race data to be pushed to MultiGP",
                 field_type=UIFieldType.SELECT,
                 options=result_class_list,
@@ -428,7 +427,7 @@ class UImanager:
 
             ranking_selector = UIField(
                 f"ranks_select_{index}",
-                f'Overall Results: ({race["mgpid"]}) {race["name"]}',
+                f"Overall Results: ({race['mgpid']}) {race['name']}",
                 desc="Class holding the Overall Results to be pushed to MultiGP.",
                 field_type=UIFieldType.SELECT,
                 options=rank_class_list,
