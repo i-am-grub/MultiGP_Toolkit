@@ -401,9 +401,9 @@ class RaceSyncCoordinator:
         """
         if race_data["raceType"] == "2":
             logger.info("Importing GQ race")
-            for key, value in self._system_verification.get_system_status().items():
-                if not value:
-                    message = f"Global Qualifier not imported - {key}"
+            for msg, status in self._system_verification.get_system_status():
+                if not status:
+                    message = f"Global Qualifier not imported - {msg}"
                     self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                     logger.warning(message)
                     return False
@@ -628,6 +628,7 @@ class RaceSyncCoordinator:
                 "is not approved to run Global Qualifier races"
             )
             self._rhapi.ui.message_alert(self._rhapi.language.__(message))
+            logger.warning(message)
             return False
 
         return True
