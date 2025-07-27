@@ -566,10 +566,9 @@ class RaceSyncExporter:
         """
 
         self._rhapi.db.option_set("consecutivesCount", 3)
-        verification_status = self._verification.get_system_status()
-        for key, value in verification_status.items():
-            if not value:
-                message = f"Stopping Results push - {key}"
+        for msg, status in self._verification.get_system_status():
+            if not status:
+                message = f"Stopping Results push - {msg}"
                 self._rhapi.ui.message_notify(self._rhapi.language.__(message))
                 logger.warning(message)
                 return False
