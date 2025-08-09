@@ -417,16 +417,6 @@ class RaceSyncCoordinator:
         :param selected_race: The selected MultiGP event imported from
         :param race_data: The race data for the MultiGP event
         """
-
-        self._rhapi.db.option_set("mgp_race_id", selected_race)
-        self._rhapi.db.option_set("eventName", race_data["name"])
-        self._rhapi.db.option_set("eventDescription", race_data["content"])
-
-        if race_data["raceType"] == "2":
-            self._rhapi.db.option_set("global_qualifer_event", "1")
-        else:
-            self._rhapi.db.option_set("global_qualifer_event", "0")
-
         mgp_event_races = []
 
         if int(race_data["childRaceCount"]) > 0:
@@ -437,6 +427,15 @@ class RaceSyncCoordinator:
         else:
             self._importer.import_class(selected_race, race_data)
             mgp_event_races.append({"mgpid": selected_race, "name": race_data["name"]})
+
+        self._rhapi.db.option_set("mgp_race_id", selected_race)
+        self._rhapi.db.option_set("eventName", race_data["name"])
+        self._rhapi.db.option_set("eventDescription", race_data["content"])
+
+        if race_data["raceType"] == "2":
+            self._rhapi.db.option_set("global_qualifer_event", "1")
+        else:
+            self._rhapi.db.option_set("global_qualifer_event", "0")
 
         self._rhapi.db.option_set("mgp_event_races", json.dumps(mgp_event_races))
 
