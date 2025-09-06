@@ -106,21 +106,21 @@ class RaceSyncExporter:
         :yield: Formated race data
         """
         # pylint: disable=R0913
-
-        race_pilots = json.loads(
-            self._rhapi.db.race_attribute_value(race_info.id, "race_pilots")
-        )
         results = self._rhapi.db.race_results(race_info.id)["by_race_time"]
 
-        for pilot_id in race_pilots:
+        rh_slot: HeatNode
+        for rh_slot in self._rhapi.db.slots_by_heat(race_info.heat_id):
+            pilot_id = rh_slot.pilot_id
+            if not pilot_id:
+                continue
+
             for result in results:
-                if result["pilot_id"] == int(pilot_id):
+                if result["pilot_id"] == pilot_id:
                     break
             else:
                 result = None
 
-            slot_num = race_pilots[pilot_id] + 1
-
+            slot_num = rh_slot.node_index + 1
             race_data: dict[str, Any] = {}
 
             mgp_pilot_id = self.get_mgp_pilot_id(pilot_id)

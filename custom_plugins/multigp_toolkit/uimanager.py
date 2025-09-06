@@ -6,7 +6,7 @@ import json
 from collections.abc import Callable
 from typing import Union
 
-from Database import Heat, Pilot, RaceClass, SavedRaceMeta
+from Database import RaceClass
 from RHAPI import RHAPI
 from RHUI import UIField, UIFieldSelectOption, UIFieldType
 
@@ -47,7 +47,6 @@ class UImanager:
 
             if self._rhapi.db.option("zippyq_races") > 0:
                 self.show_zippyq_controls()
-                self.show_zippyq_return()
 
             if self._rhapi.db.option("global_qualifer_event") == "1":
                 self.show_gq_export_menu()
@@ -58,7 +57,6 @@ class UImanager:
             self.show_race_import_menu()
             self.show_pilot_import_menu(False)
             self.show_zippyq_controls(False)
-            self.show_zippyq_return(False)
             self.show_results_export_menu(False)
             self.show_gq_export_menu(False)
 
@@ -207,38 +205,6 @@ class UImanager:
         else:
             self._rhapi.ui.register_panel(
                 "zippyq_controls", "ZippyQ Controls", "", order=0
-            )
-
-    def create_zippyq_return(self, callback: Callable):
-        """
-        Creates the ZippyQ pack return menu.
-
-        :param callback: The callback to register for the button press
-        """
-        self._rhapi.ui.register_panel(
-            "zippyq_return", "ZippyQ Pack Return", "", order=0
-        )
-        self.zq_race_selector()
-        self.zq_pilot_selector()
-
-        self._rhapi.ui.register_quickbutton(
-            "zippyq_return", "return_pack", "Return Pack", callback
-        )
-
-    def show_zippyq_return(self, show=True):
-        """
-        Either Displays or hides the ZippyQ pack return menu
-
-        :param show: Shows the ZippyQ pack return menu if `True`, hides
-        the menu if set to `False`, defaults to True
-        """
-        if show:
-            self._rhapi.ui.register_panel(
-                "zippyq_return", "ZippyQ Pack Return", "marshal", order=0
-            )
-        else:
-            self._rhapi.ui.register_panel(
-                "zippyq_return", "ZippyQ Pack Return", "", order=0
             )
 
     def create_results_export_menu(self, callback: Callable):
@@ -455,76 +421,6 @@ class UImanager:
                 f"ranks_select_{index}", "", field_type=UIFieldType.SELECT, options=[]
             )
             self._rhapi.fields.register_option(ranking_selector, "")
-
-    def zq_race_selector(self, _args: Union[dict, None] = None):
-        """
-        Generates or updates the selector for choosing a race to remove
-        a ZippyQ pack from
-
-        :param _args: Args provided by the callback, defaults to None
-        """
-        race_list = [UIFieldSelectOption(value=None, label="")]
-
-        race: SavedRaceMeta
-        for race in self._rhapi.db.races:
-            if (
-                self._rhapi.db.raceclass_attribute_value(race.class_id, "mgp_mode")
-                == MGPMode.ZIPPYQ
-            ):
-                class_info: RaceClass = self._rhapi.db.raceclass_by_id(race.class_id)
-                heat_info: Heat = self._rhapi.db.heat_by_id(race.heat_id)
-                race_info = UIFieldSelectOption(
-                    value=race.id,
-                    label=f"{class_info.display_name} - {heat_info.display_name}",
-                )
-                race_list.append(race_info)
-
-        race_selector = UIField(
-            "zq_race_select",
-            "Race Result",
-            field_type=UIFieldType.SELECT,
-            options=race_list,
-        )
-        self._rhapi.db.option_set("zq_race_select", "")
-        self._rhapi.fields.register_option(race_selector, "zippyq_return")
-
-    def zq_pilot_selector(self, args: Union[dict, None] = None):
-        """
-        Generates or updates the selector for choosing a pilot to remove
-        a ZippyQ pack from
-
-        :param args: Callback args, defaults to None
-        """
-
-        if args is not None and args["option"] != "zq_race_select":
-            return
-
-        pilot_list = [UIFieldSelectOption(value=None, label="")]
-
-        if race_id := self._rhapi.db.option("zq_race_select"):
-            for pilot in json.loads(
-                self._rhapi.db.race_attribute_value(race_id, "race_pilots")
-            ):
-                pilot_info: Pilot = self._rhapi.db.pilot_by_id(pilot)
-                pilot_option = UIFieldSelectOption(
-                    value=pilot_info.id, label=pilot_info.callsign
-                )
-                pilot_list.append(pilot_option)
-
-        race_selector = UIField(
-            "zq_pilot_select",
-            "Pilot",
-            desc=(
-                "Prevents the upload of race data for selected Pilot in selected Race. "
-                "NOTE: Local data is NOT deleted in this process"
-            ),
-            field_type=UIFieldType.SELECT,
-            options=pilot_list,
-        )
-        self._rhapi.fields.register_option(race_selector, "zippyq_return")
-
-        if args is not None and args["option"] == "zq_race_select":
-            self._rhapi.ui.broadcast_ui("marshal")
 
     def zq_class_selector(self, _args: Union[dict, None] = None):
         """

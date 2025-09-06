@@ -132,14 +132,6 @@ def register_race_attributes(rhapi: RHAPI) -> None:
 
     :param rhapi: The provided instace of RHAPI
     """
-    result_list = UIField(
-        name="race_pilots",
-        label="Pilot Result List",
-        field_type=UIFieldType.TEXT,
-        value="",
-        private=True,
-    )
-    rhapi.fields.register_race_attribute(result_list)
 
 
 def register_global_options(rhapi: RHAPI) -> None:
