@@ -18,7 +18,6 @@ from Database import (
     Pilot,
     RaceClass,
     RaceFormat,
-    SavedRaceMeta,
 )
 from eventmanager import Evt
 from RHAPI import RHAPI
@@ -102,9 +101,6 @@ class RaceSyncCoordinator:
         )
         self._rhapi.events.on(
             Evt.DATABASE_RECOVER, self._ui.update_panels, name="update_panels"
-        )
-        self._rhapi.events.on(
-            Evt.LAPS_SAVE, self.store_pilot_list, name="store_pilot_list"
         )
         self._rhapi.events.on(
             Evt.RACE_LAP_RECORDED, self.verify_gq_lap, name="verify_gq_lap"
@@ -193,46 +189,6 @@ class RaceSyncCoordinator:
             self._rhapi.race.frequencyset = fprofile_id
             self._rhapi.ui.broadcast_frequencies()
 
-    def store_pilot_list(self, args: Union[dict, None] = None):
-        """
-        Stores a list of pilots that participated in the race as an attribute.
-        This list marks what pilots should have their data pushed. Removing a
-        pilot from this list prevents their data from being pushed (ZippyQ pack
-        return).
-
-        :param args: Callback args, defaults to None
-        """
-        race_info: SavedRaceMeta = self._rhapi.db.race_by_id(args["race_id"])
-        heat_info: Heat = self._rhapi.db.heat_by_id(race_info.heat_id)
-        class_info: RaceClass = self._rhapi.db.raceclass_by_id(race_info.class_id)
-
-        race_pilots = {}
-
-        if class_info is not None:
-            gq_class = self._rhapi.db.raceclass_attribute_value(
-                class_info.id, "gq_class", "0"
-            )
-        else:
-            gq_class = "0"
-
-        if gq_class == "0" and self._rhapi.db.option("global_qualifer_event") == "1":
-            message = (
-                "Warning: Saving non-valid Global Qualifer race results. "
-                "Use the imported class to generate valid results."
-            )
-            self._rhapi.ui.message_notify(self._rhapi.language.__(message))
-        else:
-            slot: HeatNode
-            for slot in self._rhapi.db.slots_by_heat(heat_info.id):
-                if slot.pilot_id == 0:
-                    continue
-
-                race_pilots[slot.pilot_id] = slot.node_index
-
-        self._rhapi.db.race_alter(
-            race_info.id, attributes={"race_pilots": json.dumps(race_pilots)}
-        )
-
     def verify_creds(self) -> None:
         """
         Verify the chaper api key. Sets up the remaining features of the plugin
@@ -314,22 +270,11 @@ class RaceSyncCoordinator:
             name="update_res_selector",
         )
 
-        self._rhapi.events.on(
-            Evt.HEAT_ALTER, self._ui.zq_race_selector, name="zq_race_selector"
-        )
-        self._rhapi.events.on(
-            Evt.LAPS_SAVE, self._ui.zq_race_selector, name="zq_race_selector"
-        )
-        self._rhapi.events.on(
-            Evt.OPTION_SET, self._ui.zq_pilot_selector, name="zq_pilot_selector"
-        )
-
         self._ui.create_race_import_menu(self.setup_event)
         self._ui.create_pilot_import_menu(self._importer.import_pilots)
         self._ui.create_zippyq_controls(self._importer.manual_zippyq)
         self._ui.create_results_export_menu(self._exporter.manual_push_results)
         self._ui.create_gq_export_menu(self._exporter.manual_push_results)
-        self._ui.create_zippyq_return(self.return_pack)
 
         self._ui.update_panels()
 
@@ -417,16 +362,6 @@ class RaceSyncCoordinator:
         :param selected_race: The selected MultiGP event imported from
         :param race_data: The race data for the MultiGP event
         """
-
-        self._rhapi.db.option_set("mgp_race_id", selected_race)
-        self._rhapi.db.option_set("eventName", race_data["name"])
-        self._rhapi.db.option_set("eventDescription", race_data["content"])
-
-        if race_data["raceType"] == "2":
-            self._rhapi.db.option_set("global_qualifer_event", "1")
-        else:
-            self._rhapi.db.option_set("global_qualifer_event", "0")
-
         mgp_event_races = []
 
         if int(race_data["childRaceCount"]) > 0:
@@ -437,6 +372,15 @@ class RaceSyncCoordinator:
         else:
             self._importer.import_class(selected_race, race_data)
             mgp_event_races.append({"mgpid": selected_race, "name": race_data["name"]})
+
+        self._rhapi.db.option_set("mgp_race_id", selected_race)
+        self._rhapi.db.option_set("eventName", race_data["name"])
+        self._rhapi.db.option_set("eventDescription", race_data["content"])
+
+        if race_data["raceType"] == "2":
+            self._rhapi.db.option_set("global_qualifer_event", "1")
+        else:
+            self._rhapi.db.option_set("global_qualifer_event", "0")
 
         self._rhapi.db.option_set("mgp_event_races", json.dumps(mgp_event_races))
 
@@ -516,41 +460,6 @@ class RaceSyncCoordinator:
                 )
             else:
                 self._rhapi.db.heat_alter(heat_id, attributes=heat_attrs)
-
-    def return_pack(self, _args: Union[dict, None] = None) -> None:
-        """
-        Returns a pilots pack for the race.
-
-        :param _args: Callback args, defaults to None
-        """
-        race_id = self._rhapi.db.option("zq_race_select")
-        pilot_id = self._rhapi.db.option("zq_pilot_select")
-        pilot_info: Pilot = self._rhapi.db.pilot_by_id(pilot_id)
-
-        if not race_id or not pilot_id:
-            return
-
-        race: SavedRaceMeta = self._rhapi.db.race_by_id(race_id)
-        slots: list[HeatNode] = self._rhapi.db.slots_by_heat(race.heat_id)
-
-        for slot in slots:
-            if slot.pilot_id == int(pilot_id):
-                self._rhapi.db.slot_alter(slot.id, pilot=0)
-
-        race_pilots = json.loads(
-            self._rhapi.db.race_attribute_value(race_id, "race_pilots")
-        )
-
-        if pilot_id in race_pilots:
-            del race_pilots[pilot_id]
-            self._rhapi.db.race_alter(
-                race_id, attributes={"race_pilots": json.dumps(race_pilots)}
-            )
-
-        self._ui.zq_pilot_selector(args={"option": "zq_race_select"})
-
-        message = f"Pack returned to {pilot_info.display_callsign}"
-        self._rhapi.ui.message_notify(self._rhapi.language.__(message))
 
     def _race_pilots_checks(self, heat_id: int, gq_active: bool) -> bool:
         """
